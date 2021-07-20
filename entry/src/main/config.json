@@ -1,0 +1,76 @@
+{
+  "app": {
+    "bundleName": "com.ohos.photos",
+    "vendor": "ohos",
+    "version": {
+      "code": 1,
+      "name": "1.0"
+    },
+    "apiVersion": {
+      "compatible": 6,
+      "target": 6,
+      "releaseType": "Beta1"
+    }
+  },
+  "deviceConfig": {},
+  "module": {
+    "package": "com.ohos.photos",
+    "name": ".MyApplication",
+    "deviceType": [
+      "phone",
+      "tv"
+    ],
+    "distro": {
+      "deliveryWithInstall": true,
+      "moduleName": "entry",
+      "moduleType": "entry"
+    },
+    "abilities": [
+      {
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          }
+        ],
+        "name": "com.ohos.photos.MainAbility",
+        "icon": "$media:app_icon",
+        "description": "$string:mainability_description",
+        "label": "$string:app_name",
+        "type": "page",
+        "visible": true,
+        "launchType": "standard"
+      }
+    ],
+    "js": [
+      {
+        "pages": [
+          "pages/main/main",
+          "pages/selectalbum/selectalbum",
+          "pages/photolist/photolist",
+          "pages/afterselect/afterselect",
+          "pages/photodetail/photodetail",
+          "pages/videolist/videolist",
+          "pages/selectalbumphoto/selectalbumphoto",
+          "pages/editImage/editImage"
+        ],
+        "name": "default",
+        "window": {
+          "designWidth": 720,
+          "autoDesignWidth": false
+        }
+      }
+    ],
+    "metaData": {
+      "customizeData": [
+        {
+          "name": "hwc-theme"
+        }
+      ]
+    }
+  }
+}
