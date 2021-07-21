@@ -4,7 +4,6 @@
 .idea/*
 .idea/gradle.xml
 .DS_Store
-/build.gradle
 build/outputs/hap/*
 build/outputs/app/release/com.ohos.photos-release-unsigned.app
 build/outputs/app/release/pack.info
