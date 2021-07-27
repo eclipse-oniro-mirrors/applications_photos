@@ -38,7 +38,7 @@
                                    height : {{ item.imageStyle.height }};"
                            on:touchstart="touchstart({{ item }})"
                            on:touchcancel="touchcancel({{ item }})"
-                           on:touchend="touchend({{ item }})"
+                           on:touchend=" touchend({{ item }})"
                            onlongpress="parentLongpress({{ item }},{{ index }})">
                         <image if="{{ item.mediaType == 3 }}" class="shared-transition-style"
                                style="opacity : {{ item.checked ? 0.5 : 1 }};"

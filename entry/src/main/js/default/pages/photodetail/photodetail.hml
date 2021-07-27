@@ -36,22 +36,21 @@
                 on:change="swiperChange"
                 on:touchstart="hideBottomPop">
             <div for="{{ (index, item) in list }}">
-                <image show="{{ item.mediaType == 3 && transFormType == 0 }}"
-                       src="{{ item.src }}"
-                       class="shared-transition-style"
-                       style="transform : rotate({{ item.rotate + 'deg' }});"></image>
+                <div if="{{ item.mediaType == 3 }}" style="transform : rotate({{ item.rotate + 'deg' }});">
+                    <image
+                            src="{{ item.src }}"
+                            class="shared-transition-style"
+                            style="transform : scale({{ item.scale }});"></image>
+                </div>
 
-                <image show="{{ item.mediaType == 3 && transFormType == 1 }}"
-                       src="{{ item.src }}"
-                       class="shared-transition-style"
-                       style="transform : scale({{ item.scale }});"></image>
-                <stack show="{{ item.mediaType == 4 }}">
+                <stack if="{{ item.mediaType == 4 }}">
                     <video
                             style="object-fit : fill;"
                             src='{{ item.src }}'
                             poster='{{ item.poster }}'
                             muted='false' controls="false"></video>
-                    <image style="left : 45%; top : 50%; width : 80px; height : 80px;" src="/common/image/svg/play.svg">
+                    <image style="left : 45%; top : 50%; width : 80px; height : 80px;"
+                           src="/common/image/svg/play.svg">
                     </image>
                 </stack>
             </div>

@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-import device from '@system.device';
-import prompt from '@system.prompt';
+/**
+ * @file: 视频列表界面
+ */
+
 import router from '@system.router';
 import mediaLibrary from '@ohos.multimedia.medialibrary';
 
