@@ -37,11 +37,22 @@
                            on:touchstart="touchstart"
                            on:touchcancel="touchcancel"
                            on:touchend="touchend">
-                        <image class="shared-transition-style" style="opacity : {{ item.checked ? 0.5 : 1 }};
-                                width : {{ gridImageStyle.width }};"
+                        <image if="{{ item.mediaType == 3 }}" class="shared-transition-style"
+                               style="opacity : {{ item.checked ? 0.5 : 1 }};"
                                src="{{ item.src }}" shareid="{{ index }}"
                                onclick="photoClick({{ item }},{{ index }})">
                         </image>
+                        <div class="grid-video" if="{{ item.mediaType == 4 }}"
+                             onclick="photoClick({{ item }},{{ index }})">
+                            <text class="grid-video-time">
+                                00:00
+                            </text>
+                            <video
+                                    style="object-fit : fill;"
+                                    src='{{ item.src }}'
+                                    poster='{{ item.poster }}'
+                                    muted='false' autoplay='false' controls="false"></video>
+                        </div>
 
                         <div class="scale-img" if="{{ item.icon }}" on:click="scaleImgClick({{ item }},{{ index }})">
                             <image src="/common/image/svg/fullscreen.svg"></image>

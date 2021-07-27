@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-import device from '@system.device';
+/**
+ * @file: 新建相册选择相册里的图片
+ */
+
 import router from '@system.router';
-import prompt from '@system.prompt';
 import medialibrary from '@ohos.multimedia.medialibrary';
 
 let media = medialibrary.getMediaLibraryHelper();
@@ -57,17 +59,19 @@ export default {
     onHide() {
         this.$app.$def.datamanage.setPhotoList(this.list);
     },
-
+    onDestroy() {
+        this.$app.$def.datamanage.setPhotoList([]);
+    },
     // 动态设置item宽度
     loadData() {
         let self = this;
         if (self.album) {
             let args = {
                 selections: self.album.name,
-                selectionArgs: ['imagealbum'],
+                selectionArgs: ['imagealbum', 'videoalbum'],
             };
             let shareList = self.$app.$def.datamanage.getPhotoList() || [];
-            media.getImageAssets(args, (error, images) => {
+            media.getMediaAssets(args, (error, images) => {
                 if (images) {
                     for (let i = 0; i < images.length; i++) {
                         let item = images[i];
