@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ * @file: 图片旋转
+ */
+
 import router from '@system.router';
 
 let image = new Image();

@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import router from '@system.router';
-import prompt from '@system.prompt';
+/**
+ * @file: 图片、视频详细信息弹框
+ */
 
 export default {
     data: {

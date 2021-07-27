@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import router from '@system.router';
-import prompt from '@system.prompt';
+/**
+ * @file: 工具类方法
+ */
 
 let iconCache = {};
 

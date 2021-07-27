@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import device from '@system.device';
-import app from '@system.app';
+/**
+ * @file: 自定义列表
+ */
 
 export default {
     data: {

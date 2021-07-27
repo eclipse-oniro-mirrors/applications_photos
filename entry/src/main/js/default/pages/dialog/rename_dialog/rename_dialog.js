@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import router from '@system.router';
-import prompt from '@system.prompt';
+/**
+ * @file: 重命名图片、视频和相册弹框
+ */
 
 export default {
     data: {

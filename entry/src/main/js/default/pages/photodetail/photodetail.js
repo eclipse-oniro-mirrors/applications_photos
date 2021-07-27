@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ * @file: 图片详情界面
+ */
+
 import prompt from '@system.prompt';
 import router from '@system.router';
 import medialibrary from '@ohos.multimedia.medialibrary';
@@ -40,28 +44,28 @@ export default {
                 src: '/common/image/svg/move.svg',
                 name: '',
                 visible: true,
-                disabled:false
+                disabled: false
             },
             {
                 id: 2,
                 src: '/common/image/svg/copy.svg',
                 name: '',
                 visible: true,
-                disabled:false
+                disabled: false
             },
             {
                 id: 3,
                 src: '/common/image/svg/delete.svg',
                 name: '',
                 visible: true,
-                disabled:false
+                disabled: false
             },
             {
                 id: -10,
                 src: '/common/image/svg/more.svg',
                 name: '',
                 visible: true,
-                disabled:false
+                disabled: false
             },
         ],
         bottomBarPopList: [
@@ -70,13 +74,13 @@ export default {
                 src: '/common/image/svg/rename.svg',
                 name: '',
                 visible: true,
-                disabled:false
+                disabled: false
             }, {
                 id: 2,
                 src: '/common/image/svg/rotate.svg',
                 name: '',
                 visible: true,
-                disabled:false
+                disabled: false
             }
         ],
         currentItem: {},
@@ -87,10 +91,9 @@ export default {
             size: 0,
             name: ''
         },
-        transFormType: 0,
-        showScale:true,
-        isScaleMinusDisable:false,
-        isScaleAddDisable:false
+        showScale: true,
+        isScaleMinusDisable: false,
+        isScaleAddDisable: false
     },
     onInit() {
         this.initNational();
@@ -114,7 +117,7 @@ export default {
             let item = self.list[self.sharetIndex];
             self.currentItem = item;
             self.topBarSource.title = self.currentItem.name;
-            if(self.currentItem.mediaType === 4) {
+            if (self.currentItem.mediaType === 4) {
                 self.showScale = false;
                 self.bottomBarPopList[1].visible = false;
             } else {
@@ -160,13 +163,13 @@ export default {
                 item.scale = 1;
                 list.push(item);
             }
-            if (self.refreshType === 1 ) {
+            if (self.refreshType === 1) {
                 if (self.sharetIndex > 0) {
                     self.sharetIndex--;
                 } else {
                     self.sharetIndex = 0;
                 }
-            } else if (self.refreshType ===2) {
+            } else if (self.refreshType === 2) {
                 self.sharetIndex = 0;
             }
             self.currentItem = list[self.sharetIndex];
@@ -217,7 +220,7 @@ export default {
                     } else {
                         self.sharetIndex = 0;
                     }
-                } else if (self.refreshType ===2) {
+                } else if (self.refreshType === 2) {
                     self.sharetIndex = 0;
                 }
                 self.list = list;
@@ -256,7 +259,8 @@ export default {
         this.currentItem.rotate = 0;
         let obj = this.list[item.index];
         this.currentItem = obj;
-        if(this.currentItem.mediaType === 4) {
+        this.sharetIndex = item.index;
+        if (this.currentItem.mediaType === 4) {
             this.showScale = false;
             this.bottomBarPopList[1].visible = false;
         } else {
@@ -324,14 +328,11 @@ export default {
             }
             self.$element('rename_dialog').show();
         } else if (item.detail.id === 2) {
-            if(self.transFormType !== 0) {
-                self.currentItem.scale = 1;
-            }
-            self.transFormType = 0;
-            if(self.currentItem.rotate === 270 ) {
+            self.currentItem.scale = 1;
+            if (self.currentItem.rotate === -270) {
                 self.currentItem.rotate = 0;
             } else {
-                self.currentItem.rotate += 90;
+                self.currentItem.rotate -= 90;
             }
         }
     },
@@ -441,7 +442,7 @@ export default {
     },
     deleteQuery() {
         let self = this;
-        let currentItem = self.list[self.sharetIndex];
+        let currentItem = self.currentItem;
         let list = self.cacheList || [];
         for (let i = 0; i < list.length; i++) {
             let item = list[i];
@@ -515,27 +516,19 @@ export default {
     changePopVisible(e) {
         this.popVisible = e.detail;
     },
-    leftScale(){
-        if(this.transFormType !== 1){
-            this.currentItem.rotate = 0;
-        }
-        this.transFormType = 1;
+    leftScale() {
         this.currentItem.scale += 0.5;
-        this.isScaleMinusDisable = false
-        if(this.currentItem.scale > 2) {
-            this.currentItem.scale = 2 ;
+        this.isScaleMinusDisable = false;
+        if (this.currentItem.scale > 2) {
+            this.currentItem.scale = 2;
             this.isScaleAddDisable = true;
             this.isScaleMinusDisable = false;
         }
     },
-    rightScale(){
-        if(this.transFormType !== 1){
-            this.currentItem.rotate = 0;
-        }
-        this.transFormType = 1;
+    rightScale() {
         this.currentItem.scale -= 0.25;
         this.isScaleAddDisable = false;
-        if(this.currentItem.scale < 0.5) {
+        if (this.currentItem.scale < 0.5) {
             this.currentItem.scale  = 0.5;
             this.isScaleMinusDisable = true;
             this.isScaleAddDisable = false;

@@ -28,7 +28,7 @@
     "device": "设备",
     "inputPlaceholder": "请输入名称",
     "selectAll": "全选",
-    "unSelectAll": "非全选",
+    "unSelectAll": "取消全选",
     "chooseAlbums": "选择相册",
     "operateTitle": "移动/复制到",
     "deleteInfo": "是否删除已选择 ",

@@ -50,6 +50,20 @@
     height: 38px;
 }
 
+.grid-video-time {
+    position: absolute;
+    color: #fff;
+    font-size: 24px;
+    bottom: 10px;
+    left: 10px;
+    background-color: #6666666a;
+    padding: 5px 10px;
+    border-radius: 16px;
+}
+
+.grid-video {
+    position: relative;
+}
 /* xxx.css */
 
 .shared-transition-style {

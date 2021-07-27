@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
-import prompt from '@system.prompt';
+/**
+ * @file: 相册选择界面
+ */
+
 import router from '@system.router';
 import medialibrary from '@ohos.multimedia.medialibrary';
 

@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-/*
-* @file
-*
-*
-*/
+/**
+ * @file: 主入口
+ */
 
 import router from '@system.router';
 import prompt from '@system.prompt';
