@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import prompt from '@system.prompt';
-import brightness from '@system.brightness';
+/**
+ * @file: 底部操作栏
+ */
 
 export default {
     data: {

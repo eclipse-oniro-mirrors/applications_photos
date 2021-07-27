@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import router from '@system.router';
-import prompt from '@system.prompt';
+/**
+ * @file: 图片、视频移动复制后的进度条
+ */
 
 export default {
     data: {

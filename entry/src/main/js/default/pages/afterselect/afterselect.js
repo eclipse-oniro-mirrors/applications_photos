@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * @file: 图片、视频选择界面
+ */
+
 import router from '@system.router';
-import prompt from '@system.prompt';
 import medialibrary from '@ohos.multimedia.medialibrary';
 
 let media = medialibrary.getMediaLibraryHelper();
@@ -35,11 +38,14 @@ export default {
         // 操作方式
         operationType: '',
         progress: 0,
-        progressTilte: '相册',
+        progressTilte: '',
         oprateType: '',
         fromAlbum: null,
         toAlbum: null,
         consoleInfo: '',
+    },
+    onInit() {
+        this.progressTilte = this.$t('strings.albums');
     },
     onReady() {
         let self = this;
@@ -152,11 +158,6 @@ export default {
                         }
                     }
                 }
-            } else {
-                prompt.showToast({
-                    message: error.message,
-                    duration: 1000
-                });
             }
         });
     },
@@ -167,7 +168,7 @@ export default {
         if (self.album) {
             let args = {
                 selections: self.topBarSource.title,
-                selectionArgs: ['imagealbum'],
+                selectionArgs: ['imagealbum', 'videoalbum'],
             };
 
             if (self.album.name === self.$t('strings.allPhotos')) {
@@ -175,12 +176,6 @@ export default {
                 self.topBarSource.title = self.$t('strings.allPhotos');
             }
             media.getMediaAssets(args, (error, images) => {
-                if (error) {
-                    prompt.showToast({
-                        message: error.message,
-                        duration: 1000
-                    });
-                }
                 if (images) {
                     for (let i = 0; i < images.length; i++) {
                         let item = images[i];
@@ -270,11 +265,6 @@ export default {
                         }
                     }
                 }
-            } else {
-                prompt.showToast({
-                    message: error.message,
-                    duration: 1000
-                });
             }
         });
     },
@@ -297,16 +287,6 @@ export default {
 
     },
     itemClick(item, index) {
-        let self = this;
-        router.push(
-            {
-                uri: 'pages/mypages/photodetail/photodetail',
-                params: {
-                    list: self.list,
-                    selectMode: self.selectMode,
-                    sharetIndex: index
-                },
-            }
-        );
+
     }
 };

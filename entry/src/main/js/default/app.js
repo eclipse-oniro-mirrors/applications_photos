@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
-import device from '@system.device';
+/**
+ * @file: 全局入口文件
+ */
+
 import utils from './common/utils/utils.js';
 import datamanage from './common/utils/datamanage.js';
 

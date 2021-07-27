@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
-import router from '@system.router';
+/**
+ * @file: 新建相册弹框
+ */
+
 import prompt from '@system.prompt';
 
 export default {

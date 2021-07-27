@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-import device from '@system.device';
+/**
+ * @file: 图片列表界面
+ */
+
 import router from '@system.router';
-import prompt from '@system.prompt';
 import medialibrary from '@ohos.multimedia.medialibrary';
 
 let media = medialibrary.getMediaLibraryHelper();
@@ -99,6 +101,9 @@ export default {
     onInit() {
         this.initNational();
     },
+    onDestroy() {
+        this.$app.$def.datamanage.setPhotoList([]);
+    },
     initNational() {
         this.bottomBarSource[0].name = this.$t('strings.move');
         this.bottomBarSource[1].name = this.$t('strings.delete');
@@ -167,8 +172,8 @@ export default {
                         URI: item.URI,
                         icon: '',
                         checked: false,
-                        rotate : 0,
-                        scale:1,
+                        rotate: 0,
+                        scale: 1,
                         itemStyle: {
                             width: '176px',
                             height: '180px'
@@ -223,8 +228,8 @@ export default {
                         URI: item.URI,
                         icon: '',
                         checked: false,
-                        rotate : 0,
-                        scale:1,
+                        rotate: 0,
+                        scale: 1,
                         itemStyle: {
                             width: '176px',
                             height: '180px'
