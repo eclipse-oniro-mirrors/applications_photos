@@ -15,14 +15,13 @@
  */
 -->
 
-<dialog id="renameDialog" class="rename_dialog-main" oncancel="cancelDialog">
+<dialog id="renameDialog" class="rename-dialog-main" oncancel="cancelDialog">
     <div class="dialog-div">
         <text class="title">{{ $t('strings.rename') }}</text>
-        <input class="input" type="text" value="{{ inputName }}" placeholder="请输入名称"></input>
+        <input class="input" type="text" value="{{ inputName }}" placeholder="{{ $t('strings.inputPlaceholder') }}"></input>
         <div class="bottom-div">
             <text onclick="cancel" class="btn-txt">{{ $t('strings.cancel') }}</text>
             <text onclick="query" class="btn-txt line">{{ $t('strings.define') }}</text>
         </div>
     </div>
 </dialog>
-

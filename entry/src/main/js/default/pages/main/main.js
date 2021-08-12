@@ -19,10 +19,34 @@
 
 import router from '@system.router';
 import prompt from '@system.prompt';
-import medialibrary from '@ohos.multimedia.medialibrary';
+import mediaLibrary from '@ohos.multimedia.medialibrary';
 import featureAbility from '@ohos.ability.featureAbility';
 
-let media = medialibrary.getMediaLibraryHelper();
+let media = mediaLibrary.getMediaLibraryHelper();
+
+// 重命名id
+const RENAME_ID = 1;
+
+// 删除id
+const DELETE_ID = 2;
+
+// 所有照片id
+const ALL_PHOTO_ID = -1;
+
+// 调用getAlbumImage延时
+const GET_ALBUM_IMAGE_TIME = 50;
+
+// 视频相册id
+const VIDEO_ALBUM_ID = -2;
+
+// 命名重复弹框停留时长
+const REPEAT_NAME_TIME = 1000;
+
+// 获取重命名的随机数
+const RANDOM_INPUT_NAME = 10;
+
+// 删除相册延时
+const DELETE_ALBUM_TIME = 200;
 
 export default {
     data: {
@@ -30,22 +54,22 @@ export default {
         showEmptyDiv: true,
         topBarSource: {
             title: '',
-            leftSrc: '/common/image/svg/close.svg',
-            rightSrc: '/common/image/svg/add.svg',
+            leftSrc: '',
+            rightSrc: '',
             isShowLeft: false,
             isShowRight: true
         },
         bottomBarSource: [
             {
-                id: 1,
-                src: '/common/image/svg/rename.svg',
+                id: RENAME_ID,
+                src: '',
                 name: '',
                 disabled: false,
                 visible: true,
             },
             {
-                id: 2,
-                src: '/common/image/svg/delete.svg',
+                id: DELETE_ID,
+                src: '',
                 name: '',
                 disabled: false,
                 visible: true,
@@ -62,7 +86,6 @@ export default {
             height: '490px',
             radius: '32px'
         },
-        consoleInfo: '',
         gridItemCheckedStyle: {
             height: '38px',
             width: '38px',
@@ -70,17 +93,26 @@ export default {
         },
         gridCopyData: [],
         cacheAlbums: [],
-        inputName: ''
+        inputName: '',
+        utils: null
     },
+
+/**
+    * 初始化数据
+    */
     onInit() {
+        const self = this;
+        this.utils = this.$app.$def.utils;
+        this.utils.logDebug('main => onInit => startTime');
         this.initNational();
 
         // 判断是否从相机跳转过来
         featureAbility.getWant().then(r => {
+            self.utils.logDebug('main => onInit => endTime');
             if (r && r.parameters && r.parameters.uri) {
                 router.replace(
                     {
-                        uri: 'pages/photodetail/photodetail',
+                        uri: 'pages/photoDetail/photoDetail',
                         params: {
                             album: {
                                 name: 'camera',
@@ -92,27 +124,53 @@ export default {
             }
         });
     },
+
+/**
+    * 初始化数据源
+    */
     initNational() {
+        this.utils.logDebug('main => initNational');
+        this.topBarSource.rightSrc = this.utils.getIcon('add');
+        this.topBarSource.leftSrc = this.utils.getIcon('close');
         this.headTitle = this.$t('strings.albums');
         this.bottomBarSource[0].name = this.$t('strings.rename');
+        this.bottomBarSource[0].src = this.utils.getIcon('rename');
         this.bottomBarSource[1].name = this.$t('strings.delete');
+        this.bottomBarSource[1].src = this.utils.getIcon('delete');
     },
+
+/**
+    * 组件显示加载数据
+    */
     onShow() {
-        if (this.$app.$def.datamanage.getRefreshed()) {
+        this.utils.logDebug('main => onShow');
+        if (this.$app.$def.dataManage.getRefreshed()) {
             this.loadData();
         }
     },
+
+/**
+    * 回退按钮事件
+    *
+    * @return {boolean} - 返回是否是选择模式
+    */
     onBackPress() {
+        this.utils.logDebug('main => onBackPress');
         if (this.selectMode) {
             this.topBarLeftClick();
             return true;
         } else {
             return false;
         }
+
     },
-    // 根据是否开启选择模式，初始化选中效果
+
+/**
+    * 根据是否开启选择模式，初始化选中效果
+    */
     initChecked() {
         let self = this;
+        this.utils.logDebug('main => initChecked');
         let gridList = self.list;
         // 宫格数据
         for (let index = 0; index < gridList.length; index++) {
@@ -125,7 +183,12 @@ export default {
             item.checked = false;
         }
     },
+
+/**
+    * 加载数据
+    */
     loadData() {
+        this.utils.logDebug('main => loadData');
         let self = this;
         self.selectMode = false;
         self.getAllPhotos().then(allRes => {
@@ -144,18 +207,24 @@ export default {
                 });
             }
         });
-        self.$app.$def.datamanage.isRefreshed(false);
+        self.$app.$def.dataManage.isRefreshed(false);
     },
 
-    // 所有照片
+/**
+    * 获取所有照片数据
+    *
+    * @return {Promise} - 返回获取照片promise
+    */
     getAllPhotos() {
+        this.utils.logDebug('main => getAllPhotos => startTime');
         let self = this;
         return new Promise(function (resolve, reject) {
             media.getMediaAssets((error, value) => {
+                self.utils.logDebug('main => getAllPhotos => endTime');
                 if (value && value.length > 0) {
                     let obj = {
                         name: self.$t('strings.allPhotos'),
-                        id: -1,
+                        id: ALL_PHOTO_ID,
                         icon: '',
                         checked: false,
                         type: 'system',
@@ -170,8 +239,13 @@ export default {
         });
     },
 
-    // 所有相册
+/**
+    * 获取所有相册数据
+    *
+    * @return {Promise} - 返回获取所有相册promise
+    */
     getAlbums() {
+        this.utils.logDebug('main => getAlbums => startTime');
         let self = this;
         let args = {
             selections: '',
@@ -179,6 +253,7 @@ export default {
         };
         return new Promise(function (resolve, reject) {
             media.getImageAlbums(args, (error, albums) => {
+                self.utils.logDebug('main => getAlbums => endTime');
                 if (albums) {
                     self.cacheAlbums = albums;
                     let list = [];
@@ -211,7 +286,7 @@ export default {
                                     });
                                 }
                             });
-                        }, (i + 1) * 50);
+                        }, (i + 1) * GET_ALBUM_IMAGE_TIME);
                     }
                 } else {
                     reject(null);
@@ -219,13 +294,23 @@ export default {
             });
         });
     },
+
+/**
+    * 获取相册图片数据
+    *
+    * @param {string} album - 指定相册对象
+    * @return {Promise} - 返回获取相册图片promise
+    */
     getAlbumImage(album) {
+        this.utils.logDebug('main => getAlbumImage => startTime');
+        let self = this;
         let args = {
             selections: album.albumName,
             selectionArgs: ['imagealbum', 'videoalbum'],
         };
         return new Promise(function (resolve, reject) {
             media.getMediaAssets(args, (error, images) => {
+                self.utils.logDebug('main => getAlbumImage => endTime');
                 if (images) {
                     resolve(images);
                 } else {
@@ -235,8 +320,13 @@ export default {
         });
     },
 
-    // 获取视频数据创建视频相册
+/**
+    * 获取视频相册数据
+    *
+    * @return {Promise} - 返回获取视频相册promise
+    */
     getVideoAlbum() {
+        this.utils.logDebug('main => getVideoAlbum => startTime');
         let self = this;
         let args = {
             selections: '',
@@ -244,6 +334,7 @@ export default {
         };
         return new Promise(function (resolve, reject) {
             media.getVideoAssets(args, (error, albums) => {
+                self.utils.logDebug('main => getVideoAlbum => endTime');
                 if (error) {
                     reject(null);
                 }
@@ -251,7 +342,7 @@ export default {
                     let album = albums[0];
                     let videoObj = {
                         name: self.$t('strings.video'),
-                        id: -2,
+                        id: VIDEO_ALBUM_ID,
                         icon: '',
                         checked: false,
                         type: 'system',
@@ -264,24 +355,37 @@ export default {
             });
         });
     },
+
+/**
+    * 新建相册弹窗
+    *
+    * @param {Object} value - 新建相册名
+    */
     createDialogAlbum(value) {
+        this.utils.logDebug('main => createDialogAlbum');
         let name = value.detail;
         if (!this.isRepeatName(name)) {
             this.createAlbum(value.detail);
         }
     },
 
-    // 新增
+/**
+    * 新建相册接口
+    *
+    * @param {string} albumName - 新建相册名
+    */
     createAlbum(albumName) {
+        this.utils.logDebug('main => createAlbum => startTime');
         let self = this;
-        self.$element('create_dailog').close();
+        self.$element('create_dialog').close();
         media.createAlbum((err, album) => {
             if (album) {
-                album.albumName = albumName + Math.round(Math.random() * 10);
+                album.albumName = albumName;
                 album.commitCreate((err, fcommitFlag) => {
+                    self.utils.logDebug('main => createAlbum => endTime');
                     if (fcommitFlag) {
                         router.push({
-                            uri: 'pages/selectalbum/selectalbum',
+                            uri: 'pages/selectAlbum/selectAlbum',
                             params: {
                                 createParams: {
                                     name: albumName,
@@ -294,23 +398,36 @@ export default {
             }
         });
     },
+
+/**
+    * 修改相册名称弹窗
+    *
+    * @param {Object} value - 相册名
+    */
     renameDialogAlbum(value) {
+        this.utils.logDebug('main => renameDialogAlbum');
         let name = value.detail;
         if (!this.isRepeatName(name)) {
             this.modifyAlbumName(name);
         }
     },
 
-    // 判断是否重复相册名
+/**
+    * 判断是否重复相册名
+    *
+    * @param {string} name - 相册名
+    * @return {boolean} - 中断代码
+    */
     isRepeatName(name) {
+        this.utils.logDebug('main => isRepeatName');
         let list = this.cacheAlbums || [];
         let flag = false;
         for (let i = 0; i < list.length; i++) {
             let item = list[i];
             if (item.albumName === name) {
                 prompt.showToast({
-                    message: this.$t('strings.repeateName'),
-                    duration: 1000
+                    message: this.$t('strings.repeatName'),
+                    duration: REPEAT_NAME_TIME
                 });
                 flag = true;
                 break;
@@ -319,10 +436,14 @@ export default {
         return flag;
     },
 
-    // 修改
+/**
+    * 修改相册接口
+    *
+    * @param {string} albumName - 相册名
+    */
     modifyAlbumName(albumName) {
+        this.utils.logDebug('main => modifyAlbumName => startTime');
         let self = this;
-        let list = self.cacheAlbums || [];
         self.$element('rename_dialog').close();
         let checkedItem = self.getCheckedData()[0];
         let args = {
@@ -330,6 +451,7 @@ export default {
             selectionArgs: ['imagealbum'],
         };
         media.getImageAlbums(args, (error, albums) => {
+            self.utils.logDebug('main => modifyAlbumName => endTime');
             if (albums) {
                 for (let j = 0; j < albums.length; j++) {
                     let item = albums[j];
@@ -337,7 +459,7 @@ export default {
                         item.albumName = albumName;
                         item.commitModify((err, fcommitFlag) => {
                             if (fcommitFlag) {
-                                self.$app.$def.datamanage.isRefreshed(true);
+                                self.$app.$def.dataManage.isRefreshed(true);
                                 self.loadData();
                                 self.onCheckedChange();
                             }
@@ -348,8 +470,11 @@ export default {
         });
     },
 
-    // 顶部左侧按钮
+/**
+    * 顶部左侧按钮
+    */
     topBarLeftClick() {
+        this.utils.logDebug('main => topBarLeftClick');
         let self = this;
         self.listData.forEach(item => {
             item.checked = false;
@@ -366,34 +491,50 @@ export default {
         self.isShowBottomBar = false;
     },
 
-    // 顶部右侧按钮
+/**
+    * 顶部右侧按钮
+    */
     topBarRightClick() {
-        this.$element('create_dailog').show();
+        this.utils.logDebug('main => topBarRightClick');
+        this.$element('create_dialog').show();
     },
 
-    // 底部菜单
+/**
+    * 底部菜单点击事件
+    *
+    * @param {Object} item - 底部点击项
+    * @return {boolean} - 中断代码
+    */
     bottomTabClick(item) {
+        this.utils.logDebug('main => bottomTabClick');
         let length = this.getCheckedData().length;
-        if (item.detail.id === 2) {
+        if (item.detail.id === DELETE_ID) {
             if (length === 0) {
                 return false;
             }
             let child = this.$child('delete_dialog');
             child.setTitle(this.$t('strings.deleteInfo') + length + this.$t('strings.items'));
             child.show();
-        } else if (item.detail.id === 1) {
+        } else if (item.detail.id === RENAME_ID) {
             if (length !== 1) {
                 return false;
             }
-            this.inputName = this.getCheckedData()[0].name + Math.round(Math.random() * 10);
+            this.inputName = this.getCheckedData()[0].name + Math.round(Math.random() * RANDOM_INPUT_NAME);
             this.$element('rename_dialog').show();
         }
     },
+
+/**
+    * 列表点击事件回调
+    *
+    * @param {Object} obj - 列表点击项
+    */
     itemClick(obj) {
+        this.utils.logDebug('main => itemClick');
         let item = obj.detail.item;
-        let uri = 'pages/photolist/photolist';
+        let uri = 'pages/photoList/photoList';
         if (item.kind === 'video') {
-            uri = 'pages/videolist/videolist';
+            uri = 'pages/videoList/videoList';
         }
         router.push(
             {
@@ -405,10 +546,12 @@ export default {
         );
     },
 
-    // 长按事件
+/**
+    * 长按事件回调
+    */
     longPress() {
+        this.utils.logDebug('main => longPress');
         let self = this;
-        let topbar = self.$element('topBar');
         self.selectMode = true;
         self.topBarSource.isShowLeft = true;
         self.topBarSource.isShowRight = false;
@@ -417,8 +560,11 @@ export default {
         self.onCheckedChange();
     },
 
-    // 选中发生改变
-    onCheckedChange(obj) {
+/**
+    * 选中发生改变事件回调
+    */
+    onCheckedChange() {
+        this.utils.logDebug('main => onCheckedChange');
         let self = this;
         let length = this.getCheckedData().length;
         if (self.selectMode) {
@@ -442,8 +588,13 @@ export default {
         }
     },
 
-    // 选中数据
+/**
+    * 选中数据
+    *
+    * @return {Array} - 选中列表
+    */
     getCheckedData() {
+        this.utils.logDebug('main => getCheckedData');
         let self = this;
         let list = [];
         self.listData.forEach(item => {
@@ -458,12 +609,19 @@ export default {
         });
         return list;
     },
+
+/**
+    * 删除回调
+    */
     deleteQuery() {
         this.deletePhotos();
     },
 
-    // 删除相册
+/**
+    * 删除相册接口
+    */
     deletePhotos() {
+        this.utils.logDebug('main => deletePhotos');
         let self = this;
         let choose = self.getCheckedData();
         for (let j = 0; j < choose.length; j++) {
@@ -472,8 +630,9 @@ export default {
                 let item = self.cacheAlbums[i];
                 if (item.albumName === chooseItem.name) {
                     item.commitDelete((err, deleteFlag) => {
+                        self.utils.logDebug('main => deletePhotos => endTime');
                         if (deleteFlag) {
-                            self.$app.$def.datamanage.isRefreshed(true);
+                            self.$app.$def.dataManage.isRefreshed(true);
 
                             if (j === choose.length - 1) {
                                 if (choose.length === self.listData.length) {
@@ -482,7 +641,7 @@ export default {
                                     setTimeout(() => {
                                         self.loadData();
                                         self.onCheckedChange();
-                                    }, 200);
+                                    }, DELETE_ALBUM_TIME);
                                 }
                             }
                         }

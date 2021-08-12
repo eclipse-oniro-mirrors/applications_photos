@@ -15,7 +15,7 @@
 
 @import "../../common/css/app.css";
 
-.afterselect-container {
+.after-select-container {
     flex-direction: column;
     padding: 0 8px;
     background-color: #fff;
@@ -31,7 +31,6 @@
     width: 174px;
     height: 180px;
     padding: 4px;
-
 }
 
 .scale-img {
@@ -64,7 +63,6 @@
 .grid-video {
     position: relative;
 }
-/* xxx.css */
 
 .shared-transition-style {
     shared-transition-effect: exchange;

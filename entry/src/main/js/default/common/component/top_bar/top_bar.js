@@ -21,22 +21,24 @@ export default {
     data: {
         dataSource: {
             title: '',
-            leftSrc: '/common/image/svg/close.svg',
-            rightSrc: '/common/image/svg/add.svg',
+            leftSrc: '',
+            rightSrc: '',
             isShowLeft: true,
             isShowRight: true
         }
     },
+
+/**
+    * 左边点击
+    */
     leftClick() {
         this.$emit('leftClick');
     },
+
+/**
+    * 右边点击
+    */
     rightClick() {
         this.$emit('rightClick');
-    },
-    setFormData(formData) {
-        this.formData = formData;
-    },
-    setRight(flag) {
-        this.dataSource.isShowRight = flag;
     }
 };

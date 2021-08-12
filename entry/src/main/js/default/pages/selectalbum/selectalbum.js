@@ -18,9 +18,12 @@
  */
 
 import router from '@system.router';
-import medialibrary from '@ohos.multimedia.medialibrary';
+import mediaLibrary from '@ohos.multimedia.medialibrary';
 
-let media = medialibrary.getMediaLibraryHelper();
+let media = mediaLibrary.getMediaLibraryHelper();
+
+// 加载数据延时
+const LOAD_DATA_TIME = 50;
 
 export default {
     data: {
@@ -28,44 +31,64 @@ export default {
         otherList: [],
         topBarSource: {
             title: '',
-            leftSrc: '/common/image/svg/back.svg',
-            rightSrc: '/common/image/svg/add.svg',
+            leftSrc: '',
+            rightSrc: '',
             isShowLeft: true,
             isShowRight: false
         },
-
-        // 是否是操作后 跳进来的(移动，复制等)
         isOperationFrom: false,
-
-        // 是否是操作后 操作类型(移动，复制等)
         operationType: '',
         createParams: null,
         checkedList: [],
         fromAlbum: null,
-        consoleInfo: '',
         listItemStyle: {
             height: '160px'
-        }
+        },
+        utils: null
     },
+
+/**
+    * 初始化数据
+    */
     onInit() {
+        this.utils = this.$app.$def.utils;
+        this.utils.logDebug('selectAlbum => onInit');
         this.initNational();
     },
+
+/**
+    * 初始化菜单资源
+    */
     initNational() {
+        this.utils.logDebug('selectAlbum => initNational');
+        this.topBarSource.leftSrc = this.utils.getIcon('back');
+        this.topBarSource.rightSrc = this.utils.getIcon('add');
         this.topBarSource.title = this.$t('strings.chooseAlbums');
     },
+
+/**
+    * 组件显示加载数据
+    */
     onShow() {
+        this.utils.logDebug('selectAlbum => onShow');
         if (this.operationType) {
             this.topBarSource.title = this.$t('strings.operateTitle');
         }
         this.getAlbums();
     },
+
+/**
+    * 获取相册
+    */
     getAlbums() {
         let self = this;
         let args = {
             selections: '',
             selectionArgs: ['imagealbum'],
         };
+        self.utils.logDebug('selectAlbum => getImageAlbums => startTime');
         media.getImageAlbums(args, (error, albums) => {
+            self.utils.logDebug('selectAlbum => getImageAlbums => endTime');
             if (albums) {
                 let list = [];
                 let others = [];
@@ -76,7 +99,9 @@ export default {
                             selections: album.albumName,
                             selectionArgs: ['imagealbum', 'videoalbum'],
                         };
+                        self.utils.logDebug('selectAlbum => getMediaAssets => startTime =>');
                         media.getMediaAssets(args, (error, images) => {
+                            self.utils.logDebug('selectAlbum => getMediaAssets => endTime =>');
                             if (images) {
                                 let gridObj = {
                                     name: album.albumName,
@@ -96,9 +121,7 @@ export default {
                                     } else {
                                         others.push(gridObj);
                                     }
-
-                                    // 剔除掉当前选中的相册， 由于查询出来是全部相册，避免移动/复制到当前选中相册
-
+                                // 剔除掉当前选中的相册， 由于查询出来是全部相册，避免移动/复制到当前选中相册
                                 } else if (self.isOperationFrom && self.fromAlbum.name !== album.albumName) {
                                     if (album.albumName === 'camera') {
                                         gridObj.type = 'system';
@@ -109,54 +132,37 @@ export default {
                                 }
                             }
                         });
-                    }, (i + 1) * 50);
+                    }, (i + 1) * LOAD_DATA_TIME);
                 }
                 self.listData = list;
                 self.otherList = others;
             }
         });
     },
-    getOtherAlbums(args) {
-        let self = this;
-        media.getMediaAssets((error, albums) => {
-            if (error) {
-                return false;
-            }
-            if (albums) {
-                for (let i = 0; i < albums.length; i++) {
-                    let item = albums[i];
-                    item.showNumber = true;
-                    item.getImageAssets().then(function (image) {
-                        if (!image) {
-                            item.list = [];
-                        } else {
-                            item.list = image;
-                        }
-                    });
-                }
-                self.otherList = albums;
-            }
-        });
-    },
 
-    // 顶部左侧按钮
+/**
+    * 顶部左侧按钮
+    */
     topBarLeftClick() {
+        this.utils.logDebug('selectAlbum => topBarLeftClick');
         router.back();
     },
 
-    // 顶部右侧按钮
-    topBarRightClick() {
-
-    },
+/**
+    * 列表点击回调
+    *
+    * @param {Object} obj - 当前点击列表项
+    */
     listClick(obj) {
         let self = this;
+        self.utils.logDebug('selectAlbum => listClick');
         let detail = obj.detail.item;
         if (self.createParams) {
             self.createParams.album = detail;
         }
 
         let routerParams = {
-            uri: 'pages/selectalbumphoto/selectalbumphoto',
+            uri: 'pages/selectAlbumPhoto/selectAlbumPhoto',
             params: {
                 album: detail,
                 isOperationFrom: self.isOperationFrom,
@@ -168,7 +174,7 @@ export default {
             if (self.fromAlbum.name === self.$t('strings.allPhotos') && self.isRepeatAlbum(detail)) {
                 routerParams.params.operationType = '';
             }
-            routerParams.uri = 'pages/afterselect/afterselect';
+            routerParams.uri = 'pages/afterSelect/afterSelect';
             routerParams.params.list = self.checkedList;
             routerParams.params.fromAlbum = self.fromAlbum;
             routerParams.params.toAlbum = detail;
@@ -184,16 +190,21 @@ export default {
         router.replace(routerParams);
     },
 
-    // 判断所有照片入口进来 是否操作了自身相册
+/**
+    * 判断所有照片入口进来 是否操作了自身相册
+    *
+    * @param {Object} detail - 当前操作项
+    * @return {boolean} Verify result
+    */
     isRepeatAlbum(detail) {
         let self = this;
+        self.utils.logDebug('selectAlbum => isRepeatAlbum');
         let list = self.checkedList;
         let flag = false;
         for (let i = 0; i < list.length; i++) {
             let item = list[i];
-            let arrs = item.URI.split('/');
-            let albumName = arrs[arrs.length - 2];
-            self.consoleInfo = albumName;
+            let arrStr = item.URI.split('/');
+            let albumName = arrStr[arrStr.length - 2];
             if (albumName === detail.name) {
                 flag = true;
                 break;

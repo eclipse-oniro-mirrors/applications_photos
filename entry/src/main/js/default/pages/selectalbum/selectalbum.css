@@ -15,8 +15,7 @@
 
 @import "../../common/css/app.css";
 
-.selectalbum-container {
+.select-album-container {
     flex-direction: column;
     background-color: #fff;
 }
-

@@ -17,6 +17,9 @@
  * @file: 自定义列表
  */
 
+// 初始化图片样式延时
+const GRID_IMAGE_STYLE = 50;
+
 export default {
     data: {
         headTitle: '',
@@ -69,18 +72,23 @@ export default {
             return this.listData;
         },
     },
+
+/**
+    * 初始化数据
+    */
     onInit() {
         setTimeout(() => {
             this.gridImageStyle = Object.assign({}, this.gridItemStyle);
-
-        }, 50);
+        }, GRID_IMAGE_STYLE);
     },
-    initData() {
 
-    },
-    onShow() {
-
-    },
+/**
+    * 列表点击事件
+    *
+    * @param {Object} item - 点击项
+    * @param {number} index - 点击索引
+    * @param {string} type - 点击类型
+    */
     photoClick(item, index, type) {
         let self = this;
         let obj = {
@@ -97,14 +105,23 @@ export default {
                 item.icon = self.$app.$def.utils.getIcon('unselected_black');
             }
 
-            self.$emit('onCheckedChange', obj);
+            self.$emit('onCheckedChange');
         }
 
         if (!self.selectMode) {
             self.$emit('onClick', obj);
         }
     },
-    parentLongpress(item, index, type) {
+
+/**
+    * 列表长按事件
+    *
+    * @param {Object} item - 长按项
+    * @param {number} index - 长按索引
+    * @param {string} type - 长按类型
+    * @return {boolean} - 中断代码
+    */
+    parentLongPress(item, index, type) {
         let self = this;
         if (!self.longPressFlag) {
             return false;
@@ -126,8 +143,13 @@ export default {
         self.$emit('longPress', item);
 
         self.photoClick(item, index, type);
-
     },
+
+/**
+    * 获取列表是否开启选择模式
+    *
+    * @return {boolean} - 是否是选择模式
+    */
     getSelectMode() {
         return this.selectMode;
     }

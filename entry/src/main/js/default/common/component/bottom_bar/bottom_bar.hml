@@ -18,17 +18,17 @@
 <div class="bottom-bar" show="{{ isShow }}">
     <div class="bottom-bar-content" for="{{ (index, item) in dataSource }}" id="{{ index }}"
          onclick="tabClick({{ item }},{{ index }})">
-        <image class="img" src="{{ item.src }}" if="{{ ! item.disabled }}"></image>
-        <image class="img" style="opacity : 0.5;" src="{{ item.src }}" else></image>
+        <image class="img" src="{{ item.src }}" show="{{ ! item.disabled }}"></image>
+        <image class="img" style="opacity : 0.5;" src="{{ item.src }}" show="{{ item.disabled }}"></image>
 
-        <text class="text" if="{{ ! item.disabled }}">{{ item.name }}</text>
-        <text class="text" style="opacity : 0.5;" else>{{ item.name }}</text>
+        <text class="text" show="{{ ! item.disabled }}">{{ item.name }}</text>
+        <text class="text" style="opacity : 0.5;" show="{{ item.disabled }}">{{ item.name }}</text>
     </div>
     <div if="{{ popVisible }}" class="container" style="height : {{ popHeight }};">
-        <div class="listTxt" for="{{ popupList }}"  onclick="popupItemClick({{ $item }})">
-            <div style="padding: 20px 0;"  if="{{ $item.visible }}">
-                <text class="title" if="{{ ! $item.disabled }}">{{ $item.name }} </text>
-                <text class="title" style="opacity : 0.5;" else>{{ $item.name }} </text>
+        <div class="list-text" for="{{ popupList }}" onclick="popupItemClick({{ $item }})">
+            <div style="padding : 20px 0;" show="{{ $item.visible }}">
+                <text class="title" show="{{ ! $item.disabled }}">{{ $item.name }} </text>
+                <text class="title" style="opacity : 0.5;" show="{{ $item.disabled }}">{{ $item.name }} </text>
             </div>
         </div>
     </div>

@@ -19,8 +19,9 @@
 <element src="../../common/component/top_bar/top_bar.hml"></element>
 <element src="../../common/component/bottom_bar/bottom_bar.hml"></element>
 <element src="../dialog/detail_dialog/detail_dialog.hml"></element>
-<element src="../dialog/add_type_dailog/add_type_dailog.hml"></element>
-<div class="selectphoto-container">
+<element src="../dialog/add_type_dialog/add_type_dialog.hml"></element>
+
+<div class="select-photo-container">
     <top_bar
             id="topBar"
             data-source="{{ topBarSource }}"
@@ -33,16 +34,13 @@
                 <div for="{{ (index, item) in list }}" class="content-div">
                     <stack class="grid-content-stack"
                            style="width : {{ gridImageStyle.width }};
-                                   height : {{ gridImageStyle.height }};"
-                           on:touchstart="touchstart"
-                           on:touchcancel="touchcancel"
-                           on:touchend="touchend">
-                        <image if="{{ item.mediaType == 3 }}" class="shared-transition-style"
+                                   height : {{ gridImageStyle.height }};">
+                        <image if="{{ item.mediaType == photoType }}" class="shared-transition-style"
                                style="opacity : {{ item.checked ? 0.5 : 1 }};"
                                src="{{ item.src }}" shareid="{{ index }}"
                                onclick="photoClick({{ item }},{{ index }})">
                         </image>
-                        <div class="grid-video" if="{{ item.mediaType == 4 }}"
+                        <div class="grid-video" if="{{ item.mediaType == videoType }}"
                              onclick="photoClick({{ item }},{{ index }})">
                             <text class="grid-video-time">
                                 00:00
@@ -58,12 +56,12 @@
                             <image src="/common/image/svg/fullscreen.svg"></image>
                         </div>
 
-                        <image class="select-img " if="{{ item.icon }}" src="{{ item.icon }}"></image>
+                        <image class="select-img" if="{{ item.icon }}" src="{{ item.icon }}"></image>
                     </stack>
                 </div>
             </div>
         </list-item>
     </list>
     <detail_dialog id="detail_dialog" form-data="{{ detailData }}"></detail_dialog>
-    <add_type_dailog id="add_type_dailog" @add-type-dialog-click="addTypeDialogClick"></add_type_dailog>
+    <add_type_dialog id="add_type_dialog" @add-type-dialog-click="addTypeDialogClick"></add_type_dialog>
 </div>

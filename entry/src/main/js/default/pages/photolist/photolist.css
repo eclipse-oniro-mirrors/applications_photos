@@ -21,7 +21,7 @@
     width: 100%;
 }
 
-.selectphoto-container {
+.select-photo-container {
     flex-direction: column;
     padding: 0 8px;
     background-color: #fff;
@@ -76,8 +76,6 @@
     height: 38px;
 }
 
-/* xxx.css */
-
 .shared-transition-style {
     shared-transition-effect: exchange;
     shared-transition-name: shared-transition;
@@ -87,5 +85,3 @@
     animation-name: transition-enter;
     animation-duration: 1500ms;
 }
-
-

@@ -18,16 +18,28 @@
  */
 
 import router from '@system.router';
-import medialibrary from '@ohos.multimedia.medialibrary';
+import mediaLibrary from '@ohos.multimedia.medialibrary';
 
-let media = medialibrary.getMediaLibraryHelper();
+let media = mediaLibrary.getMediaLibraryHelper();
+
+// 进度条
+const PROGRESS = 100;
+
+// 调用operations延时
+const OPERATION_TIME = 50;
+
+// 照片类型
+const PHOTO_TYPE = 3;
+
+// 视频类型
+const VIDEO_TYPE = 4;
 
 export default {
     data: {
         topBarSource: {
             title: '',
-            leftSrc: '/common/image/svg/back.svg',
-            rightSrc: '/common/image/icon/selected.png',
+            leftSrc: '',
+            rightSrc: '',
             isShowLeft: true,
             isShowRight: false
         },
@@ -38,60 +50,78 @@ export default {
         // 操作方式
         operationType: '',
         progress: 0,
-        progressTilte: '',
-        oprateType: '',
+        progressTitle: '',
+        operateType: '',
         fromAlbum: null,
         toAlbum: null,
-        consoleInfo: '',
-    },
-    onInit() {
-        this.progressTilte = this.$t('strings.albums');
-    },
-    onReady() {
-        let self = this;
-        for (let i = 0; i < self.list.length; i++) {
-            setTimeout(() => {
-                self.progress += Math.floor(100 / self.list.length);
-                if (i === self.list.length - 1) {
-                    self.$element('progress_dialog').close();
-                }
-            }, (i + 1) * 300);
-        }
-        setTimeout(() => {
-            self.$element('progress_dialog').show();
-            self.operations();
-        }, 50);
+        utils: null,
+        videoType: VIDEO_TYPE,
+        photoType: PHOTO_TYPE
     },
 
-    // 如果是从操作项过来
+/**
+    * 初始化数据
+    */
+    onInit() {
+        this.utils = this.$app.$def.utils;
+        this.utils.logDebug('afterSelect => onInit');
+        this.topBarSource.leftSrc = this.utils.getIcon('back');
+        this.topBarSource.rightSrc = this.utils.getIcon('select');
+        this.progressTitle = this.topBarSource.title;
+    },
+
+/**
+    * 初始化数据
+    */
+    onReady() {
+        this.utils.logDebug('afterSelect => onReady');
+        let self = this;
+        setTimeout(() => {
+            self.progress = PROGRESS;
+            self.$element('progress_dialog').close();
+        }, self.list.length * PROGRESS);
+        setTimeout(() => {
+            self.operations();
+        }, OPERATION_TIME);
+    },
+
+/**
+    * 操作后调用方法
+    */
     operations() {
+        this.utils.logDebug('afterSelect => operations');
         let self = this;
         self.initData();
         if (self.operationType === 'move') {
-            self.oprateType = self.$t('strings.move');
+            self.operateType = self.$t('strings.moving');
             if (self.fromAlbum.name === self.$t('strings.allPhotos')
-                || self.fromAlbum.name === self.$t('strings.video')) {
+            || self.fromAlbum.name === self.$t('strings.video')) {
                 self.mediaAllAlbumMove();
             } else {
                 self.mediaMove();
             }
-
+            self.$element('progress_dialog').show();
         } else if (self.operationType === 'copy') {
-            self.oprateType = self.$t('strings.copy');
+            self.operateType = self.$t('strings.copying');
             if (self.fromAlbum.name === self.$t('strings.allPhotos')
-                || self.fromAlbum.name === self.$t('strings.video')) {
+            || self.fromAlbum.name === self.$t('strings.video')) {
                 self.mediaAllAlbumCopy();
             } else {
                 self.mediaCopy();
             }
+            self.$element('progress_dialog').show();
         } else {
             self.$element('progress_dialog').close();
             self.loadData();
         }
+        self.$app.$def.dataManage.isRefreshed(true);
     },
 
-    // 所有相册入口复制
+/**
+    * 所有相册入口复制
+    */
     mediaAllAlbumCopy() {
+        this.utils.logDebug('afterSelect => mediaAllAlbumCopy => startTime');
         let self = this;
         for (let i = 0; i < self.list.length; i++) {
             let item = self.list[i];
@@ -110,11 +140,13 @@ export default {
                                 if (newImage) {
                                     newImage.startCreate((error, startFlag) => {
                                         if (startFlag) {
-                                            self.$element('progress_dialog').close();
                                             newImage.albumName = self.toAlbum.name;
                                             fromItem.commitCopy(newImage, (err, data) => {
-                                                self.$app.$def.datamanage.isRefreshed(true);
-                                                self.loadData();
+                                                self.progress += Math.ceil(PROGRESS / self.list.length - 1);
+                                                if (i === self.list.length - 1) {
+                                                    self.loadData();
+                                                    self.utils.logDebug('afterSelect => mediaAllAlbumCopy => endTime');
+                                                }
                                             });
                                         }
                                     });
@@ -127,13 +159,17 @@ export default {
         }
     },
 
-    // 复制功能
+/**
+    * 复制功能
+    */
     mediaCopy() {
+        this.utils.logDebug('afterSelect => mediaCopy => startTime');
         let self = this;
         let args = {
             selections: self.fromAlbum.name,
             selectionArgs: ['imagealbum', 'videoalbum'],
         };
+        let num = 0;
         media.getMediaAssets(args, (error, images) => {
             if (images) {
                 for (let j = 0; j < images.length; j++) {
@@ -141,15 +177,18 @@ export default {
                     for (let i = 0; i < self.list.length; i++) {
                         let item = self.list[i];
                         if (fromItem.name === item.name) {
+                            num++;
                             media.createImageAsset((error, newImage) => {
                                 if (newImage) {
                                     newImage.startCreate((error, startFlag) => {
                                         if (startFlag) {
-                                            self.$element('progress_dialog').close();
                                             newImage.albumName = self.topBarSource.title;
                                             fromItem.commitCopy(newImage, (err, data) => {
-                                                self.$app.$def.datamanage.isRefreshed(true);
-                                                self.loadData();
+                                                self.progress += Math.ceil(PROGRESS / self.list.length - 1);
+                                                if (i === self.list.length - 1 && num === self.list.length) {
+                                                    self.loadData();
+                                                    self.utils.logDebug('afterSelect => mediaCopy => endTime');
+                                                }
                                             });
                                         }
                                     });
@@ -162,8 +201,11 @@ export default {
         });
     },
 
-    // 查询
+/**
+    * 查询
+    */
     loadData() {
+        this.utils.logDebug('afterSelect => loadData => startTime');
         let self = this;
         if (self.album) {
             let args = {
@@ -176,6 +218,7 @@ export default {
                 self.topBarSource.title = self.$t('strings.allPhotos');
             }
             media.getMediaAssets(args, (error, images) => {
+                self.utils.logDebug('afterSelect => loadData => endTime');
                 if (images) {
                     for (let i = 0; i < images.length; i++) {
                         let item = images[i];
@@ -189,13 +232,16 @@ export default {
         }
     },
 
-    // 所有相册入口移动功能
+/**
+    * 所有相册入口移动功能
+    */
     mediaAllAlbumMove() {
+        this.utils.logDebug('afterSelect => mediaAllAlbumMove => startTime');
         let self = this;
         for (let i = 0; i < self.list.length; i++) {
             let item = self.list[i];
-            let arrs = item.URI.split('/');
-            let albumName = arrs[arrs.length - 2];
+            let arrData = item.URI.split('/');
+            let albumName = arrData[arrData.length - 2];
             let args = {
                 selections: albumName,
                 selectionArgs: ['imagealbum', 'videoalbum'],
@@ -211,11 +257,14 @@ export default {
                                         if (startFlag) {
                                             newImage.albumName = self.toAlbum.name;
                                             fromItem.commitCopy(newImage, (err, data) => {
-                                                self.$element('progress_dialog').close();
-                                                self.loadData();
                                                 fromItem.commitDelete((error, commitFlag) => {
+                                                    self.progress += Math.ceil(PROGRESS / self.list.length - 1);
                                                     if (commitFlag) {
-                                                        self.$app.$def.datamanage.isRefreshed(true);
+                                                        if (i === self.list.length - 1) {
+                                                            self.loadData();
+                                                            self.utils.logDebug(
+                                                                'afterSelect => mediaAllAlbumMove => endTime');
+                                                        }
                                                     }
                                                 });
                                             });
@@ -230,13 +279,17 @@ export default {
         }
     },
 
-    // 移动功能
+/**
+    * 移动功能
+    */
     mediaMove() {
+        this.utils.logDebug('afterSelect => mediaMove => startTime');
         let self = this;
         let args = {
             selections: self.fromAlbum.name,
             selectionArgs: ['imagealbum', 'videoalbum'],
         };
+        let num = 0;
         media.getMediaAssets(args, (error, images) => {
             if (images) {
                 for (let j = 0; j < images.length; j++) {
@@ -244,17 +297,20 @@ export default {
                     for (let i = 0; i < self.list.length; i++) {
                         let item = self.list[i];
                         if (fromItem.name === item.name) {
+                            num++;
                             media.createImageAsset((error, newImage) => {
                                 if (newImage) {
                                     newImage.startCreate((error, startFlag) => {
                                         if (startFlag) {
                                             newImage.albumName = self.topBarSource.title;
                                             fromItem.commitCopy(newImage, (err, data) => {
-                                                self.$element('progress_dialog').close();
-                                                self.loadData();
                                                 fromItem.commitDelete((error, commitFlag) => {
+                                                    self.progress += Math.ceil(PROGRESS / self.list.length - 1);
                                                     if (commitFlag) {
-                                                        self.$app.$def.datamanage.isRefreshed(true);
+                                                        if (i === self.list.length - 1 && num === self.list.length) {
+                                                            self.loadData();
+                                                            self.utils.logDebug('afterSelect => mediaMove => endTime');
+                                                        }
                                                     }
                                                 });
                                             });
@@ -268,7 +324,12 @@ export default {
             }
         });
     },
+
+/**
+    * 初始化数据
+    */
     initData() {
+        this.utils.logDebug('afterSelect => initData');
         let list = this.list;
         for (let index = 0; index < list.length; index++) {
             let item = list[index];
@@ -277,16 +338,11 @@ export default {
         }
     },
 
-    // 顶部左侧按钮
+/**
+    * 顶部左侧按钮
+    */
     topBarLeftClick() {
+        this.utils.logDebug('afterSelect => topBarLeftClick');
         router.back();
-    },
-
-    // 顶部右侧按钮
-    topBarRightClick() {
-
-    },
-    itemClick(item, index) {
-
     }
 };

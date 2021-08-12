@@ -20,7 +20,8 @@
 <element src="../../common/component/bottom_bar/bottom_bar.hml"></element>
 <element src="../dialog/detail_dialog/detail_dialog.hml"></element>
 <element src="../dialog/delete_dialog/delete_dialog.hml"></element>
-<div class="videolist-container">
+
+<div class="video-list-container">
     <top_bar
             id="topBar"
             data-source="{{ topBarSource }}"
@@ -32,15 +33,14 @@
             <div class="list-item">
                 <stack class="item-stack" for="{{ (index, item) in listData }}"
                        style="width : {{ videoWidth }};"
-                       on:longpress="longpress({{ item }},{{ index }})">
+                       on:longpress="longPress({{ item }},{{ index }})">
                     <video
                             style="object-fit : fill;"
                             src='{{ item.src }}'
-                            poster='{{ item.poster }}'
                             muted='false'
                             autoplay='false'
                             controls="false"
-                            onprepared="videoPrepare"
+                            onprepared="videoPrepare({{ item }})"
                             ></video>
                     <div style="background-color : transparent; width : 100%; height : 100%;"
                          onclick="videoClick({{ item }},{{ index }})"></div>
@@ -50,7 +50,7 @@
                     <image if="{{ selectMode }}" class="select" src="{{ item.icon }}">
                     </image>
                     <text else class="text" onclick="videoClick({{ item }})">
-                        {{ videoDuration }}
+                        {{ item.duration }}
                     </text>
                 </stack>
             </div>
@@ -68,4 +68,3 @@
     <detail_dialog id="detail_dialog" form-data="{{ detailData }}"></detail_dialog>
     <delete_dialog id="delete_dialog" @delete-query="deleteQuery"></delete_dialog>
 </div>
-
