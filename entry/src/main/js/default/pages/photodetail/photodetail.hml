@@ -20,37 +20,48 @@
 <element src="../dialog/rename_dialog/rename_dialog.hml"></element>
 <element src="../dialog/delete_dialog/delete_dialog.hml"></element>
 
-<div class="photodetail-container">
+<div class="photo-detail-container">
     <top_bar
             id="topBar"
             data-source="{{ topBarSource }}"
             @left-click="topBarLeftClick"
             @right-click="topBarRightClick">
     </top_bar>
-    <div class="photodetail-div">
+    <div class="photo-detail-div">
         <swiper
-                class="photodetail-swiper"
+                class="photo-detail-swiper"
                 id="photoDetailSwiper"
-                index="{{ sharetIndex }}"
+                index="{{ shareIndex }}"
                 loop="false" indicator="false"
                 on:change="swiperChange"
                 on:touchstart="hideBottomPop">
             <div for="{{ (index, item) in list }}">
-                <div if="{{ item.mediaType == 3 }}" style="transform : rotate({{ item.rotate + 'deg' }});">
+                <div if="{{ item.mediaType == photoType }}" style="transform : rotate({{ item.rotate + 'deg' }});">
                     <image
                             src="{{ item.src }}"
                             class="shared-transition-style"
                             style="transform : scale({{ item.scale }});"></image>
                 </div>
 
-                <stack if="{{ item.mediaType == 4 }}">
+                <stack if="{{ item.mediaType == videoType }}">
                     <video
+                            id="{{ 'video' + index }}"
                             style="object-fit : fill;"
                             src='{{ item.src }}'
-                            poster='{{ item.poster }}'
-                            muted='false' controls="false"></video>
-                    <image style="left : 45%; top : 50%; width : 80px; height : 80px;"
-                           src="/common/image/svg/play.svg">
+                            muted='false'
+                            autoplay="false"
+                            controls="true"
+                            on:prepared="videoPrepare({{ item }})"
+                            on:start="videoStart({{ item }}"
+                            on:pause="videoPause({{ item }})"
+                            on:finish="videoFinish({{ item }})"
+                            on:stop="videoStop({{ item }}})"
+                            on:error="videoError({{ item }})"></video>
+
+                    <image class="video-player"
+                           on:click="videoPlay({{ item }},{{ index }})"
+                           src="/common/image/svg/play.svg"
+                           show="{{ item.isPause }}">
                     </image>
                 </stack>
             </div>
@@ -78,12 +89,12 @@
     <rename_dialog id="rename_dialog" @rename-dialog-album="renameDialogAlbum" input-name="{{ inputName }}">
     </rename_dialog>
     <delete_dialog id="delete_dialog" @delete-query="deleteQuery"></delete_dialog>
-    <dialog id="photo_detail_dialog" oncancel="cancel" class="detail_dialog">
-        <div class="detailDialog-div">
-            <text class="detailDialog-title">{{ $t('strings.detailInfo') }}</text>
-            <text class="detailDialog-text">{{ $t('strings.name') }}： {{ detailData.name }}</text>
-            <text class="detailDialog-text">{{ $t('strings.size') }}： {{ detailData.size }}MB</text>
-            <div class="detailDialog-btn">
+    <dialog id="photo_detail_dialog" oncancel="cancel" class="detail-dialog">
+        <div class="detail-dialog-div">
+            <text class="detail-dialog-title">{{ $t('strings.detailInfo') }}</text>
+            <text class="detail-dialog-text">{{ $t('strings.name') }}： {{ detailData.name }}</text>
+            <text class="detail-dialog-text">{{ $t('strings.size') }}： {{ detailData.size }}MB</text>
+            <div class="detail-dialog-btn">
                 <text style="color : dodgerblue;" on:click="dialogCancel">{{ $t('strings.know') }}</text>
             </div>
         </div>

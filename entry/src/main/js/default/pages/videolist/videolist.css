@@ -19,7 +19,7 @@
     width: 100%;
 }
 
-.videolist-container {
+.video-list-container {
     flex-direction: column;
     background-color: #fff;
 }
@@ -27,7 +27,6 @@
 .list-item {
     display: flex;
     flex-wrap: wrap;
-
 }
 
 .item-stack {

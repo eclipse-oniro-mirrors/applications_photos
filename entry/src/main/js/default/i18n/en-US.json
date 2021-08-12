@@ -16,13 +16,13 @@
     "unChoose": "Select images",
     "cancel": "Cancel",
     "define": "Confirm",
-    "repeateName": "Name already exists",
+    "repeatName": "Name already exists",
     "detailInfo": "Details",
     "name": "Title",
     "size": "Size",
     "know": "Ok",
     "chooseAddType": "Copy or move",
-    "items": " items",
+    "items": " items ? ",
     "selected": "Selected ",
     "number": "Quantity",
     "createAlbum": "Add album",
@@ -32,8 +32,13 @@
     "unSelectAll": "Deselect all",
     "chooseAlbums": "Select album",
     "operateTitle": "Move or Copy",
+    "deleteTitleInfo": "Delete selected ",
+    "files": " files ? ",
     "deleteInfo": "Delete selected ",
-    "isDeleteChooseItem": "Delete item ? ",
-    "free": "free"
+    "free": "free",
+    "copying": "Copying to",
+    "moving": "Moving to",
+    "isDeleteChooseImage": "Delete image ? ",
+    "isDeleteChooseVideo": "Delete video ? "
   }
 }

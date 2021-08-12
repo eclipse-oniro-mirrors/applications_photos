@@ -50,13 +50,12 @@
       {
         "pages": [
           "pages/main/main",
-          "pages/selectalbum/selectalbum",
-          "pages/photolist/photolist",
-          "pages/afterselect/afterselect",
-          "pages/photodetail/photodetail",
-          "pages/videolist/videolist",
-          "pages/selectalbumphoto/selectalbumphoto",
-          "pages/editImage/editImage"
+          "pages/selectAlbum/selectAlbum",
+          "pages/photoList/photoList",
+          "pages/afterSelect/afterSelect",
+          "pages/photoDetail/photoDetail",
+          "pages/videoList/videoList",
+          "pages/selectAlbumPhoto/selectAlbumPhoto"
         ],
         "name": "default",
         "window": {

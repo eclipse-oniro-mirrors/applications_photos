@@ -15,14 +15,13 @@
  */
 -->
 
-<dialog id="detail_dialog" oncancel="cancel" class="detail_dialog">
-    <div class="detailDialog-div">
-        <text class="detailDialog-title">{{ $t('strings.detailInfo') }}</text>
-        <text class="detailDialog-text">{{ $t('strings.number') }}： {{ formData.number }}</text>
-        <text class="detailDialog-text">{{ $t('strings.size') }}： {{ formData.size }} MB</text>
-        <div class="detailDialog-btn">
+<dialog id="detail_dialog" oncancel="cancel" class="detail-dialog">
+    <div class="detail-dialog-div">
+        <text class="detail-dialog-title">{{ $t('strings.detailInfo') }}</text>
+        <text class="detail-dialog-text">{{ $t('strings.number') }}： {{ formData.number }}</text>
+        <text class="detail-dialog-text">{{ $t('strings.size') }}： {{ formData.size }} MB</text>
+        <div class="detail-dialog-btn">
             <text style="color : dodgerblue;" on:click="query">{{ $t('strings.know') }}</text>
         </div>
     </div>
 </dialog>
-
