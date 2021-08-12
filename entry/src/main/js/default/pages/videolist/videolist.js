@@ -21,67 +21,39 @@ import router from '@system.router';
 import mediaLibrary from '@ohos.multimedia.medialibrary';
 
 let media = mediaLibrary.getMediaLibraryHelper();
-
-// 加载数据延时
-const LOAD_DATA_TIME = 200;
-
-// 移动id
-const MOVE_ID = 1;
-
-// 删除id
-const DELETE_ID = 2;
-
-// 全选id
-const SELECT_ALL_ID = 3;
-
-// 更多id
-const MORE_ID = -10;
-
-// 详细信息id
-const ABOUT_ID = 1;
-
-// 复制id
-const COPY_ID = 2;
-
-// 详细信息尺寸取小数点后4位
-const DETAIL_SIZE = 4;
-
-// 图片尺寸转换单位
-const DATA_SIZE = 1024;
-
 export default {
     data: {
         listData: [],
         topBarSource: {
             title: '',
-            leftSrc: '',
-            rightSrc: '',
+            leftSrc: '/common/image/svg/back.svg',
+            rightSrc: '/common/image/svg/add.svg',
             isShowLeft: true,
             isShowRight: false
         },
         isShowBottomBar: false,
         bottomBarSource: [
             {
-                id: MOVE_ID,
-                src: '',
+                id: 1,
+                src: '/common/image/svg/move.svg',
                 disabled: true,
                 name: ''
             },
             {
-                id: DELETE_ID,
-                src: '',
+                id: 2,
+                src: '/common/image/svg/delete.svg',
                 disabled: true,
                 name: ''
             },
             {
-                id: SELECT_ALL_ID,
-                src: '',
+                id: 3,
+                src: '/common/image/svg/select_all.svg',
                 disabled: true,
                 name: ''
             },
             {
-                id: MORE_ID,
-                src: '',
+                id: -10,
+                src: '/common/image/svg/more.svg',
                 disabled: false,
                 visible: true,
                 name: ''
@@ -89,15 +61,15 @@ export default {
         ],
         bottomBarPopList: [
             {
-                id: ABOUT_ID,
-                src: '',
+                id: 1,
+                src: '/common/image/svg/about.svg',
                 disabled: false,
                 visible: true,
                 name: ''
             },
             {
-                id: COPY_ID,
-                src: '',
+                id: 2,
+                src: '/common/image/svg/copy.svg',
                 disabled: false,
                 visible: true,
                 name: ''
@@ -105,57 +77,28 @@ export default {
         ],
         popVisible: false,
         videoWidth: '360px',
+        videoDuration: '00:00',
         selectMode: false,
         detailData: [],
         isAllChecked: false,
         album: null,
-        deleteDialogTitle: '',
-        utils: null
+        deleteDialogTitle: ''
     },
-
-/**
-    * 初始化数据
-    */
     onInit() {
-        this.utils = this.$app.$def.utils;
-        this.utils.logDebug('videoList => onInit');
         this.initNational();
     },
-
-/**
-    * 初始化菜单资源
-    */
     initNational() {
-        this.utils.logDebug('videoList => initNational');
-        this.topBarSource.leftSrc = this.utils.getIcon('close');
-        this.topBarSource.rightSrc = this.utils.getIcon('select');
         this.bottomBarSource[0].name = this.$t('strings.move');
-        this.bottomBarSource[0].src = this.utils.getIcon('move');
         this.bottomBarSource[1].name = this.$t('strings.delete');
-        this.bottomBarSource[1].src = this.utils.getIcon('delete');
         this.bottomBarSource[2].name = this.$t('strings.selectAll');
-        this.bottomBarSource[2].src = this.utils.getIcon('select_all');
         this.bottomBarSource[3].name = this.$t('strings.more');
-        this.bottomBarSource[3].src = this.utils.getIcon('more');
         this.bottomBarPopList[0].name = this.$t('strings.detailInfo');
         this.bottomBarPopList[1].name = this.$t('strings.copy');
-        this.bottomBarPopList[1].src = this.utils.getIcon('copy');
     },
-
-/**
-    * 组件显示加载数据
-    */
     onShow() {
         this.loadData();
     },
-
-/**
-    * 回退按钮
-    *
-    * @return {boolean} Verify result
-    */
     onBackPress() {
-        this.utils.logDebug('videoList => onBackPress');
         if (this.selectMode) {
             this.topBarSource.leftSrc = this.$app.$def.utils.getIcon('back');
             this.topBarSource.title = this.$t('strings.video');
@@ -167,12 +110,7 @@ export default {
             return false;
         }
     },
-
-/**
-    * 加载数据
-    */
     loadData() {
-        this.utils.logDebug('videoList => loadData => startTime');
         let self = this;
         let arg = {
             selections: '',
@@ -180,15 +118,11 @@ export default {
         };
 
         // 用来保存从详情的选中数据
-        let shareList = self.$app.$def.dataManage.getPhotoList() || [];
-
+        let shareList = self.$app.$def.datamanage.getPhotoList() || [];
         media.getVideoAssets(arg, (error, videos) => {
-            self.utils.logDebug('videoList => loadData => endTime');
             if (videos) {
                 videos.forEach((item, index) => {
                     item.src = 'file://' + item.URI;
-                    item.duration = '00:00';
-                    item.isPause = true;
                     if (self.selectMode) {
                         item.icon = self.$app.$def.utils.getIcon('unselected');
                         for (let j = 0; j < shareList.length; j++) {
@@ -206,6 +140,7 @@ export default {
                         item.icon = '';
                         item.checked = false;
                     }
+                    item.poster = '/common/image/internet' + index + 1 + '.jpg';
                 });
                 self.listData = videos;
                 self.onCheckedChange();
@@ -213,13 +148,8 @@ export default {
         });
     },
 
-/**
-    * 顶部左侧按钮
-    *
-    * @return {boolean} Verify result
-    */
+    // 顶部左侧按钮
     topBarLeftClick() {
-        this.utils.logDebug('videoList => topBarLeftClick');
         if (this.selectMode) {
             this.topBarSource.leftSrc = this.$app.$def.utils.getIcon('back');
             this.topBarSource.title = this.$t('strings.video');
@@ -231,47 +161,27 @@ export default {
         router.back();
     },
 
-/**
-    * 视频加载后回调
-    *
-    * @param {Object} item - 当前点击视频项
-    * @param {Object} e - 当前点击视频项event
-    */
-    videoPrepare(item, e) {
-        this.utils.logDebug('videoList => videoPrepare');
-        item.duration = e.duration;
-    },
+    // 顶部右侧按钮
+    topBarRightClick() {
 
-/**
-    * 放大按钮点击事件
-    *
-    * @param {Object} item - 当前点击视频项
-    * @param {number} index - 当前点击视频项下标
-    */
+    },
+    videoPrepare(e) {
+        this.videoDuration = e.duration;
+    },
     scaleClick(item, index) {
-        this.utils.logDebug('videoList => scaleClick');
         router.push(
             {
-                uri: 'pages/photoDetail/photoDetail',
+                uri: 'pages/photodetail/photodetail',
                 params: {
                     list: this.listData,
                     album: this.album,
                     selectMode: this.selectMode,
-                    shareIndex: index
+                    sharetIndex: index
                 },
             }
         );
     },
-
-/**
-    * 列表项点击事件
-    *
-    * @param {Object} item - 当前点击视频项
-    * @param {number} index - 当前点击视频项下标
-    * @return {boolean} Verify result
-    */
     videoClick(item, index) {
-        this.utils.logDebug('videoList => videoClick');
         this.hideBottomPop();
         if (this.selectMode) {
             item.checked = !item.checked;
@@ -285,40 +195,26 @@ export default {
         }
         router.push(
             {
-                uri: 'pages/photoDetail/photoDetail',
+                uri: 'pages/photodetail/photodetail',
                 params: {
                     list: this.listData,
                     album: this.album,
                     selectMode: this.selectMode,
-                    shareIndex: index
+                    sharetIndex: index
                 },
             }
         );
     },
-
-/**
-    * 长按事件
-    *
-    * @param {Object} item - 当前点击视频项
-    * @param {number} index - 当前点击视频项下标
-    */
-    longPress(item, index) {
-        this.utils.logDebug('videoList => longPress');
+    longpress(item, index) {
         this.selectMode = true;
         this.topBarSource.leftSrc = this.$app.$def.utils.getIcon('close');
         this.topBarSource.title = this.$t('strings.unChoose');
         this.isShowBottomBar = true;
         this.initListChecked();
+
         this.videoClick(item, index);
     },
-
-/**
-    * 选中改变事件
-    *
-    * @return {boolean} Verify result
-    */
     onCheckedChange() {
-        this.utils.logDebug('videoList => onCheckedChange');
         let self = this;
         let checkList = self.getCheckedData();
         if (!self.selectMode) {
@@ -337,7 +233,7 @@ export default {
             self.isAllChecked = false;
             for (let i = 0; i < self.bottomBarSource.length; i++) {
                 const item = self.bottomBarSource[i];
-                if (item.id !== SELECT_ALL_ID) {
+                if (item.id !== 3) {
                     item.disabled = true;
                 }
             }
@@ -359,25 +255,15 @@ export default {
             }
         }
     },
-
-/**
-    * 初始化列表选中状态
-    */
     initListChecked() {
-        this.utils.logDebug('videoList => initListChecked');
         this.listData.forEach(item => {
             item.checked = false;
             item.icon = this.$app.$def.utils.getIcon('unselected');
         });
     },
 
-/**
-    * 获取选中数据
-    *
-    * @return {Array} list - 选中数据
-    */
+    // 获取选中数据
     getCheckedData() {
-        this.utils.logDebug('videoList => getCheckedData');
         let self = this;
         let list = [];
         self.listData.forEach(item => {
@@ -388,27 +274,19 @@ export default {
         return list;
     },
 
-/**
-    * 底部菜单点击事件
-    *
-    * @param {Object} item - 当前点击底部菜单项
-    */
+    // 底部菜单
     bottomTabClick(item) {
-        this.utils.logDebug('videoList => bottomTabClick');
-        if (item.detail.id === MOVE_ID) {
+        if (item.detail.id === 1) {
             this.movePhotos();
-        } else if (item.detail.id === DELETE_ID) {
+        } else if (item.detail.id === 2) {
             this.deletePhotos();
-        } else if (item.detail.id === SELECT_ALL_ID) {
+        } else if (item.detail.id === 3) {
             this.setListChecked();
         }
     },
 
-/**
-    * 设置全选
-    */
+    // 设置全选
     setListChecked() {
-        this.utils.logDebug('videoList => setListChecked');
         let self = this;
         let list = self.listData;
 
@@ -424,19 +302,14 @@ export default {
             }
         }
         self.onCheckedChange();
+
     },
 
-/**
-    * 设置全选
-    *
-    * @param {Object} item - 当前点击Pop菜单项
-    * @return {boolean} Verify result
-    */
+    // 弹出提示框点击事件
     popupItemClick(item) {
-        this.utils.logDebug('videoList => popupItemClick');
-        if (item.detail.id === COPY_ID) {
+        if (item.detail.id === 2) {
             this.copyPhotos();
-        } else if (item.detail.id === ABOUT_ID) {
+        } else if (item.detail.id === 1) {
             let list = this.getCheckedData();
             if (list.length === 0) {
                 return false;
@@ -445,29 +318,20 @@ export default {
             for (let i = 0; i < list.length; i++) {
                 size += Number(list[i].size);
             }
-            size = size / DATA_SIZE / DATA_SIZE;
+            size = size / 1024 / 1024;
             this.detailData = {
                 number: list.length,
-                size: size.toFixed(DETAIL_SIZE)
+                size: size.toFixed(4)
             };
             this.$element('detail_dialog').show();
         }
     },
-
-/**
-    * 删除弹窗确定回调
-    */
     deleteQuery() {
         this.deleteDialogCommit();
     },
 
-/**
-    * 删除显示图片弹窗
-    *
-    * @return {boolean} Verify result
-    */
+    // 删除图片
     deletePhotos() {
-        this.utils.logDebug('videoList => deletePhotos');
         let length = this.getCheckedData().length;
         if (length === 0) {
             return false;
@@ -476,12 +340,7 @@ export default {
         child.setTitle(this.$t('strings.selected') + length + this.$t('strings.items'));
         child.show();
     },
-
-/**
-    * 删除图片接口调用
-    */
     deleteDialogCommit() {
-        this.utils.logDebug('videoList => deleteDialogCommit => startTime');
         let self = this;
         let choose = self.getCheckedData();
         let arg = {
@@ -489,7 +348,6 @@ export default {
             selectionArgs: ['videoalbum'],
         };
         media.getVideoAssets(arg, (error, videos) => {
-            self.utils.logDebug('videoList => deleteDialogCommit => endTime');
             if (videos) {
                 for (let j = 0; j < choose.length; j++) {
                     let shareItem = choose[j];
@@ -497,7 +355,7 @@ export default {
                         if (item.name === shareItem.name && item.id === shareItem.id) {
                             item.commitDelete((error, commitFlag) => {
                                 if (commitFlag) {
-                                    self.$app.$def.dataManage.isRefreshed(true);
+                                    self.$app.$def.datamanage.isRefreshed(true);
                                     self.selectMode = false;
                                     setTimeout(() => {
                                         if (choose.length === self.listData.length) {
@@ -506,7 +364,7 @@ export default {
                                         } else {
                                             self.loadData();
                                         }
-                                    }, LOAD_DATA_TIME);
+                                    }, 200);
                                 }
                             });
                         }
@@ -516,16 +374,13 @@ export default {
         });
     },
 
-/**
-    * 移动
-    */
+    // 移动
     movePhotos() {
-        this.utils.logDebug('videoList => movePhotos');
         let self = this;
         let choose = self.getCheckedData();
         router.push(
             {
-                uri: 'pages/selectAlbum/selectAlbum',
+                uri: 'pages/selectalbum/selectalbum',
                 params: {
                     isOperationFrom: true,
                     operationType: 'move',
@@ -536,16 +391,13 @@ export default {
         );
     },
 
-/**
-    * 复制
-    */
+    // 复制
     copyPhotos() {
-        this.utils.logDebug('videoList => copyPhotos');
         let self = this;
         let choose = self.getCheckedData();
         router.push(
             {
-                uri: 'pages/selectAlbum/selectAlbum',
+                uri: 'pages/selectalbum/selectalbum',
                 params: {
                     isOperationFrom: true,
                     operationType: 'copy',
@@ -555,22 +407,10 @@ export default {
             }
         );
     },
-
-/**
-    * 隐藏pop弹窗
-    */
     hideBottomPop() {
-        this.utils.logDebug('videoList => hideBottomPop');
         this.popVisible = false;
     },
-
-/**
-    * 改变pop弹窗显示状态
-    *
-    * @param {Object} e - 改变pop弹出层回调参数
-    */
     changePopVisible(e) {
-        this.utils.logDebug('videoList => changePopVisible');
         this.popVisible = e.detail;
     }
 };

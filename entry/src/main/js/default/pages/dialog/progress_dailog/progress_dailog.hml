@@ -15,17 +15,19 @@
  */
 -->
 
-<dialog id="addTypeDialog" class="add-type-dialog-main" oncancel="cancelDialog">
+<dialog id="progressDialog" oncancel="cancel" class="progress_dailog">
     <div class="dialog-div">
-        <text class="title">{{ $t('strings.chooseAddType') }}</text>
-        <div class="text-div" on:click="operation({{ $t('strings.copy') }})">
-            <text class="text">{{ $t('strings.copy') }}</text>
+        <div class="inner-txt">
+            <text class="text">正在{{ oprateType }}到{{ title }}</text>
+            <text class="grey-text">{{ progress }}%</text>
         </div>
-        <div style="padding : 28px 48px;" on:click="operation({{ $t('strings.move') }})">
-            <text class="text">{{ $t('strings.move') }}</text>
-        </div>
-        <div class="bottom-div" onclick="cancel">
-            <text class="btn-txt">{{ $t('strings.cancel') }}</text>
+        <div class="inner-progress">
+            <div>
+                <progress class="progress" type="horizontal" percent="{{ progress }}"></progress>
+            </div>
+            <div style="padding-left : 10px;">
+                <image class="icon" src="/common/image/svg/cancel_bg.svg"></image>
+            </div>
         </div>
     </div>
 </dialog>

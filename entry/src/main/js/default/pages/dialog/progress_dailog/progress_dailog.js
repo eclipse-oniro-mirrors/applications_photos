@@ -21,33 +21,23 @@ export default {
     data: {
         progress: 0,
         title: '',
-        operateType: ''
+        oprateType: ''
     },
+    onReady() {
 
-/**
-    * 弹框显示
-    */
+    },
+    onInit() {
+
+    },
     show() {
         this.$element('progressDialog').show();
     },
-
-/**
-    * 弹框隐藏
-    */
     close() {
         this.$element('progressDialog').close();
     },
-
-/**
-    * 确定
-    */
     query() {
         this.close();
     },
-
-/**
-    * 取消
-    */
     cancel() {
         this.close();
     }

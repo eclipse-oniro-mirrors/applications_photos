@@ -39,6 +39,7 @@
     text-align: center;
 }
 
+
 .container {
     background-color: #fff;
     display: flex;
@@ -55,7 +56,7 @@
     box-shadow: 1px 3px 3px 3px #dcdcdc;
 }
 
-.list-text {
+.listTxt {
     width: 160px;
     display: flex;
     align-items: center;

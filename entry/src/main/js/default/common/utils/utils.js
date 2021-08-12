@@ -17,40 +17,23 @@
  * @file: 工具类方法
  */
 
-// 倍数
-const DOUBLE = 2;
-
-// 月份
-const MOUTH = 10;
-
 let iconCache = {};
 
-let isStartLog = true;
-
 export default {
-    isStartLog,
-
-/**
-    * 获取图标
-    *
-    * @param {string} type - 图标
-    * @return {string} - 返回图标路径
-    */
     getIcon(type) {
         return iconCache[type];
     },
-
-/**
-    * 初始化图标
-    */
     initIcon() {
         iconCache['camera'] = '/common/image/svg/camera.svg';
         iconCache['selected'] = '/common/image/svg/checkbox_filled.svg';
         iconCache['unselected'] = '/common/image/svg/checkbox_white.svg';
+        iconCache['collection'] = '/common/image/svg/favorite_white_filled.svg';
         iconCache['friend'] = '/common/image/svg/shared_album_white_filled.svg';
         iconCache['video'] = '/common/image/svg/video_white_filled.svg';
         iconCache['rename'] = '/common/image/svg/rename.svg';
+        iconCache['rename_black'] = '/common/image/svg/rename_filled_black.svg';
         iconCache['delete'] = '/common/image/svg/delete.svg';
+        iconCache['delete_black'] = '/common/image/svg/delete_filled_black.svg';
         iconCache['more'] = '/common/image/svg/more.svg';
         iconCache['select_all'] = '/common/image/svg/select_all.svg';
         iconCache['move'] = '/common/image/svg/move.svg';
@@ -59,112 +42,27 @@ export default {
         iconCache['close'] = '/common/image/svg/close.svg';
         iconCache['info'] = '/common/image/svg/info.svg';
         iconCache['unselected_black'] = '/common/image/svg/unchecked_black.svg';
+        iconCache['enlarge'] = '/common/image/svg/enlarge.svg';
+        iconCache['narrow'] = '/common/image/svg/narrow.svg';
         iconCache['scaleadd'] = '/common/image/svg/scaleadd.svg';
         iconCache['scaleminus'] = '/common/image/svg/scaleminus.svg';
-        iconCache['add'] = '/common/image/svg/add.svg';
-        iconCache['select'] = '/common/image/icon/selected.png';
     },
-
-/**
-    * px转dp
-    *
-    * @param {number} value - px值
-    * @param {number} density - 屏幕密度
-    * @return {number} - dp单位大小
-    */
     pxTodp(value, density) {
-        return value / density * DOUBLE;
+        return value / density * 2;
     },
 
-/**
-    * 以下函数返回 min（包含）～ max（包含）之间的数字
-    *
-    * @param {number} min - 最小值
-    * @param {number} max - 最大值
-    * @return {number} - 随机数
-    */
+    // 以下函数返回 min（包含）～ max（包含）之间的数字：
     getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     },
-
-/**
-    * logInfo
-    *
-    * @param {string} str - 日志
-    */
-    logInfo(str) {
-        if (isStartLog) {
-            console.info('Photos info : ' + str);
-        }
-    },
-
-/**
-    * logError
-    *
-    * @param {string} str - 日志
-    */
-    logError(str) {
-        if (isStartLog) {
-            console.error('Photos error : ' + str);
-        }
-    },
-
-/**
-    * logDebug
-    *
-    * @param {string} str - 日志
-    */
-    logDebug(str) {
-        if (isStartLog) {
-            console.debug('Photos debug : ' + str);
-        }
-    },
-
-/**
-    * log
-    *
-    * @param {string} str - 日志
-    */
-    log(str) {
-        if (isStartLog) {
-            console.log('Photos log : ' + str);
-        }
-    },
-
-/**
-    * logWarn
-    *
-    * @param {string} str - 日志
-    */
-    logWarn(str) {
-        if (isStartLog) {
-            console.warn('Photos warn : ' + str);
-        }
-    },
-
-/**
-    * 设置是否开启日志
-    *
-    * @param {boolean} flag - 是否开启日志
-    */
-    setStartLog(flag) {
-        isStartLog = flag;
-    },
-
-/**
-    * 获取时间拼接
-    *
-    * @return {string} - 时间
-    */
-    getTime() {
-        let date = new Date();
-        let Y = date.getFullYear() + '-';
-        let M = (date.getMonth() + 1 < MOUTH ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
-        let D = date.getDate() + '-';
+    timestampToTime(timestamp) {
+        let date = new Date(timestamp * 1000);
+        let Y = date.getFullYear() + '年';
+        let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '月';
+        let D = date.getDate() + '日';
         let h = date.getHours() + ':';
         let m = date.getMinutes() + ':';
-        let s = date.getSeconds() + ':';
-        let mill = date.getMilliseconds();
-        return Y + M + D + h + m + s + mill;
+        let s = date.getSeconds();
+        return Y + M + D;
     }
 };

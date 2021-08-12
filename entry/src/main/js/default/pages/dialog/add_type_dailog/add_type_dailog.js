@@ -21,40 +21,24 @@ export default {
     data: {
         inputName: ''
     },
+    onReady() {
 
-/**
-    * 弹框显示
-    */
+    },
+    onInit() {
+
+    },
     show() {
         this.$element('addTypeDialog').show();
     },
-
-/**
-    * 弹框隐藏
-    */
     close() {
         this.$element('addTypeDialog').close();
     },
-
-/**
-    * 确定
-    */
     query() {
         this.close();
     },
-
-/**
-    * 取消
-    */
     cancel() {
         this.close();
     },
-
-/**
-    * 全选全不选
-    *
-    * @param {string} name - 操作类型名称
-    */
     operation(name) {
         this.$emit('addTypeDialogClick', name);
     }

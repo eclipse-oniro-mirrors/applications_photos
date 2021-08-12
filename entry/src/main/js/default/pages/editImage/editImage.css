@@ -13,49 +13,16 @@
  * limitations under the License.
  */
 
-.progress-dialog {
+.editImage-container {
     background-color: #fff;
-    width: 100%;
-    border-radius: 16px;
-    margin: 24px;
-}
-
-.dialog-div {
-    padding: 48px 36px;
     flex-direction: column;
-    background-color: #fff;
-    border-radius: 20px;
+    height: 100%;
+    width: 100%;
 }
 
-.inner-txt {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.text {
-    color: #000;
-}
-
-.grey-text {
-    color: #a9a9a9;
-    font-size: 25px;
-}
-
-.inner-progress {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.icon {
-    height: 48px;
-    width: 48px;
-    align-items: center;
-}
-
-.progress {
-    color: #1e90ff;
-    background-color: #dcdcdc;
+.title {
+    font-size: 30px;
+    text-align: center;
+    width: 200px;
+    height: 100px;
 }

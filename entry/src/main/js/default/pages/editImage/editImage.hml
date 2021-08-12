@@ -15,15 +15,17 @@
  */
 -->
 
-<dialog id="delete_dialog" class="delete-dialog-main" oncancel="cancelDialog">
-    <div class="dialog-div">
-        <div class="text-div">
-            <text class="title">{{ title }}</text>
-        </div>
-        <div class="bottom-div">
-            <text onclick="cancel" class="text">{{ $t('strings.cancel') }}</text>
-            <text onclick="query" class="text line" style="color : #ff0000;">{{ $t('strings.delete') }}</text>
-        </div>
+<element src="../../common/component/top_bar/top_bar.hml"></element>
+<element src="../../common/component/bottom_bar/bottom_bar.hml"></element>
+<div class="editImage-container">
+    <top_bar
+            id="topBar"
+            data-source="{{ topBarSource }}"
+            @left-click="topBarLeftClick">
+    </top_bar>
+    <div>
+        <canvas id="edit_canvas"></canvas>
     </div>
-</dialog>
-
+    <bottom_bar is-show="{{ true }}" @bottom-tab-click="bottomTabClick"
+                data-source="{{ bottomBarSource }}"></bottom_bar>
+</div>

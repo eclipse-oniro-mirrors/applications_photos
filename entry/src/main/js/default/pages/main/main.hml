@@ -19,9 +19,8 @@
 <element src="../../common/component/top_bar/top_bar.hml"></element>
 <element src="../../common/component/bottom_bar/bottom_bar.hml"></element>
 <element src="../dialog/rename_dialog/rename_dialog.hml"></element>
-<element src="../dialog/create_dialog/create_dialog.hml"></element>
+<element src="../dialog/create_dailog/create_dailog.hml"></element>
 <element src="../dialog/delete_dialog/delete_dialog.hml"></element>
-
 <div class="main-container" ref="parentDiv">
     <top_bar
             id="topBar"
@@ -56,6 +55,6 @@
     </bottom_bar>
     <rename_dialog id="rename_dialog" input-name="{{ inputName }}" @rename-dialog-album="renameDialogAlbum">
     </rename_dialog>
-    <create_dialog id="create_dialog" @create-dialog-album="createDialogAlbum"></create_dialog>
+    <create_dailog id="create_dailog" @create-dialog-album="createDialogAlbum"></create_dailog>
     <delete_dialog id="delete_dialog" @delete-query="deleteQuery"></delete_dialog>
 </div>

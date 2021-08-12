@@ -17,18 +17,6 @@
  * @file: 底部操作栏
  */
 
-// 弹框高度
-const POP_HEIGHT = 100;
-
-// 删除id
-const DELETE_ID = -10;
-
-// 弹框显示与隐藏延时
-const POP_VISIBLE = 50;
-
-// 触发弹框点击事件延时
-const POP_ITEM_CLICK = 200;
-
 export default {
     data: {
         isShow: true,
@@ -46,62 +34,40 @@ export default {
                     length++;
                 }
             }
-            return (length * POP_HEIGHT) + 'px';
+            return (length * 100) + 'px';
         }
     },
-
-/**
-    * 底部菜单点击事件
-    *
-    * @param {Object} item - 底部点击项
-    */
-    tabClick(item) {
+    tabClick(item, index) {
         let self = this;
         if (!item.disabled) {
-            if (item.id === DELETE_ID) {
+            if (item.id === -10) {
                 setTimeout(() => {
                     self.popVisible = !self.popVisible;
                     self.$emit('changePopVisible', self.popVisible);
-                }, POP_VISIBLE);
+                }, 50);
             } else {
                 setTimeout(() => {
                     self.popVisible = false;
-                }, POP_VISIBLE);
+                }, 50);
                 self.$emit('bottomTabClick', item);
             }
         }
     },
-
-/**
-    * 弹出层点击事件
-    *
-    * @param {Object} item - 弹框点击项
-    */
     popupItemClick(item) {
         let self = this;
         setTimeout(() => {
             self.popVisible = false;
-        }, POP_VISIBLE);
+        }, 50);
 
         setTimeout(() => {
             if (!item.disabled) {
                 self.$emit('popupItemClick', item);
             }
-        }, POP_ITEM_CLICK);
+        }, 200);
     },
-
-/**
-    * 弹出层显示隐藏
-    */
     popupVisible() {
         this.popVisible = !this.popVisible;
     },
-
-/**
-    * 获取弹出层显示隐藏
-    *
-    * @return {boolean} - 弹框显示与隐藏
-    */
     getPopVisible() {
         return this.popVisible;
     }

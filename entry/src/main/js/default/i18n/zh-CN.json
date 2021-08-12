@@ -16,11 +16,12 @@
     "unChoose": "未选择",
     "cancel": "取消",
     "define": "确定",
-    "repeatName": "命名重复",
+    "repeateName": "命名重复",
     "detailInfo": "详细信息",
     "name": "名称",
     "size": "大小",
     "know": "知道了",
+    "isDeleteChooseItem": "是否删除已选项？",
     "chooseAddType": "选择添加方式",
     "number": "数量",
     "createAlbum": "新建相册",
@@ -30,15 +31,9 @@
     "unSelectAll": "取消全选",
     "chooseAlbums": "选择相册",
     "operateTitle": "移动/复制到",
-    "deleteTitleInfo": "是否删除 ",
-    "files": " 个文件？",
     "deleteInfo": "是否删除已选择 ",
     "items": " 项",
     "selected": "已选择 ",
-    "free": "剩余",
-    "copying": "正在复制到",
-    "moving": "正在移动到",
-    "isDeleteChooseImage": "是否删除此图片？",
-    "isDeleteChooseVideo": "是否删除此视频？"
+    "free": "剩余"
   }
 }

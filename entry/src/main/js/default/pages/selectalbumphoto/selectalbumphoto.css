@@ -15,7 +15,7 @@
 
 @import "../../common/css/app.css";
 
-.select-photo-container {
+.selectphoto-container {
     flex-direction: column;
     padding: 0 8px;
     background-color: #fff;
@@ -69,6 +69,8 @@
     width: 38px;
     height: 38px;
 }
+
+/* xxx.css */
 
 .shared-transition-style {
     shared-transition-effect: exchange;

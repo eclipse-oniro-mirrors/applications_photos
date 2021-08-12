@@ -18,81 +18,45 @@
  */
 
 import router from '@system.router';
-import mediaLibrary from '@ohos.multimedia.medialibrary';
+import medialibrary from '@ohos.multimedia.medialibrary';
 
-let media = mediaLibrary.getMediaLibraryHelper();
-
-// 加载数据延时
-const LOAD_DATA_TIME = 200;
-
-// 移动id
-const MOVE_ID = 1;
-
-// 删除id
-const DELETE_ID = 2;
-
-// 全选id
-const SELECT_ALL_ID = 3;
-
-// 更多id
-const MORE_ID = -10;
-
-// 详细信息id
-const ABOUT_ID = 1;
-
-// 复制id
-const COPY_ID = 2;
-
-// 详细信息尺寸取小数点后4位
-const DETAIL_SIZE = 4;
-
-// 图片尺寸转换单位
-const DATA_SIZE = 1024;
-
-// 点击图片缩小效果
-const SCALE_MIN = 0.9;
-
-// 照片类型
-const PHOTO_TYPE = 3;
-
-// 视频类型
-const VIDEO_TYPE = 4;
+let media = medialibrary.getMediaLibraryHelper();
 
 export default {
     data: {
         album: null,
         topBarSource: {
             title: '',
-            leftSrc: '',
-            rightSrc: '',
+            leftSrc: '/common/image/svg/back.svg',
+            rightSrc: '/common/image/icon/selected.png',
             isShowLeft: true,
             isShowRight: false
         },
         bottomBarSource: [
             {
-                id: MOVE_ID,
-                src: '',
+                id: 1,
+                src: '/common/image/svg/move.svg',
                 disabled: false,
                 visible: true,
                 name: ''
             },
             {
-                id: DELETE_ID,
-                src: '',
+                id: 2,
+                src: '/common/image/svg/delete.svg',
                 disabled: false,
                 visible: true,
                 name: ''
             },
             {
-                id: SELECT_ALL_ID,
-                src: '',
+                id: 3,
+                src: '/common/image/svg/select_all.svg',
                 disabled: false,
                 visible: true,
                 name: ''
             },
             {
-                id: MORE_ID,
-                src: '',
+                id: -10,
+                src: '/common/image/svg/more.svg',
                 disabled: false,
                 visible: true,
                 name: ''
@@ -100,15 +64,15 @@ export default {
         ],
         bottomBarPopList: [
             {
-                id: ABOUT_ID,
-                src: '',
+                id: 1,
+                src: '/common/image/svg/about.svg',
                 disabled: false,
                 visible: true,
                 name: ''
             },
             {
-                id: COPY_ID,
-                src: '',
+                id: 2,
+                src: '/common/image/svg/copy.svg',
                 disabled: false,
                 visible: true,
                 name: ''
@@ -131,75 +95,33 @@ export default {
         // 弹窗详细信息
         detailData: {},
         deleteDialogTitle: '',
-        popVisible: false,
-        utils: null,
-        videoType: VIDEO_TYPE,
-        photoType: PHOTO_TYPE
+        consoleInfo: '',
+        popVisible: false
     },
-
-/**
-    * 初始化数据
-    */
     onInit() {
-        this.utils = this.$app.$def.utils;
-        this.utils.logDebug('photoList => onInit');
         this.initNational();
     },
-
-/**
-    * 组件销魂重置数据
-    */
     onDestroy() {
-        this.utils.logDebug('photoList => onDestroy');
-        this.$app.$def.dataManage.setPhotoList([]);
+        this.$app.$def.datamanage.setPhotoList([]);
     },
-
-/**
-    * 初始化菜单资源
-    */
     initNational() {
-        this.utils.logDebug('photoList => initNational');
-        this.topBarSource.leftSrc = this.utils.getIcon('back');
-        this.topBarSource.rightSrc = this.utils.getIcon('select');
         this.bottomBarSource[0].name = this.$t('strings.move');
-        this.bottomBarSource[0].src = this.utils.getIcon('move');
         this.bottomBarSource[1].name = this.$t('strings.delete');
-        this.bottomBarSource[1].src = this.utils.getIcon('delete');
         this.bottomBarSource[2].name = this.$t('strings.selectAll');
-        this.bottomBarSource[2].src = this.utils.getIcon('select_all');
         this.bottomBarSource[3].name = this.$t('strings.more');
-        this.bottomBarSource[3].src = this.utils.getIcon('more');
         this.bottomBarPopList[0].name = this.$t('strings.detailInfo');
         this.bottomBarPopList[1].name = this.$t('strings.copy');
-        this.bottomBarPopList[1].src = this.utils.getIcon('copy');
     },
-
-/**
-    * 组件显示加载数据
-    */
     onShow() {
-        this.utils.logDebug('photoList => onShow');
         this.loadData();
         if (this.selectMode) {
             this.onCheckedChange();
         }
     },
-
-/**
-    * 组件隐藏保存数据
-    */
     onHide() {
-        this.utils.logDebug('photoList => onHide');
-        this.$app.$def.dataManage.setPhotoList(this.list);
+        this.$app.$def.datamanage.setPhotoList(this.list);
     },
-
-/**
-    * 回退按钮
-    *
-    * @return {boolean} Verify result
-    */
     onBackPress() {
-        this.utils.logDebug('photoList => onBackPress');
         if (this.selectMode) {
             this.selectMode = false;
             this.onCheckedChange();
@@ -208,13 +130,8 @@ export default {
             return false;
         }
     },
-
-/**
-    * 加载数据
-    */
     loadData() {
         let self = this;
-        self.utils.logDebug('photoList => loadData');
         if (self.album) {
             self.topBarSource.title = self.album.name;
             if (self.album.name === self.$t('strings.allPhotos')) {
@@ -224,23 +141,20 @@ export default {
             }
         }
     },
-
-/**
-    * 获取相册图片
-    */
     getAlbumPhotos() {
         let self = this;
-        self.utils.logDebug('photoList => getAlbumPhotos => startTime');
 
         //  用来保存从详情的选中数据
-        let shareList = self.$app.$def.dataManage.getPhotoList() || [];
+        let shareList = self.$app.$def.datamanage.getPhotoList() || [];
         let args = {
             selections: self.album.name,
             selectionArgs: ['imagealbum', 'videoalbum'],
         };
         media.getMediaAssets(args, (error, images) => {
-            self.utils.logDebug('photoList => getAlbumPhotos => endTime');
             let list = [];
+            if (error) {
+                console.info(' MediaLibraryTest: getImageAssets error ' + error);
+            }
             if (images) {
                 self.cacheList = images;
                 for (let i = 0; i < images.length; i++) {
@@ -254,7 +168,6 @@ export default {
                         albumName: item.albumName,
                         albumId: item.albumId,
                         id: item.id,
-                        isPause: true,
                         src: 'file://' + item.URI,
                         URI: item.URI,
                         icon: '',
@@ -291,18 +204,12 @@ export default {
             }
         });
     },
-
-/**
-    * 获取所有图片
-    */
     getAllPhotos() {
         let self = this;
-        self.utils.logDebug('photoList => getAllPhotos => startTime');
 
         // 用来保存从详情的选中数据
-        let shareList = self.$app.$def.dataManage.getPhotoList() || [];
+        let shareList = self.$app.$def.datamanage.getPhotoList() || [];
         media.getMediaAssets((error, images) => {
-            self.utils.logDebug('photoList => getAllPhotos => endTime');
             self.cacheList = images;
             if (images) {
                 let list = [];
@@ -317,7 +224,6 @@ export default {
                         albumName: item.albumName,
                         albumId: item.albumId,
                         id: item.id,
-                        isPause: true,
                         src: 'file://' + item.URI,
                         URI: item.URI,
                         icon: '',
@@ -355,12 +261,9 @@ export default {
         });
     },
 
-/**
-    * 顶部左侧按钮
-    */
+    //  顶部左侧按钮
     topBarLeftClick() {
         let self = this;
-        self.utils.logDebug('photoList => topBarLeftClick');
         if (self.selectMode) {
             self.selectMode = false;
         } else {
@@ -369,70 +272,53 @@ export default {
         self.onCheckedChange();
     },
 
-/**
-    * 顶部右侧按钮
-    */
+    //  顶部右侧按钮
     topBarRightClick() {
         let self = this;
-        self.utils.logDebug('photoList => topBarRightClick');
         let checkedList = self.getCheckedData();
 
         //  添加方式弹出操作窗
         if (checkedList.length > 0) {
-            self.$element('add_type_dialog').show();
+            self.$element('add_type_dailog').show();
         }
+
     },
 
-/**
-    * 底部菜单
-    *
-    * @param {Object} item - 底部菜单当前点击项
-    */
+    //  底部菜单
     bottomTabClick(item) {
         let self = this;
-        self.utils.logDebug('photoList => bottomTabClick');
-        if (item.detail.id === MOVE_ID) {
+        if (item.detail.id === 1) {
             self.movePhotos();
-        } else if (item.detail.id === DELETE_ID) {
+        } else if (item.detail.id === 2) {
             self.deletePhotos();
-        } else if (item.detail.id === SELECT_ALL_ID) {
+        } else if (item.detail.id === 3) {
             self.setListChecked();
         }
     },
 
-/**
-    * 弹出提示框点击事件
-    *
-    * @param {Object} item - 弹窗层点击项
-    */
+    //  弹出提示框点击事件
     popupItemClick(item) {
         let self = this;
-        self.utils.logDebug('photoList => popupItemClick');
-        if (item.detail.id === DELETE_ID) {
+        if (item.detail.id === 2) {
             self.copyPhotos();
-        } else if (item.detail.id === MOVE_ID) {
+        } else if (item.detail.id === 1) {
             let list = self.getCheckedData();
             let size = 0;
             for (let i = 0; i < list.length; i++) {
                 size += Number(list[i].size);
             }
-            size = size / DATA_SIZE / DATA_SIZE;
+            size = size / 1024 / 1024;
             self.detailData = {
                 number: list.length,
-                size: size.toFixed(DETAIL_SIZE)
+                size: size.toFixed(4)
             };
             self.$element('detail_dialog').show();
         }
     },
 
-/**
-    * 选中发生改变
-    *
-    * @return {boolean} Verify result
-    */
+    // 选中发生改变
     onCheckedChange() {
         let self = this;
-        self.utils.logDebug('photoList => onCheckedChange');
         if (!self.selectMode) {
             self.topBarSource.isShowLeft = true;
             self.topBarSource.title = self.album.name;
@@ -451,7 +337,7 @@ export default {
 
             for (let i = 0; i < self.bottomBarSource.length; i++) {
                 const item = self.bottomBarSource[i];
-                if (item.id !== SELECT_ALL_ID) {
+                if (item.id !== 3) {
                     item.disabled = true;
                 }
             }
@@ -476,26 +362,14 @@ export default {
             }
         }
     },
-
-/**
-    * 放大按钮点击事件
-    *
-    * @param {Object} item - 当前列表长按项
-    * @param {number} index - 当前列表长按项下标
-    */
+    // 放大按钮点击事件
     scaleImgClick(item, index) {
         this.goDetail(item, index);
     },
 
-/**
-    * 列表点击事件回调
-    *
-    * @param {Object} item - 当前列表长按项
-    * @param {number} index - 当前列表长按项下标
-    */
+    //  点击事件
     photoClick(item, index) {
         let self = this;
-        self.utils.logDebug('photoList => photoClick');
         self.hideBottomPop();
         if (self.selectMode) {
             item.checked = !item.checked;
@@ -512,38 +386,25 @@ export default {
         }
     },
 
-/**
-    * 跳转详情页面
-    *
-    * @param {Object} item - 当前列表长按项
-    * @param {number} index - 当前列表长按项下标
-    */
+    // 跳转详情页面
     goDetail(item, index) {
         let self = this;
-        self.utils.logDebug('photoList => goDetail');
         router.push(
             {
-                uri: 'pages/photoDetail/photoDetail',
+                uri: 'pages/photodetail/photodetail',
                 params: {
                     list: self.list,
                     album: self.album,
                     selectMode: self.selectMode,
-                    shareIndex: index
+                    sharetIndex: index
                 },
             }
         );
     },
 
-/**
-    * 长按事件
-    *
-    * @param {Object} item - 当前列表长按项
-    * @param {number} index - 当前列表长按项下标
-    * @return {boolean} Verify result
-    */
-    parentLongPress(item, index) {
+    // 长按事件
+    parentLongpress(item, index) {
         let self = this;
-        self.utils.logDebug('photoList => parentLongPress');
         if (self.selectMode) {
             return false;
         }
@@ -561,12 +422,9 @@ export default {
         self.photoClick(item, index);
     },
 
-/**
-    * 根据是否开启选择模式，初始化选中效果
-    */
+    // 根据是否开启选择模式，初始化选中效果
     initChecked() {
         let self = this;
-        self.utils.logDebug('photoList => initChecked');
         let gridList = self.list;
 
         // 宫格数据
@@ -581,14 +439,9 @@ export default {
         }
     },
 
-/**
-    * 获取选中数据
-    *
-    * @return {Array} list - 当前选中列表
-    */
+    // 获取选中数据
     getCheckedData() {
         let self = this;
-        self.utils.logDebug('photoList => getCheckedData');
         let list = [];
         self.list.forEach(item => {
             if (item.checked) {
@@ -598,12 +451,9 @@ export default {
         return list;
     },
 
-/**
-    * 设置全选/全不选
-    */
+    // 设置全选/全不选
     setListChecked() {
         let self = this;
-        self.utils.logDebug('photoList => setListChecked');
         let list = self.list;
 
         // 宫格数据
@@ -620,26 +470,16 @@ export default {
         self.onCheckedChange();
     },
 
-/**
-    * 设置全选/全不选
-    *
-    * @param {Object} obj - 选择类型弹窗点击项
-    */
+    // 添加方式弹窗点击事件
     addTypeDialogClick(obj) {
-        this.utils.logDebug('photoList => addTypeDialogClick');
-        if (obj.detail === this.$t('strings.copy')) {
+        if (obj.detail === '复制') {
             this.copyPhotos();
-        } else if (obj.detail === this.$t('strings.move')) {
+        } else if (obj.detail === '移动') {
             this.movePhotos();
         }
     },
-
-/**
-    * 删除
-    */
     deleteDialogCommit() {
         let self = this;
-        self.utils.logDebug('photoList => deleteDialogCommit => startTime');
         let choose = this.getCheckedData();
         let list = self.cacheList;
         for (let i = 0; i < choose.length; i++) {
@@ -650,9 +490,8 @@ export default {
                 // 由于查询所有返回的图片id 跟查询单个相册返回的图片id 对应不上，所以不能只以id判断
                 if (item.name === checkItem.name && item.id === checkItem.id) {
                     item.commitDelete((error, commitFlag) => {
-                        self.utils.logDebug('photoList => deleteDialogCommit => endTime');
                         if (commitFlag) {
-                            self.$app.$def.dataManage.isRefreshed(true);
+                            self.$app.$def.datamanage.isRefreshed(true);
                             self.selectMode = false;
 
                             setTimeout(() => {
@@ -662,47 +501,35 @@ export default {
                                 } else {
                                     self.loadData();
                                 }
-                            }, LOAD_DATA_TIME);
+                            }, 200);
                         }
                     });
                 }
             }
         }
     },
-
-/**
-    * 删除弹窗确定
-    */
     deleteQuery() {
         this.deleteDialogCommit();
     },
 
-/**
-    * 删除图片弹窗显示
-    *
-    * @return {boolean} Verify result
-    */
+    //  删除图片
     deletePhotos() {
-        this.utils.logDebug('photoList => deletePhotos');
         let length = this.getCheckedData().length;
         if (length === 0) {
             return false;
         }
         let child = this.$child('delete_dialog');
-        child.setTitle(this.$t('strings.deleteTitleInfo') + length + this.$t('strings.files'));
+        child.setTitle(this.$t('strings.deleteInfo') + length + this.$t('strings.items'));
         child.show();
     },
 
-/**
-    * 移动
-    */
+    // 移动
     movePhotos() {
         let self = this;
-        self.utils.logDebug('photoList => movePhotos');
         let choose = self.getCheckedData();
         router.push(
             {
-                uri: 'pages/selectAlbum/selectAlbum',
+                uri: 'pages/selectalbum/selectalbum',
                 params: {
                     isOperationFrom: true,
                     operationType: 'move',
@@ -713,16 +540,13 @@ export default {
         );
     },
 
-/**
-    * 复制
-    */
+    // 复制
     copyPhotos() {
         let self = this;
-        self.utils.logDebug('photoList => copyPhotos');
         let choose = self.getCheckedData();
         router.push(
             {
-                uri: 'pages/selectAlbum/selectAlbum',
+                uri: 'pages/selectalbum/selectalbum',
                 params: {
                     isOperationFrom: true,
                     operationType: 'copy',
@@ -732,57 +556,26 @@ export default {
             }
         );
     },
-
-/**
-    * 触摸事件开始
-    *
-    * @param {Object} item - 当前触摸列表项
-    */
-    touchStart(item) {
-        this.utils.logDebug('photoList => touchStart');
+    touchstart(item, e) {
+        let self = this;
         let width = item.itemStyle.width.replace('px', '');
         let height = item.itemStyle.height.replace('px', '');
-        item.imageStyle.width = SCALE_MIN * width;
-        item.imageStyle.height = SCALE_MIN * height;
-    },
 
-/**
-    * 触摸事件取消
-    *
-    * @param {Object} item - 当前触摸列表项
-    */
-    touchCancel(item) {
-        this.utils.logDebug('photoList => touchCancel');
+        item.imageStyle.width = 0.9 * width;
+        item.imageStyle.height = 0.9 * height;
+    },
+    touchcancel(item, e) {
         item.imageStyle.width = item.itemStyle.width;
         item.imageStyle.height = item.itemStyle.height;
     },
-
-/**
-    * 触摸事件结束
-    *
-    * @param {Object} item - 当前触摸列表项
-    */
-    touchEnd(item) {
-        this.utils.logDebug('photoList => touchEnd');
+    touchend(item, e) {
         item.imageStyle.width = item.itemStyle.width;
         item.imageStyle.height = item.itemStyle.height;
     },
-
-/**
-    * 隐藏底部菜单pop
-    */
     hideBottomPop() {
-        this.utils.logDebug('photoList => hideBottomPop');
         this.popVisible = false;
     },
-
-/**
-    * 改变底部菜单pop显示隐藏
-    *
-    * @param {Object} e - 当前点击弹出层event
-    */
     changePopVisible(e) {
-        this.utils.logDebug('photoList => changePopVisible');
         this.popVisible = e.detail;
     }
 };

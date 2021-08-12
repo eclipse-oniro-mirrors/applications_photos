@@ -18,8 +18,7 @@
 <element src="../../common/component/custom_list/custom_list.hml"></element>
 <element src="../../common/component/top_bar/top_bar.hml"></element>
 <element src="../dialog/rename_dialog/rename_dialog.hml"></element>
-
-<div class="select-album-container">
+<div class="selectalbum-container">
     <top_bar
             id="topBar"
             data-source="{{ topBarSource }}"

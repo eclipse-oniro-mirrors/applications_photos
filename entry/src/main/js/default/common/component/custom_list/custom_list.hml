@@ -17,7 +17,7 @@
 
 <div class="main-list-container">
     <text class="title" if="{{ headTitle }}">{{ headTitle }}</text>
-    <stack class="head-content" onlongpress="parentLongPress({{ headSource }})" if="{{ showHead && headSource }}">
+    <stack class="head-content" onlongpress="parentLongpress({{ headSource }})" if="{{ showHead && headSource }}">
         <image class="head-img img" if="{{ showHead }}" src="{{ headSource.src }}"
                onclick="photoClick({{ headSource }},{{ 0 }})">
         </image>
@@ -29,7 +29,7 @@
                 <div class="text-div">
                     <text class="text"> {{ headSource.list.length }} </text>
                 </div>
-                <div class="img-div">
+                <div class="img-div ">
                     <image class="select-img" style="width : {{ gridItemCheckedStyle.width }};
                             height : {{ gridItemCheckedStyle.height }};" if="{{ headSource.icon }}"
                            src="{{ headSource.icon }}"></image>
@@ -49,7 +49,7 @@
                     style="width : {{ gridImageStyle.width }};
                             height : {{ gridImageStyle.height }};"
                     onclick="photoClick({{ item }},{{ index }},{{ 'grid' }})"
-                    onlongpress="parentLongPress({{ item }},{{ index }},{{ 'grid' }})">
+                    onlongpress="parentLongpress({{ item }},{{ index }},{{ 'grid' }})">
                 <image style="border-radius : {{ gridImageStyle.radius }};"
                        src="{{ item.src }}"></image>
 
@@ -64,7 +64,7 @@
                         <div class="img-div" style="padding : {{ gridItemCheckedStyle.padding }};">
                             <image
                                     style="width : {{ gridItemCheckedStyle.width }};
-                                           height : {{ gridItemCheckedStyle.height }};"
+                                            height : {{ gridItemCheckedStyle.height }};"
                                     if="{{ item.icon }}"
                                     src="{{ item.icon }}">
                             </image>
@@ -78,7 +78,7 @@
     <text class="list-title" if="{{ showListTitle }}">{{ listTitle }}</text>
     <div class="list-content" if="{{ listSource && listSource.length > 0 }}">
         <div for="{{ (index, item) in listSource }}"
-             onlongpress="parentLongPress({{ item }},{{ index }})"
+             onlongpress="parentLongpress({{ item }},{{ index }})"
              onclick="photoClick({{ item }},{{ index }})">
             <div class="list-content-layout" style="height : {{ listItemStyle.height }};">
                 <div style="align-items : center;">

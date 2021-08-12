@@ -18,16 +18,16 @@
  */
 
 import utils from './common/utils/utils.js';
-import dataManage from './common/utils/dataManage.js';
+import datamanage from './common/utils/datamanage.js';
 
 export default {
     utils,
-    dataManage,
+    datamanage,
     onCreate() {
-        utils.logDebug('AceApplication onCreate');
+        console.info('AceApplication onCreate');
         utils.initIcon();
     },
     onDestroy() {
-        utils.logDebug('AceApplication onDestroy');
+        console.info('AceApplication onDestroy');
     },
 };

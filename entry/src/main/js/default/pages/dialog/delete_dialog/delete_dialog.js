@@ -21,41 +21,27 @@ export default {
     data: {
         title: ''
     },
+    onReady() {
+    },
+    onInit() {
 
-/**
-    * 设置标题
-    *
-    * @param {string} text - 标题
-    */
+    },
+    onHide() {
+
+    },
     setTitle(text) {
         this.title = text;
     },
-
-/**
-    * 弹框显示
-    */
     show() {
         this.$element('delete_dialog').show();
     },
-
-/**
-    * 弹框隐藏
-    */
     close() {
         this.$element('delete_dialog').close();
     },
-
-/**
-    * 确定
-    */
     query() {
         this.$emit('deleteQuery');
         this.close();
     },
-
-/**
-    * 取消
-    */
     cancel() {
         this.close();
     }
