@@ -22,28 +22,28 @@ export default {
         formData: {}
     },
 
-/**
+    /**
     * 弹框显示
     */
     show() {
         this.$element('detail_dialog').show();
     },
 
-/**
+    /**
     * 弹框隐藏
     */
     close() {
         this.$element('detail_dialog').close();
     },
 
-/**
+    /**
     * 确定
     */
     query() {
         this.close();
     },
 
-/**
+    /**
     * 取消
     */
     cancel() {

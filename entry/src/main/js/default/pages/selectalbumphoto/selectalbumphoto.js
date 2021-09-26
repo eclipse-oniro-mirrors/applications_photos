@@ -28,6 +28,9 @@ const PHOTO_TYPE = 3;
 // 视频类型
 const VIDEO_TYPE = 4;
 
+// 懒加载列表数
+const PAGE_SIZE = 28;
+
 export default {
     data: {
         album: null,
@@ -39,11 +42,11 @@ export default {
             isShowRight: false
         },
         utils: null,
-        gridImageStyle: {},
-        list: [],
-        gridItemStyle: {
+        gridImageStyle: {
+            width: '176px',
             height: '180px'
         },
+        list: [],
 
         // 是否开启选择模式
         selectMode: true,
@@ -60,10 +63,11 @@ export default {
         // 新建相册对象
         createParams: null,
         videoType: VIDEO_TYPE,
-        photoType: PHOTO_TYPE
+        photoType: PHOTO_TYPE,
+        cacheOtherList: []
     },
 
-/**
+    /**
     * 初始化数据
     */
     onInit() {
@@ -72,14 +76,14 @@ export default {
         this.topBarSource.rightSrc = this.utils.getIcon('select');
     },
 
-/**
+    /**
     * 组件显示加载数据
     */
     onShow() {
         this.loadData();
     },
 
-/**
+    /**
     * 组件隐藏保存数据
     */
     onHide() {
@@ -87,7 +91,7 @@ export default {
         this.$app.$def.dataManage.setPhotoList(this.list);
     },
 
-/**
+    /**
     * 组件销魂重置数据
     */
     onDestroy() {
@@ -95,7 +99,7 @@ export default {
         this.$app.$def.dataManage.setPhotoList([]);
     },
 
-/**
+    /**
     * 获取数据
     */
     loadData() {
@@ -106,39 +110,35 @@ export default {
                 selections: self.album.name,
                 selectionArgs: ['imagealbum', 'videoalbum'],
             };
-            let shareList = self.$app.$def.dataManage.getPhotoList() || [];
+            let shareList = self.utils.deepCopy(self.$app.$def.dataManage.getPhotoList()) || [];
+            if (shareList.length > 0) {
+                self.list = shareList;
+                self.onCheckedChange();
+            }
             media.getMediaAssets(args, (error, images) => {
                 self.utils.logDebug('selectAlbumPhoto => loadData => endTime');
-                if (images) {
+                if (images && shareList.length === 0) {
                     for (let i = 0; i < images.length; i++) {
                         let item = images[i];
                         item.src = 'file://' + item.URI;
-                        item.icon = self.$app.$def.utils.getIcon('unselected');
+                        item.icon = self.utils.getIcon('unselected');
                         item.rotate = 0;
                         item.scale = 1;
                         item.checked = false;
-                        if (shareList.length > 0) {
-                            for (let j = 0; j < shareList.length; j++) {
-                                let shareItem = shareList[j];
-                                if (item.name === shareItem.name && item.id === shareItem.id) {
-                                    item.checked = shareItem.checked;
-                                    if (shareItem.checked) {
-                                        item.icon = self.$app.$def.utils.getIcon('selected');
-                                    } else {
-                                        item.icon = self.$app.$def.utils.getIcon('unselected');
-                                    }
-                                }
-                            }
-                        }
                     }
-                    self.list = images;
+                    self.cacheOtherList = images;
+                    if (images.length > PAGE_SIZE) {
+                        self.list = images.slice(0, PAGE_SIZE);
+                    } else {
+                        self.list = images;
+                    }
                     self.onCheckedChange();
                 }
             });
         }
     },
 
-/**
+    /**
     * 顶部左侧按钮
     */
     topBarLeftClick() {
@@ -146,7 +146,7 @@ export default {
         router.back();
     },
 
-/**
+    /**
     * 顶部右侧按钮
     */
     topBarRightClick() {
@@ -160,7 +160,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 新建相册
     *
     * @param {Array} checkList - 新建弹窗选中数据
@@ -187,7 +187,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 选中发生改变
     */
     onCheckedChange() {
@@ -197,12 +197,12 @@ export default {
         if (length === 0) {
             self.topBarSource.title = self.$t('strings.unChoose');
             self.topBarSource.isShowRight = false;
-            self.topBarSource.leftSrc = self.$app.$def.utils.getIcon('close');
+            self.topBarSource.leftSrc = self.utils.getIcon('close');
             self.isAllChecked = false;
         } else {
             self.topBarSource.title = self.$t('strings.selected') + length + self.$t('strings.items');
             self.topBarSource.isShowRight = true;
-            self.topBarSource.leftSrc = self.$app.$def.utils.getIcon('close');
+            self.topBarSource.leftSrc = self.utils.getIcon('close');
             if (self.getCheckedData().length === self.list.length) {
                 self.isAllChecked = true;
             } else {
@@ -211,7 +211,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 放大按钮点击事件
     *
     * @param {Object} item - 当前点击项
@@ -221,7 +221,7 @@ export default {
         this.goDetail(item, index);
     },
 
-/**
+    /**
     * 列表点击事件
     *
     * @param {Object} item - 当前点击项
@@ -231,14 +231,14 @@ export default {
         self.utils.logDebug('selectAlbumPhoto => photoClick');
         item.checked = !item.checked;
         if (item.checked) {
-            item.icon = self.$app.$def.utils.getIcon('selected');
+            item.icon = self.utils.getIcon('selected');
         } else {
-            item.icon = self.$app.$def.utils.getIcon('unselected');
+            item.icon = self.utils.getIcon('unselected');
         }
         self.onCheckedChange();
     },
 
-/**
+    /**
     * 跳转详情页面
     *
     * @param {Object} item - 当前点击项
@@ -260,7 +260,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 根据是否开启选择模式，初始化选中效果
     */
     initChecked() {
@@ -271,12 +271,12 @@ export default {
         // 宫格数据
         for (let index = 0; index < gridList.length; index++) {
             let item = gridList[index];
-            item.icon = self.$app.$def.utils.getIcon('unselected');
+            item.icon = self.utils.getIcon('unselected');
             item.checked = false;
         }
     },
 
-/**
+    /**
     * 获取选中数据
     *
     * @return {Array} list - 选择数据
@@ -293,7 +293,7 @@ export default {
         return list;
     },
 
-/**
+    /**
     * 设置全选/全不选
     */
     setListChecked() {
@@ -306,17 +306,17 @@ export default {
             let item = list[index];
             if (self.isAllChecked) {
                 item.checked = false;
-                item.icon = self.$app.$def.utils.getIcon('unselected');
+                item.icon = self.utils.getIcon('unselected');
             } else {
                 item.checked = true;
-                item.icon = self.$app.$def.utils.getIcon('selected');
+                item.icon = self.utils.getIcon('selected');
             }
 
         }
         self.onCheckedChange();
     },
 
-/**
+    /**
     * 设置全选/全不选
     *
     * @param {Object} obj - 选择类型弹窗点击项
@@ -330,7 +330,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 移动
     *
     * @return {boolean} Verify result
@@ -362,7 +362,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 复制
     *
     * @return {boolean} Verify result
@@ -392,5 +392,22 @@ export default {
                 }
             }
         );
+    },
+
+    /**
+    * 滚动到底部触发事件
+    */
+    scrollBottom() {
+        this.utils.logDebug('selectAlbumPhoto => scrollBottom');
+        let cacheLength = this.cacheOtherList.length;
+        let listLength = this.list.length;
+        let diffLength = cacheLength - listLength;
+        if (diffLength >= PAGE_SIZE) {
+            this.list = this.list.concat(this.cacheOtherList.slice(listLength, listLength + PAGE_SIZE));
+        } else if (0 < diffLength < PAGE_SIZE) {
+            this.list = this.list.concat(this.cacheOtherList.slice(listLength, listLength + diffLength));
+        } else {
+            this.utils.logDebug('selectAlbumPhoto => scrollBottom => lenError');
+        }
     }
 };

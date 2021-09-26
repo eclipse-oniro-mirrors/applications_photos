@@ -35,13 +35,13 @@
 .load-div-text1 {
     font-size: 36px;
     opacity: .9;
-    padding: 28px;
+    margin-top: 28px;
 }
 
 .load-div-text2 {
     font-size: 28px;
     opacity: .9;
-    padding: 28px;
+    margin-top: 28px;
 }
 
 @keyframes shared-transition {

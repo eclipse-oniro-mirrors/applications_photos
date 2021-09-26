@@ -24,7 +24,6 @@
     "chooseAddType": "选择添加方式",
     "number": "数量",
     "createAlbum": "新建相册",
-    "device": "设备",
     "inputPlaceholder": "请输入名称",
     "selectAll": "全选",
     "unSelectAll": "取消全选",
@@ -35,10 +34,10 @@
     "deleteInfo": "是否删除已选择 ",
     "items": " 项",
     "selected": "已选择 ",
-    "free": "剩余",
     "copying": "正在复制到",
     "moving": "正在移动到",
     "isDeleteChooseImage": "是否删除此图片？",
-    "isDeleteChooseVideo": "是否删除此视频？"
+    "isDeleteChooseVideo": "是否删除此视频？",
+    "noPhotos": "没有照片和视频"
   }
 }

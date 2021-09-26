@@ -30,7 +30,7 @@ let isStartLog = true;
 export default {
     isStartLog,
 
-/**
+    /**
     * 获取图标
     *
     * @param {string} type - 图标
@@ -40,14 +40,13 @@ export default {
         return iconCache[type];
     },
 
-/**
+    /**
     * 初始化图标
     */
     initIcon() {
         iconCache['camera'] = '/common/image/svg/camera.svg';
         iconCache['selected'] = '/common/image/svg/checkbox_filled.svg';
         iconCache['unselected'] = '/common/image/svg/checkbox_white.svg';
-        iconCache['friend'] = '/common/image/svg/shared_album_white_filled.svg';
         iconCache['video'] = '/common/image/svg/video_white_filled.svg';
         iconCache['rename'] = '/common/image/svg/rename.svg';
         iconCache['delete'] = '/common/image/svg/delete.svg';
@@ -65,7 +64,7 @@ export default {
         iconCache['select'] = '/common/image/icon/selected.png';
     },
 
-/**
+    /**
     * px转dp
     *
     * @param {number} value - px值
@@ -76,7 +75,7 @@ export default {
         return value / density * DOUBLE;
     },
 
-/**
+    /**
     * 以下函数返回 min（包含）～ max（包含）之间的数字
     *
     * @param {number} min - 最小值
@@ -87,7 +86,7 @@ export default {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     },
 
-/**
+    /**
     * logInfo
     *
     * @param {string} str - 日志
@@ -98,7 +97,7 @@ export default {
         }
     },
 
-/**
+    /**
     * logError
     *
     * @param {string} str - 日志
@@ -109,7 +108,7 @@ export default {
         }
     },
 
-/**
+    /**
     * logDebug
     *
     * @param {string} str - 日志
@@ -120,7 +119,7 @@ export default {
         }
     },
 
-/**
+    /**
     * log
     *
     * @param {string} str - 日志
@@ -131,7 +130,7 @@ export default {
         }
     },
 
-/**
+    /**
     * logWarn
     *
     * @param {string} str - 日志
@@ -142,7 +141,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 设置是否开启日志
     *
     * @param {boolean} flag - 是否开启日志
@@ -151,7 +150,7 @@ export default {
         isStartLog = flag;
     },
 
-/**
+    /**
     * 获取时间拼接
     *
     * @return {string} - 时间
@@ -166,5 +165,39 @@ export default {
         let s = date.getSeconds() + ':';
         let mill = date.getMilliseconds();
         return Y + M + D + h + m + s + mill;
+    },
+
+    /**
+    * 深度拷贝
+    *
+    * @param {Object} obj - 被拷贝对象
+    * @return {Object} copy - 目标对象
+    */
+    deepCopy(object) {
+        let copyObj;
+        if (null == object || "object" != typeof object) {
+            return object;
+        }
+        if (object instanceof Date) {
+            copyObj = new Date();
+            copyObj.setTime(object.getTime());
+            return copyObj;
+        }
+
+        if (object instanceof Array) {
+            copyObj = [];
+            for (let i = 0, len = object.length; i < len; i++) {
+                copyObj[i] = this.deepCopy(object[i]);
+            }
+            return copyObj;
+        }
+
+        if (object instanceof Object) {
+            copyObj = {};
+            for (let attr in object) {
+                if (object.hasOwnProperty(attr)) copyObj[attr] = this.deepCopy(object[attr]);
+            }
+            return copyObj;
+        }
     }
 };

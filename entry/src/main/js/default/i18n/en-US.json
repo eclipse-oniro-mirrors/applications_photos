@@ -26,7 +26,6 @@
     "selected": "Selected ",
     "number": "Quantity",
     "createAlbum": "Add album",
-    "device": "Device",
     "inputPlaceholder": "The name cannot be left empty",
     "selectAll": "Select all",
     "unSelectAll": "Deselect all",
@@ -35,10 +34,10 @@
     "deleteTitleInfo": "Delete selected ",
     "files": " files ? ",
     "deleteInfo": "Delete selected ",
-    "free": "free",
     "copying": "Copying to",
     "moving": "Moving to",
     "isDeleteChooseImage": "Delete image ? ",
-    "isDeleteChooseVideo": "Delete video ? "
+    "isDeleteChooseVideo": "Delete video ? ",
+    "noPhotos": "No photos or videos"
   }
 }

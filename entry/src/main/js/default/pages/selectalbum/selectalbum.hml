@@ -26,7 +26,7 @@
             @left-click="topBarLeftClick"
             @right-click="topBarRightClick">
     </top_bar>
-    <list style="padding : 0px 24px;">
+    <list style="padding : 0px 24px;" onscrollbottom="scrollBottom">
         <list-item clickeffect="false">
             <custom_list
                     show-list-title="{{ false }}"

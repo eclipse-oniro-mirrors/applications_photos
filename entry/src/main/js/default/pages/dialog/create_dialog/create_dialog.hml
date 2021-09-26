@@ -20,7 +20,6 @@
         <text class="title">{{ $t('strings.createAlbum') }}</text>
         <input class="input" type="text" value="{{ inputName }}" onchange="valueChange"
                placeholder="{{ $t('strings.inputPlaceholder') }}"></input>
-        <text class="text">{{ $t('strings.device') }}（{{ $t('strings.free') }} 0GB）</text>
         <div class="bottom-div">
             <text onclick="cancel" class="btn-txt">{{ $t('strings.cancel') }}</text>
             <text onclick="query" class="btn-txt line">{{ $t('strings.define') }}</text>

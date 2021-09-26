@@ -28,20 +28,13 @@
             @left-click="topBarLeftClick"
             @right-click="topBarRightClick">
     </top_bar>
-    <list class="list-content" @click="hideBottomPop">
+    <list class="list-content" @click="hideBottomPop" onscrollbottom="scrollBottom">
         <list-item clickeffect="false">
             <div class="list-item">
                 <stack class="item-stack" for="{{ (index, item) in listData }}"
                        style="width : {{ videoWidth }};"
                        on:longpress="longPress({{ item }},{{ index }})">
-                    <video
-                            style="object-fit : fill;"
-                            src='{{ item.src }}'
-                            muted='false'
-                            autoplay='false'
-                            controls="false"
-                            onprepared="videoPrepare({{ item }})"
-                            ></video>
+                    <image src="/common/image/icon/video_poster.png"></image>
                     <div style="background-color : transparent; width : 100%; height : 100%;"
                          onclick="videoClick({{ item }},{{ index }})"></div>
                     <image if="{{ selectMode }}" class="scale" src="/common/image/svg/fullscreen.svg"
@@ -49,7 +42,7 @@
                     </image>
                     <image if="{{ selectMode }}" class="select" src="{{ item.icon }}">
                     </image>
-                    <text else class="text" onclick="videoClick({{ item }})">
+                    <text else class="video-duration" onclick="videoClick({{ item }},{{ index }})">
                         {{ item.duration }}
                     </text>
                 </stack>
