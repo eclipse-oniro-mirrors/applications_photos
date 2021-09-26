@@ -22,21 +22,21 @@ export default {
         inputName: 'modifyAlbumName'
     },
 
-/**
+    /**
     * 弹框显示
     */
     show() {
         this.$element('renameDialog').show();
     },
 
-/**
+    /**
     * 弹框隐藏
     */
     close() {
         this.$element('renameDialog').close();
     },
 
-/**
+    /**
     * 设置输入框数据
     *
     * @param {string} inputName - 图片、相册和视频命名
@@ -45,7 +45,7 @@ export default {
         this.inputName = inputName;
     },
 
-/**
+    /**
     * 获取弹窗输入框数据
     *
     * @return {string} 输入框名称
@@ -54,14 +54,14 @@ export default {
         return this.inputName;
     },
 
-/**
+    /**
     * 重命名确定
     */
     query() {
         this.$emit('renameDialogAlbum', this.inputName);
     },
 
-/**
+    /**
     * 重命名取消
     */
     cancel() {

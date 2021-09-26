@@ -50,7 +50,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 底部菜单点击事件
     *
     * @param {Object} item - 底部点击项
@@ -72,7 +72,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 弹出层点击事件
     *
     * @param {Object} item - 弹框点击项
@@ -90,14 +90,14 @@ export default {
         }, POP_ITEM_CLICK);
     },
 
-/**
+    /**
     * 弹出层显示隐藏
     */
     popupVisible() {
         this.popVisible = !this.popVisible;
     },
 
-/**
+    /**
     * 获取弹出层显示隐藏
     *
     * @return {boolean} - 弹框显示与隐藏

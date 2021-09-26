@@ -27,7 +27,7 @@ export default {
         inputName: ''
     },
 
-/**
+    /**
     * 新建相册名
     */
     onReady() {
@@ -37,7 +37,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 随机获取新建相册名
     *
     * @param {number} min - 随机最小数
@@ -48,21 +48,21 @@ export default {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     },
 
-/**
+    /**
     * 弹框显示
     */
     show() {
         this.$element('createDialog').show();
     },
 
-/**
+    /**
     * 弹框隐藏
     */
     close() {
         this.$element('createDialog').close();
     },
 
-/**
+    /**
     * 输入框改变事件
     *
     * @param {string} value - 相册名
@@ -71,7 +71,7 @@ export default {
         this.inputName = value.value;
     },
 
-/**
+    /**
     * 设置输入框数据
     *
     * @param {string} inputName - 相册名
@@ -80,7 +80,7 @@ export default {
         this.inputName = inputName;
     },
 
-/**
+    /**
     * 获取弹窗输入框数据
     *
     * @return {string} - 相册名
@@ -89,7 +89,7 @@ export default {
         return this.inputName;
     },
 
-/**
+    /**
     * 弹窗确定
     *
     * @return {boolean} - 中断代码
@@ -104,7 +104,7 @@ export default {
         this.$emit('createDialogAlbum', this.inputName);
     },
 
-/**
+    /**
     * 重命名取消
     */
     cancel() {

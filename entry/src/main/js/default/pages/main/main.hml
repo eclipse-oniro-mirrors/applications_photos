@@ -34,7 +34,9 @@
         <text class="load-div-text1"> {{ $t('strings.loadTextOne') }}</text>
         <text class="load-div-text2"> {{ $t('strings.loadTextTwo') }}</text>
     </div>
-    <list style="padding : 0px 24px;" show="{{ ! showEmptyDiv }}">
+    <list style="padding : 0px 24px;"
+          show="{{ ! showEmptyDiv }}"
+          onscrollbottom="scrollBottom">
         <list-item clickeffect="false">
             <custom_list id="mainList"
                          head-title="{{ headTitle }}"

@@ -18,4 +18,5 @@
 .select-album-container {
     flex-direction: column;
     background-color: #fff;
+    height: 100%;
 }

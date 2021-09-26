@@ -49,6 +49,9 @@ const DETAIL_SIZE = 4;
 // 图片尺寸转换单位
 const DATA_SIZE = 1024;
 
+// 懒加载列表数
+const PAGE_SIZE = 6;
+
 export default {
     data: {
         listData: [],
@@ -110,10 +113,11 @@ export default {
         isAllChecked: false,
         album: null,
         deleteDialogTitle: '',
-        utils: null
+        utils: null,
+        cacheOtherList: []
     },
 
-/**
+    /**
     * 初始化数据
     */
     onInit() {
@@ -122,7 +126,7 @@ export default {
         this.initNational();
     },
 
-/**
+    /**
     * 初始化菜单资源
     */
     initNational() {
@@ -142,14 +146,30 @@ export default {
         this.bottomBarPopList[1].src = this.utils.getIcon('copy');
     },
 
-/**
+    /**
     * 组件显示加载数据
     */
     onShow() {
         this.loadData();
     },
 
-/**
+    /**
+    * 组件销魂重置数据
+    */
+    onDestroy() {
+        this.utils.logDebug('videoList => onDestroy');
+        this.$app.$def.dataManage.setPhotoList([]);
+    },
+
+    /**
+    * 组件隐藏保存数据
+    */
+    onHide() {
+        this.utils.logDebug('videoList => onHide');
+        this.$app.$def.dataManage.setPhotoList(this.listData);
+    },
+
+    /**
     * 回退按钮
     *
     * @return {boolean} Verify result
@@ -157,7 +177,7 @@ export default {
     onBackPress() {
         this.utils.logDebug('videoList => onBackPress');
         if (this.selectMode) {
-            this.topBarSource.leftSrc = this.$app.$def.utils.getIcon('back');
+            this.topBarSource.leftSrc = this.utils.getIcon('back');
             this.topBarSource.title = this.$t('strings.video');
             this.isShowBottomBar = false;
             this.selectMode = false;
@@ -168,7 +188,30 @@ export default {
         }
     },
 
-/**
+    /**
+    * 初始化需要连接的数据
+    *
+    * @params {Array} list - 被初始化的数组
+    * @return {Array} 返回处理后的数组
+    */
+    initConcatList(list) {
+        let self = this;
+        if (self.selectMode) {
+            list.forEach(item => {
+                item.icon = self.utils.getIcon('unselected');
+                item.checked = false;
+            });
+        }
+        if (self.isAllChecked) {
+            list.forEach(item => {
+                item.icon = self.utils.getIcon('selected');
+                item.checked = true;
+            });
+        }
+        return list;
+    },
+
+    /**
     * 加载数据
     */
     loadData() {
@@ -180,40 +223,37 @@ export default {
         };
 
         // 用来保存从详情的选中数据
-        let shareList = self.$app.$def.dataManage.getPhotoList() || [];
-
+        let shareList = self.utils.deepCopy(self.$app.$def.dataManage.getPhotoList()) || [];
+        if (shareList.length > 0) {
+            self.listData = shareList;
+            self.onCheckedChange();
+        }
         media.getVideoAssets(arg, (error, videos) => {
             self.utils.logDebug('videoList => loadData => endTime');
-            if (videos) {
+            if (videos && shareList.length === 0) {
                 videos.forEach((item, index) => {
                     item.src = 'file://' + item.URI;
-                    item.duration = '00:00';
                     item.isPause = true;
                     if (self.selectMode) {
-                        item.icon = self.$app.$def.utils.getIcon('unselected');
-                        for (let j = 0; j < shareList.length; j++) {
-                            let shareItem = shareList[j];
-                            if (item.name === shareItem.name && item.id === shareItem.id) {
-                                item.checked = shareItem.checked;
-                                if (shareItem.checked) {
-                                    item.icon = self.$app.$def.utils.getIcon('selected');
-                                } else {
-                                    item.icon = self.$app.$def.utils.getIcon('unselected');
-                                }
-                            }
-                        }
+                        item.icon = self.utils.getIcon('unselected');
                     } else {
                         item.icon = '';
                         item.checked = false;
                     }
                 });
-                self.listData = videos;
+                self.cacheOtherList = videos;
+                if (videos.length > PAGE_SIZE) {
+                    self.listData = videos.slice(0, PAGE_SIZE);
+                } else {
+                    self.listData = videos;
+                }
+
                 self.onCheckedChange();
             }
         });
     },
 
-/**
+    /**
     * 顶部左侧按钮
     *
     * @return {boolean} Verify result
@@ -221,7 +261,7 @@ export default {
     topBarLeftClick() {
         this.utils.logDebug('videoList => topBarLeftClick');
         if (this.selectMode) {
-            this.topBarSource.leftSrc = this.$app.$def.utils.getIcon('back');
+            this.topBarSource.leftSrc = this.utils.getIcon('back');
             this.topBarSource.title = this.$t('strings.video');
             this.isShowBottomBar = false;
             this.selectMode = false;
@@ -231,18 +271,7 @@ export default {
         router.back();
     },
 
-/**
-    * 视频加载后回调
-    *
-    * @param {Object} item - 当前点击视频项
-    * @param {Object} e - 当前点击视频项event
-    */
-    videoPrepare(item, e) {
-        this.utils.logDebug('videoList => videoPrepare');
-        item.duration = e.duration;
-    },
-
-/**
+    /**
     * 放大按钮点击事件
     *
     * @param {Object} item - 当前点击视频项
@@ -263,7 +292,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 列表项点击事件
     *
     * @param {Object} item - 当前点击视频项
@@ -276,9 +305,9 @@ export default {
         if (this.selectMode) {
             item.checked = !item.checked;
             if (item.checked) {
-                item.icon = this.$app.$def.utils.getIcon('selected');
+                item.icon = this.utils.getIcon('selected');
             } else {
-                item.icon = this.$app.$def.utils.getIcon('unselected');
+                item.icon = this.utils.getIcon('unselected');
             }
             this.onCheckedChange();
             return false;
@@ -296,7 +325,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 长按事件
     *
     * @param {Object} item - 当前点击视频项
@@ -305,14 +334,14 @@ export default {
     longPress(item, index) {
         this.utils.logDebug('videoList => longPress');
         this.selectMode = true;
-        this.topBarSource.leftSrc = this.$app.$def.utils.getIcon('close');
+        this.topBarSource.leftSrc = this.utils.getIcon('close');
         this.topBarSource.title = this.$t('strings.unChoose');
         this.isShowBottomBar = true;
         this.initListChecked();
         this.videoClick(item, index);
     },
 
-/**
+    /**
     * 选中改变事件
     *
     * @return {boolean} Verify result
@@ -324,7 +353,7 @@ export default {
         if (!self.selectMode) {
             self.topBarSource.isShowLeft = true;
             self.topBarSource.title = self.album.name;
-            self.topBarSource.leftSrc = self.$app.$def.utils.getIcon('back');
+            self.topBarSource.leftSrc = self.utils.getIcon('back');
             self.isShowBottomBar = false;
             self.isAllChecked = false;
             self.initListChecked();
@@ -360,18 +389,18 @@ export default {
         }
     },
 
-/**
+    /**
     * 初始化列表选中状态
     */
     initListChecked() {
         this.utils.logDebug('videoList => initListChecked');
         this.listData.forEach(item => {
             item.checked = false;
-            item.icon = this.$app.$def.utils.getIcon('unselected');
+            item.icon = this.utils.getIcon('unselected');
         });
     },
 
-/**
+    /**
     * 获取选中数据
     *
     * @return {Array} list - 选中数据
@@ -388,7 +417,7 @@ export default {
         return list;
     },
 
-/**
+    /**
     * 底部菜单点击事件
     *
     * @param {Object} item - 当前点击底部菜单项
@@ -404,7 +433,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 设置全选
     */
     setListChecked() {
@@ -417,16 +446,16 @@ export default {
             let item = list[index];
             if (self.isAllChecked) {
                 item.checked = false;
-                item.icon = self.$app.$def.utils.getIcon('unselected');
+                item.icon = self.utils.getIcon('unselected');
             } else {
                 item.checked = true;
-                item.icon = self.$app.$def.utils.getIcon('selected');
+                item.icon = self.utils.getIcon('selected');
             }
         }
         self.onCheckedChange();
     },
 
-/**
+    /**
     * 设置全选
     *
     * @param {Object} item - 当前点击Pop菜单项
@@ -454,14 +483,14 @@ export default {
         }
     },
 
-/**
+    /**
     * 删除弹窗确定回调
     */
     deleteQuery() {
         this.deleteDialogCommit();
     },
 
-/**
+    /**
     * 删除显示图片弹窗
     *
     * @return {boolean} Verify result
@@ -477,7 +506,7 @@ export default {
         child.show();
     },
 
-/**
+    /**
     * 删除图片接口调用
     */
     deleteDialogCommit() {
@@ -493,30 +522,39 @@ export default {
             if (videos) {
                 for (let j = 0; j < choose.length; j++) {
                     let shareItem = choose[j];
-                    videos.forEach((item, index) => {
-                        if (item.name === shareItem.name && item.id === shareItem.id) {
-                            item.commitDelete((error, commitFlag) => {
-                                if (commitFlag) {
-                                    self.$app.$def.dataManage.isRefreshed(true);
-                                    self.selectMode = false;
-                                    setTimeout(() => {
-                                        if (choose.length === self.listData.length) {
-                                            self.listData = [];
-                                            self.onCheckedChange();
-                                        } else {
-                                            self.loadData();
-                                        }
-                                    }, LOAD_DATA_TIME);
-                                }
-                            });
-                        }
+                    videos.forEach((item) => {
+                        self.dealCommitDelete(shareItem, item);
                     });
                 }
             }
         });
     },
 
-/**
+    /**
+    * 处理删除操作
+    */
+    dealCommitDelete(shareItem, item) {
+        let self = this;
+        let choose = self.getCheckedData();
+        if (item.name === shareItem.name && item.id === shareItem.id) {
+            item.commitDelete((error, commitFlag) => {
+                if (commitFlag) {
+                    self.$app.$def.dataManage.isRefreshed(true);
+                    self.selectMode = false;
+                    setTimeout(() => {
+                        if (choose.length === self.listData.length) {
+                            self.listData = [];
+                            self.onCheckedChange();
+                        } else {
+                            self.loadData();
+                        }
+                    }, LOAD_DATA_TIME);
+                }
+            });
+        }
+    },
+
+    /**
     * 移动
     */
     movePhotos() {
@@ -536,7 +574,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 复制
     */
     copyPhotos() {
@@ -556,7 +594,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 隐藏pop弹窗
     */
     hideBottomPop() {
@@ -564,7 +602,7 @@ export default {
         this.popVisible = false;
     },
 
-/**
+    /**
     * 改变pop弹窗显示状态
     *
     * @param {Object} e - 改变pop弹出层回调参数
@@ -572,5 +610,30 @@ export default {
     changePopVisible(e) {
         this.utils.logDebug('videoList => changePopVisible');
         this.popVisible = e.detail;
+    },
+
+    /**
+    * 滚动到底部触发事件
+    *
+    * @return {boolean} Verify result
+    */
+    scrollBottom() {
+        this.utils.logDebug('videoList => scrollBottom');
+        let cacheLength = this.cacheOtherList.length;
+        let listLength = this.listData.length;
+        let diffLength = cacheLength - listLength;
+        if (diffLength === 0) {
+            return false;
+        }
+        let concatList = [];
+        if (diffLength >= PAGE_SIZE) {
+            concatList = this.cacheOtherList.slice(listLength, listLength + PAGE_SIZE);
+        } else if (0 < diffLength < PAGE_SIZE) {
+            concatList = this.cacheOtherList.slice(listLength, listLength + diffLength);
+        } else {
+            this.utils.logDebug('videoList => scrollBottom => lenError');
+        }
+        this.listData = this.listData.concat(this.initConcatList(concatList));
+        this.onCheckedChange();
     }
 };

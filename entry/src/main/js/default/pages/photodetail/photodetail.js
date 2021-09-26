@@ -86,6 +86,12 @@ const ROTATE_DEG = 90;
 // 旋转270度
 const ROTATE_DEG_MIN = -270;
 
+// 懒加载列表数
+const PAGE_SIZE = 28;
+
+// 操作弹框延时
+const POP_TIME = 50;
+
 export default {
     data: {
         topBarSource: {
@@ -146,8 +152,13 @@ export default {
                 disabled: false
             }
         ],
+        commonStyle: {
+            width: '176px',
+            height: '180px'
+        },
         currentItem: {},
         cacheList: [],
+        cacheSource: [],
         inputName: '',
         refreshType: INIT_REFRESH_TYPE,
         detailData: {
@@ -162,16 +173,21 @@ export default {
         photoType: PHOTO_TYPE
     },
 
-/**
+    /**
     * 初始化数据
     */
     onInit() {
         this.utils = this.$app.$def.utils;
         this.utils.logDebug('photoDetail => onInit');
         this.initNational();
+        if (this.selectMode) {
+            this.isShowBottom = false;
+        } else {
+            this.isShowBottom = true;
+        }
     },
 
-/**
+    /**
     * 回退按钮事件
     *
     * @return {boolean} Verify result
@@ -182,7 +198,7 @@ export default {
         return true;
     },
 
-/**
+    /**
     * 初始化菜单数据
     */
     initNational() {
@@ -201,35 +217,15 @@ export default {
         this.bottomBarPopList[1].name = this.$t('strings.rotate');
     },
 
-/**
+    /**
     * 组件显示加载数据
     */
     onShow() {
-        let self = this;
-        self.utils.logDebug('photoDetail => onShow');
-        if (self.list.length > 0) {
-            let item = self.list[self.shareIndex];
-            self.currentItem = item;
-            self.topBarSource.title = self.currentItem.name;
-            if (self.currentItem.mediaType === VIDEO_TYPE) {
-                self.showScale = false;
-                self.bottomBarPopList[1].visible = false;
-            } else {
-                self.showScale = true;
-                self.bottomBarPopList[1].visible = true;
-            }
-            if (self.selectMode) {
-                self.isShowBottom = false;
-                self.changeRightIcon(item);
-            } else {
-                self.topBarSource.rightSrc = this.$app.$def.utils.getIcon('info');
-                self.isShowBottom = true;
-            }
-        }
-        self.loadData();
+        this.utils.logDebug('photoDetail => onShow');
+        this.loadData();
     },
 
-/**
+    /**
     * 加载数据
     *
     * @return {boolean} Verify result
@@ -247,47 +243,54 @@ export default {
         }
     },
 
-/**
+    /**
     * 获取视频数据
     */
     getVideoAsset() {
         let self = this;
         self.utils.logDebug('photoDetail => getVideoAsset => startTime');
+        let photoList = self.utils.deepCopy(self.$app.$def.dataManage.getPhotoList());
+        if (photoList.length > 0) {
+            self.list = photoList;
+        }
         let args = {
             selections: '',
             selectionArgs: ['videoalbum'],
         };
         media.getVideoAssets(args, (error, videos) => {
             self.utils.logDebug('photoDetail => getVideoAsset => endTime');
-            let list = [];
-            for (let i = 0; i < videos.length; i++) {
-                let item = videos[i];
-                item.icon = '';
-                item.src = 'file://' + item.URI;
-                item.rotate = 0;
-                item.scale = 1;
-                item.isPause = true;
-                list.push(item);
-            }
-            if (self.refreshType === DELETE_REFRESH_TYPE) {
-                if (self.shareIndex > 0) {
-                    self.shareIndex--;
-                } else {
-                    self.shareIndex = 0;
+            self.cacheList = videos || [];
+            if (videos && videos.length > 0) {
+                let list = self.dealListData(videos || []);
+                if (self.refreshType === DELETE_REFRESH_TYPE) {
+                    if (self.shareIndex > 0) {
+                        self.shareIndex--;
+                    } else {
+                        self.shareIndex = 0;
+                    }
                 }
-            } else if (self.refreshType === MODIFY_REFRESH_TYPE) {
-                self.shareIndex = 0;
-            }
-            self.currentItem = list[self.shareIndex];
-            self.topBarSource.title = self.currentItem.name;
-            self.list = list || [];
 
-            self.isRrefreshed = INIT_REFRESH_TYPE;
-            self.cacheList = list || [];
+                // 如果长度为0 表示此从相机跳转过来或者是操作后刷新数据,实现分页
+                if (photoList.length === 0) {
+                    if (list.length >= PAGE_SIZE) {
+                        self.list = list.slice(0, PAGE_SIZE);
+                    } else {
+                        self.list = list;
+                    }
+                    self.isRrefreshed = INIT_REFRESH_TYPE;
+                }
+
+                // 如果从列表点击的是最后一项进来, 并且后面还有数据的话， 要手动连接后面的数据 由于swiper滑动响应不到
+                if (self.shareIndex === self.list.length - 1 && list.length > self.list.length) {
+                    self.list = self.list.concat(list.slice(self.list.length, self.list.length + PAGE_SIZE));
+                }
+                self.initBar();
+                self.cacheSource = list;
+            }
         });
     },
 
-/**
+    /**
     * 获取图片及所有照片数据
     */
     getAlbumAsset() {
@@ -301,7 +304,7 @@ export default {
         //  表示直接从相机到主页面跳转过来
         if (self.list.length === 0) {
             self.topBarSource.title = 'camera';
-            self.topBarSource.rightSrc = self.$app.$def.utils.getIcon('info');
+            self.topBarSource.rightSrc = self.utils.getIcon('info');
             args.selections = 'camera';
             self.isShowBottom = true;
         }
@@ -310,38 +313,97 @@ export default {
         if (self.album.name === self.$t('strings.allPhotos')) {
             args.selections = '';
         }
+        self.getMedia(args);
+    },
+
+    /**
+    * 获取图片及所有照片数据接口调用
+    *
+    * @param{Object} args - 接口参数
+    */
+    getMedia(args) {
+        let self = this;
+        let photoList = self.utils.deepCopy(self.$app.$def.dataManage.getPhotoList());
+        if (photoList.length > 0) {
+            self.list = photoList;
+        }
         media.getMediaAssets(args, (error, images) => {
             self.utils.logDebug('photoDetail => getAlbumAsset => endTime');
-            if (self.list.length === 0 || self.refreshType !== INIT_REFRESH_TYPE) {
-                let list = [];
-                for (let i = 0; i < images.length; i++) {
-                    let item = images[i];
-                    item.icon = '';
-                    item.src = 'file://' + item.URI;
-                    item.rotate = 0;
-                    item.scale = 1;
-                    item.isPause = true;
-                    list.push(item);
-                }
-                if (self.refreshType === DELETE_REFRESH_TYPE) {
-                    if (self.shareIndex > 0) {
-                        self.shareIndex--;
-                    } else {
-                        self.shareIndex = 0;
-                    }
-                } else if (self.refreshType === MODIFY_REFRESH_TYPE) {
+            self.cacheList = images || [];
+            let list = self.dealListData(images || []);
+            if (self.refreshType === DELETE_REFRESH_TYPE) {
+                if (self.shareIndex > 0) {
+                    self.shareIndex--;
+                } else {
                     self.shareIndex = 0;
                 }
-                self.list = list;
-                self.currentItem = list[self.shareIndex];
-                self.topBarSource.title = self.currentItem.name;
+            }
+            if (photoList.length === 0) {
+                if (list.length >= PAGE_SIZE) {
+                    self.list = list.slice(0, PAGE_SIZE);
+                } else {
+                    self.list = list;
+                }
                 self.refreshType = INIT_REFRESH_TYPE;
             }
-            self.cacheList = images || [];
+
+            // 如果从列表点击的是最后一项进来, 并且后面还有数据的话， 要手动连接后面的数据， 由于swiper滑动响应不到
+            if (self.shareIndex === self.list.length - 1 && list.length > self.list.length) {
+                self.list = self.list.concat(list.slice(self.list.length, self.list.length + PAGE_SIZE));
+            }
+            self.initBar();
+            self.cacheSource = list;
         });
     },
 
-/**
+    /**
+    * 处理接口返回数据
+    *
+    * @param{Array} list - 接口返回参数
+    * @return{Array} storeList - 处理后的数据
+    */
+    dealListData(list) {
+        let self = this;
+        let storeList = [];
+        for (let i = 0; i < list.length; i++) {
+            let item = list[i];
+            item.icon = item.icon = self.selectMode ? self.utils.getIcon('unselected') : '';
+            item.src = 'file://' + item.URI;
+            item.checked = false;
+            item.rotate = 0;
+            item.scale = 1;
+            item.isPause = true;
+            item.itemStyle = Object.assign({}, self.commonStyle);
+            item.imageStyle = Object.assign({}, self.commonStyle);
+            storeList.push(item);
+        }
+        return storeList;
+    },
+    initBar() {
+        let self = this;
+        if (self.list.length > 0) {
+            let item = self.list[self.shareIndex];
+            self.currentItem = item;
+            self.utils.logDebug(' ===  > ' + JSON.stringify(self.currentItem) + '      ');
+            self.topBarSource.title = self.currentItem.name;
+            if (self.currentItem.mediaType === VIDEO_TYPE) {
+                self.showScale = false;
+                self.bottomBarPopList[1].visible = false;
+            } else {
+                self.showScale = true;
+                self.bottomBarPopList[1].visible = true;
+            }
+            if (self.selectMode) {
+                self.isShowBottom = false;
+                self.changeRightIcon(item);
+            } else {
+                self.topBarSource.rightSrc = self.utils.getIcon('info');
+                self.isShowBottom = true;
+            }
+        }
+    },
+
+    /**
     * 选中发生改变
     */
     onCheckedChange() {
@@ -355,7 +417,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 获取选中数据
     *
     * @return {Array} list - 当前选中数据
@@ -372,16 +434,17 @@ export default {
         return list;
     },
 
-/**
+    /**
     * 滑动回调
     *
     * @param {Object} item - 滑动后当前显示项
+    * @return {boolean} Verify result
     */
     swiperChange(item) {
         this.utils.logDebug('photoDetail => swiperChange');
+        let obj = this.list[item.index];
         this.currentItem.scale = 1;
         this.currentItem.rotate = 0;
-        let obj = this.list[item.index];
         this.currentItem = obj;
         this.shareIndex = item.index;
         this.isScaleAddDisable = false;
@@ -398,39 +461,79 @@ export default {
         } else {
             this.topBarSource.title = this.currentItem.name;
         }
+        let cacheLen = this.cacheSource.length;
+        let listLen = this.list.length;
+        if (this.shareIndex === listLen - 1) {
+            let len = cacheLen - listLen;
+            if (len === 0) {
+                return false;
+            }
+            let concatList = [];
+            if (len >= PAGE_SIZE) {
+                concatList = this.cacheSource.slice(listLen, listLen + PAGE_SIZE);
+            } else if (len > 0 && len < PAGE_SIZE) {
+                concatList = this.cacheSource.slice(listLen, listLen + len);
+            } else {
+                this.utils.logDebug('photoDetail => swiperChange => lenError');
+            }
+            this.list = this.list.concat(this.initConcatList(concatList));
+        }
     },
 
-/**
+    /**
+    * 初始化需要连接的数据
+    *
+    * @params {Array} list - 被初始化的数组
+    * @return {Array} 返回处理后的数组
+    */
+    initConcatList(list) {
+        let self = this;
+        if (self.selectMode) {
+            list.forEach(item => {
+                item.icon = self.utils.getIcon('unselected');
+                item.checked = false;
+            });
+        }
+        return list;
+    },
+
+    /**
     * 滑动选中切换事件
     *
     * @param {Object} item - 滑动后当前项显示项
     */
     changeRightIcon(item) {
-        this.utils.logDebug('photoDetail => changeRightIcon');
+        let self = this;
+        self.utils.logDebug('photoDetail => changeRightIcon');
         if (item.checked) {
-            this.topBarSource.rightSrc = this.$app.$def.utils.getIcon('selected');
+            self.topBarSource.rightSrc = self.utils.getIcon('selected');
+            item.icon = self.utils.getIcon('selected');
         } else {
-            this.topBarSource.rightSrc = this.$app.$def.utils.getIcon('unselected_black');
+            self.topBarSource.rightSrc = self.utils.getIcon('unselected_black');
+            item.icon = self.utils.getIcon('unselected');
         }
         this.onCheckedChange();
     },
 
-/**
+    /**
     * 顶部右侧按钮点击事件
     */
     topBarRightClick() {
         this.utils.logDebug('photoDetail => topBarRightClick');
-        if (this.selectMode) {
-            this.currentItem.checked = !this.currentItem.checked;
-            this.changeRightIcon(this.currentItem);
-        } else {
-            this.detailData.size = (Number(this.currentItem.size) / DATA_SIZE / DATA_SIZE).toFixed(DETAIL_SIZE);
-            this.detailData.name = this.currentItem.name;
-            this.$element('photo_detail_dialog').show();
-        }
+        this.hideBottomPop();
+        setTimeout(() => {
+            if (this.selectMode) {
+                this.currentItem.checked = !this.currentItem.checked;
+                this.changeRightIcon(this.list[this.shareIndex]);
+            } else {
+                this.detailData.size = (Number(this.currentItem.size) / DATA_SIZE / DATA_SIZE).toFixed(DETAIL_SIZE);
+                this.detailData.name = this.currentItem.name;
+                this.$element('photo_detail_dialog').show();
+            }
+        }, POP_TIME);
     },
 
-/**
+    /**
     * 详情弹窗取消
     */
     dialogCancel() {
@@ -438,22 +541,20 @@ export default {
         this.$element('photo_detail_dialog').close();
     },
 
-/**
+    /**
     * 顶部左侧按钮点击事件
     */
     topBarLeftClick() {
         this.utils.logDebug('photoDetail => topBarLeftClick');
-        this.$app.$def.dataManage.setPhotoList(this.list);
-        router.back({
-            uri: 'pages/photoList/photoList',
-            params: {
-                list: this.list,
-                selectMode: this.selectMode
-            },
+        this.list.forEach(item => {
+            item.rotate = 0;
+            item.scale = 1;
         });
+        this.$app.$def.dataManage.setPhotoList(this.list);
+        router.back();
     },
 
-/**
+    /**
     * 底部菜单按钮事件
     *
     * @param {Object} item - 底部菜单当前点击项
@@ -469,7 +570,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 弹出提示框点击事件
     *
     * @param {Object} item - 弹窗pop层当前点击项
@@ -499,7 +600,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 修改名称弹窗
     *
     * @param {Object} value - 弹窗修改相册对象
@@ -512,7 +613,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 修改名称弹窗
     *
     * @param {string} albumName - 当前修改相册名
@@ -528,7 +629,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 修改名称接口
     *
     * @param {string} albumName - 当前修改相册名
@@ -547,31 +648,43 @@ export default {
             args.selections = '';
         }
         media.getMediaAssets(args, (error, images) => {
-            self.utils.logDebug('photoDetail => modifyPhotoName => endTime');
             if (images) {
                 for (let i = 0; i < images.length; i++) {
                     let item = images[i];
                     if (item.id === checkItem.id) {
-                        item.startModify((error, startFlag) => {
-                            if (startFlag) {
-                                item.name = albumName;
-                                item.commitModify((error, commitFlag) => {
-                                    if (commitFlag) {
-                                        self.refreshType = MODIFY_REFRESH_TYPE;
-                                        setTimeout(() => {
-                                            self.loadData();
-                                        }, LOAD_DATA_TIME);
-                                    }
-                                });
-                            }
-                        });
+                        self.dealStartModify(item, albumName);
                     }
                 }
             }
         });
     },
 
-/**
+    /**
+    * 处理图片开始修改名称接口
+    *
+    * @param {Object} item - 当前修改项
+    * @param {string} albumName - 当前修改相册名
+    */
+    dealStartModify(item, albumName) {
+        let self = this;
+        item.startModify((error, startFlag) => {
+            if (startFlag) {
+                item.name = albumName;
+                item.commitModify((error, commitFlag) => {
+                    if (commitFlag) {
+                        self.utils.logDebug('photoDetail => modifyName => endTime');
+                        self.refreshType = MODIFY_REFRESH_TYPE;
+                        self.$app.$def.dataManage.setPhotoList([]);
+                        setTimeout(() => {
+                            self.loadData();
+                        }, LOAD_DATA_TIME);
+                    }
+                });
+            }
+        });
+    },
+
+    /**
     * 修改视频名称
     *
     * @param {string} albumName - 当前修改视频名
@@ -585,29 +698,16 @@ export default {
             selectionArgs: ['videoalbum'],
         };
         media.getVideoAssets(args, (error, videos) => {
-            self.utils.logDebug('photoDetail => modifyVideoName => endTime');
             for (let i = 0; i < videos.length; i++) {
-                let video = videos[i];
-                if (video.id === checkItem.id) {
-                    video.startModify((error, startFlag) => {
-                        if (startFlag) {
-                            video.name = albumName;
-                            video.commitModify((error, commitFlag) => {
-                                if (commitFlag) {
-                                    self.refreshType = MODIFY_REFRESH_TYPE;
-                                    setTimeout(() => {
-                                        self.loadData();
-                                    }, LOAD_DATA_TIME);
-                                }
-                            });
-                        }
-                    });
+                let item = videos[i];
+                if (item.id === checkItem.id) {
+                    self.dealStartModify(item, albumName);
                 }
             }
         });
     },
 
-/**
+    /**
     * 判断是否重复相册名
     *
     * @param {string} name - 当前点击相册名
@@ -621,7 +721,7 @@ export default {
             let item = list[i];
             if (item.name === name) {
                 prompt.showToast({
-                    message: this.$t('string.repeateName'),
+                    message: this.$t('strings.repeatName'),
                     duration: REPEAT_NAME_TIME
                 });
                 flag = true;
@@ -631,7 +731,7 @@ export default {
         return flag;
     },
 
-/**
+    /**
     * 删除图片
     */
     deleteQuery() {
@@ -648,18 +748,18 @@ export default {
                     self.utils.logDebug('photoDetail => deleteQuery => endTime');
                     if (commitFlag) {
                         self.refreshType = DELETE_REFRESH_TYPE;
+                        self.$app.$def.dataManage.setPhotoList([]);
                         setTimeout(() => {
                             self.loadData();
                         }, LOAD_DATA_TIME);
                         self.$app.$def.dataManage.isRefreshed(true);
-
                     }
                 });
             }
         }
     },
 
-/**
+    /**
     * 删除图片弹窗
     */
     deletePhotos() {
@@ -673,7 +773,7 @@ export default {
         child.show();
     },
 
-/**
+    /**
     * 移动
     */
     movePhotos() {
@@ -696,7 +796,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 复制
     */
     copyPhotos() {
@@ -721,7 +821,7 @@ export default {
         );
     },
 
-/**
+    /**
     * 隐藏底部菜单弹窗Pop
     */
     hideBottomPop() {
@@ -729,7 +829,7 @@ export default {
         this.popVisible = false;
     },
 
-/**
+    /**
     * 改变底部菜单弹窗显示隐藏
     *
     * @param {Object} e - 当前点击底部pop弹窗项event
@@ -739,7 +839,7 @@ export default {
         this.popVisible = e.detail;
     },
 
-/**
+    /**
     * 放大按钮
     */
     leftScale() {
@@ -753,7 +853,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 缩小按钮
     */
     rightScale() {
@@ -767,21 +867,21 @@ export default {
         }
     },
 
-/**
+    /**
     * 视频加载完成后回调
     */
     videoPrepared() {
         this.utils.logDebug('videoPrepared');
     },
 
-/**
+    /**
     * 视频开始后回调
     */
     videoStart() {
         this.utils.logDebug('videoStart');
     },
 
-/**
+    /**
     * 视频暂停后回调
     * @param {Object} item - 列表点击当前项
     */
@@ -790,28 +890,28 @@ export default {
         this.utils.logDebug('videoPause');
     },
 
-/**
+    /**
     * 视频播放完成后回调
     */
     videoFinish() {
         this.utils.logDebug('videoFinish');
     },
 
-/**
+    /**
     * 视频加载出错后回调
     */
     videoError() {
         this.utils.logDebug('videoError');
     },
 
-/**
+    /**
     * 视频手动停止后回调
     */
     videoStop() {
         this.utils.logDebug('videoStop');
     },
 
-/**
+    /**
     * 播放按钮
     * @param {Object} item - 列表点击当前项
     * @param {number} index - 列表点击当前项下标

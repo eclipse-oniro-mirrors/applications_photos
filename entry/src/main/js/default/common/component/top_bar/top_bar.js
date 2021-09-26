@@ -28,14 +28,14 @@ export default {
         }
     },
 
-/**
+    /**
     * 左边点击
     */
     leftClick() {
         this.$emit('leftClick');
     },
 
-/**
+    /**
     * 右边点击
     */
     rightClick() {

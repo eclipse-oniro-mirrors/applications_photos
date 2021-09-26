@@ -34,7 +34,7 @@ let isRefreshed = true;
 
 export default {
 
-/**
+    /**
     * 获取listData
     *
     * @return {Array} - 返回listData
@@ -43,7 +43,7 @@ export default {
         return listData;
     },
 
-/**
+    /**
     * 获取gridData
     *
     * @return {Array} - 返回gridData
@@ -52,7 +52,7 @@ export default {
         return gridData;
     },
 
-/**
+    /**
     * 赋值photoList
     *
     * @param {Array} list - 图片列表数据
@@ -61,7 +61,7 @@ export default {
         photoList = list;
     },
 
-/**
+    /**
     * 获取photoList
     *
     * @return {Array} - 返回photoList
@@ -70,7 +70,7 @@ export default {
         return photoList;
     },
 
-/**
+    /**
     * 赋值mainAlbumList
     *
     * @param {Array} list - 主页面相册数据
@@ -79,7 +79,7 @@ export default {
         mainAlbumList = list;
     },
 
-/**
+    /**
     * 获取mainAlbumList
     *
     * @return {Array} - 返回mainAlbumList
@@ -88,7 +88,7 @@ export default {
         return mainAlbumList;
     },
 
-/**
+    /**
     * 赋值isRefreshed
     *
     * @param {boolean} flag - 是否刷新
@@ -97,7 +97,7 @@ export default {
         isRefreshed = flag;
     },
 
-/**
+    /**
     * 获取isRefreshed
     *
     * @return {boolean} - 返回isRefreshed

@@ -28,7 +28,10 @@
             @left-click="topBarLeftClick"
             @right-click="topBarRightClick">
     </top_bar>
-    <list class="list-animation" on:click="hideBottomPop">
+    <div if="{{ showEmptyDiv }}" class="empty-div">
+        <text class="empty-text">{{ $t('strings.noPhotos') }}</text>
+    </div>
+    <list else class="list-animation" on:click="hideBottomPop" onscrollbottom="scrollBottom">
         <list-item clickeffect="false">
             <div class="grid-content" if="{{ list && list.length > 0 }}">
                 <div for="{{ (index, item) in list }}" class="content-div"
@@ -48,15 +51,10 @@
                         </image>
                         <div class="grid-video" if="{{ item.mediaType == videoType }}"
                              onclick="photoClick({{ item }},{{ index }})">
-                            <text class="grid-video-time">
-                                00:00
-                            </text>
-                            <video
+                            <image
                                     style="object-fit : fill;"
-                                    src='{{ item.src }}'
-                                    muted='false'
-                                    autoplay='false'
-                                    controls="false"></video>
+                                    src="/common/image/icon/video_poster.png"
+                                    ></image>
                         </div>
                         <div class="scale-img" if="{{ item.icon }}"
                              on:click="scaleImgClick({{ item }},{{ index }})">
