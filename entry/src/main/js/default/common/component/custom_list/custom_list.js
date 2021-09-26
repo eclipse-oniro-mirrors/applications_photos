@@ -66,14 +66,18 @@ export default {
             for (let index = 0; index < this.listData.length; index++) {
                 let item = this.listData[index];
                 if (this.selectMode) {
-                    item.icon = this.$app.$def.utils.getIcon('unselected_black');
+                    if (item.checked) {
+                        item.icon = this.$app.$def.utils.getIcon('selected');
+                    } else {
+                        item.icon = this.$app.$def.utils.getIcon('unselected_black');
+                    }
                 }
             }
             return this.listData;
         },
     },
 
-/**
+    /**
     * 初始化数据
     */
     onInit() {
@@ -82,7 +86,7 @@ export default {
         }, GRID_IMAGE_STYLE);
     },
 
-/**
+    /**
     * 列表点击事件
     *
     * @param {Object} item - 点击项
@@ -113,7 +117,7 @@ export default {
         }
     },
 
-/**
+    /**
     * 列表长按事件
     *
     * @param {Object} item - 长按项
@@ -145,7 +149,7 @@ export default {
         self.photoClick(item, index, type);
     },
 
-/**
+    /**
     * 获取列表是否开启选择模式
     *
     * @return {boolean} - 是否是选择模式

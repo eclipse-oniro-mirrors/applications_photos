@@ -24,28 +24,28 @@ export default {
         operateType: ''
     },
 
-/**
+    /**
     * 弹框显示
     */
     show() {
         this.$element('progressDialog').show();
     },
 
-/**
+    /**
     * 弹框隐藏
     */
     close() {
         this.$element('progressDialog').close();
     },
 
-/**
+    /**
     * 确定
     */
     query() {
         this.close();
     },
 
-/**
+    /**
     * 取消
     */
     cancel() {

@@ -48,6 +48,7 @@
                             id="{{ 'video' + index }}"
                             style="object-fit : fill;"
                             src='{{ item.src }}'
+                            poster="/common/image/icon/video_poster.png"
                             muted='false'
                             autoplay="false"
                             controls="true"
@@ -60,7 +61,7 @@
 
                     <image class="video-player"
                            on:click="videoPlay({{ item }},{{ index }})"
-                           src="/common/image/svg/play.svg"
+                           src="/common/image/icon/video_poster.png"
                            show="{{ item.isPause }}">
                     </image>
                 </stack>

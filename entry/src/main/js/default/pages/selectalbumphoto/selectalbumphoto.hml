@@ -28,7 +28,7 @@
             @left-click="topBarLeftClick"
             @right-click="topBarRightClick">
     </top_bar>
-    <list class="list-animation">
+    <list class="list-animation" onscrollbottom="scrollBottom">
         <list-item clickeffect="false">
             <div class="grid-content" if="{{ list && list.length > 0 }}">
                 <div for="{{ (index, item) in list }}" class="content-div">
@@ -42,14 +42,8 @@
                         </image>
                         <div class="grid-video" if="{{ item.mediaType == videoType }}"
                              onclick="photoClick({{ item }},{{ index }})">
-                            <text class="grid-video-time">
-                                00:00
-                            </text>
-                            <video
-                                    style="object-fit : fill;"
-                                    src='{{ item.src }}'
-                                    poster='{{ item.poster }}'
-                                    muted='false' autoplay='false' controls="false"></video>
+                            <image style="object-fit : fill;"
+                                   src="/common/image/icon/video_poster.png"></image>
                         </div>
 
                         <div class="scale-img" if="{{ item.icon }}" on:click="scaleImgClick({{ item }},{{ index }})">

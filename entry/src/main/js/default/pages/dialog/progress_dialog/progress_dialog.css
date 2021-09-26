@@ -25,12 +25,14 @@
     flex-direction: column;
     background-color: #fff;
     border-radius: 20px;
+    width: 100%;
 }
 
 .inner-txt {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .text {
@@ -47,6 +49,7 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 20px;
+    width: 100%;
 }
 
 .icon {

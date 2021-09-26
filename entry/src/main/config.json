@@ -9,7 +9,7 @@
     "apiVersion": {
       "compatible": 6,
       "target": 6,
-      "releaseType": "Beta1"
+      "releaseType": "Release"
     }
   },
   "deviceConfig": {},
@@ -23,7 +23,8 @@
     "distro": {
       "deliveryWithInstall": true,
       "moduleName": "entry",
-      "moduleType": "entry"
+      "moduleType": "entry",
+      "installationFree": true
     },
     "abilities": [
       {

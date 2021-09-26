@@ -22,7 +22,7 @@ export default {
         title: ''
     },
 
-/**
+    /**
     * 设置标题
     *
     * @param {string} text - 标题
@@ -31,21 +31,21 @@ export default {
         this.title = text;
     },
 
-/**
+    /**
     * 弹框显示
     */
     show() {
         this.$element('delete_dialog').show();
     },
 
-/**
+    /**
     * 弹框隐藏
     */
     close() {
         this.$element('delete_dialog').close();
     },
 
-/**
+    /**
     * 确定
     */
     query() {
@@ -53,7 +53,7 @@ export default {
         this.close();
     },
 
-/**
+    /**
     * 取消
     */
     cancel() {
