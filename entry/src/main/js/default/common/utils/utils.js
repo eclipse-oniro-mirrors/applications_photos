@@ -195,7 +195,7 @@ export default {
         if (object instanceof Object) {
             copyObj = {};
             for (let attr in object) {
-                if (object.hasOwnProperty(attr)) copyObj[attr] = this.deepCopy(object[attr]);
+                copyObj[attr] = this.deepCopy(object[attr]);
             }
             return copyObj;
         }
