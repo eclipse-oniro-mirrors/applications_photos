@@ -140,7 +140,8 @@ export default {
         media.getMediaAssets(args, (error, images) => {
             self.utils.logDebug('selectAlbum => getMediaAssets => endTime =>');
             if (images && images.length > 0) {
-                gridObj.src = images[0].mediaType === VIDEO_TYPE ? '/common/image/icon/video_poster.png' : 'file://' + images[0].URI;
+                gridObj.src = images[0].mediaType === VIDEO_TYPE
+                    ? '/common/image/icon/video_poster.png' : 'file://' + images[0].URI;
                 gridObj.list = images;
             }
             // 判断是新建选相册  还是操作选相册

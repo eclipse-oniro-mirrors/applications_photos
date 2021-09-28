@@ -223,33 +223,33 @@ export default {
     loadData() {
         this.utils.logDebug('afterSelect => loadData => startTime');
         let self = this;
-        if (self.album) {
-            let args = {
-                selections: self.topBarSource.title,
-                selectionArgs: ['imagealbum', 'videoalbum'],
-            };
-            if (self.album.name === self.$t('strings.allPhotos')) {
-                args.selections = '';
-                self.topBarSource.title = self.$t('strings.allPhotos');
-            }
-            media.getMediaAssets(args, (error, images) => {
-                self.utils.logDebug('afterSelect => loadData => endTime');
-                if (images) {
-                    for (let i = 0; i < images.length; i++) {
-                        let item = images[i];
-                        item.src = 'file://' + item.URI;
-                        item.icon = '';
-                        item.checked = false;
-                    }
-                    self.cacheOtherList = images;
-                    if (images.length > PAGE_SIZE) {
-                        self.list = images.slice(0, PAGE_SIZE);
-                    } else {
-                        self.list = images;
-                    }
-                }
-            });
+
+        let args = {
+            selections: self.topBarSource.title,
+            selectionArgs: ['imagealbum', 'videoalbum'],
+        };
+        if (self.album && self.album.name === self.$t('strings.allPhotos')) {
+            args.selections = '';
+            self.topBarSource.title = self.$t('strings.allPhotos');
         }
+        media.getMediaAssets(args, (error, images) => {
+            self.utils.logDebug('afterSelect => loadData => endTime');
+            if (images) {
+                for (let i = 0; i < images.length; i++) {
+                    let item = images[i];
+                    item.src = 'file://' + item.URI;
+                    item.icon = '';
+                    item.checked = false;
+                }
+                self.cacheOtherList = images;
+                if (images.length > PAGE_SIZE) {
+                    self.list = images.slice(0, PAGE_SIZE);
+                } else {
+                    self.list = images;
+                }
+            }
+        });
+
         setTimeout(() => {
             self.progress = PROGRESS;
             setTimeout(() => {
@@ -407,6 +407,7 @@ export default {
             });
         });
     },
+
     /**
     * 初始化数据
     */
@@ -434,7 +435,7 @@ export default {
     progressChange() {
         let self = this;
         if (self.progress < PROGRESS) {
-            self.progress += Math.round(PROGRESS / self.list.length);
+            self.progress += Math.floor(PROGRESS / self.list.length);
             self.utils.logDebug('afterSelect => progressChange => ' + self.progress);
         } else {
             self.progress = PROGRESS;
