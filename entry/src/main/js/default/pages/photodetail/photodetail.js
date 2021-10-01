@@ -261,7 +261,7 @@ export default {
             self.utils.logDebug('photoDetail => getVideoAsset => endTime');
             self.cacheList = videos || [];
             if (videos && videos.length > 0) {
-                let list = self.dealListData(videos || []);
+                let list = self.utils.deepCopy(self.dealListData(videos || []));
                 if (self.refreshType === DELETE_REFRESH_TYPE) {
                     if (self.shareIndex > 0) {
                         self.shareIndex--;
@@ -330,7 +330,7 @@ export default {
         media.getMediaAssets(args, (error, images) => {
             self.utils.logDebug('photoDetail => getAlbumAsset => endTime');
             self.cacheList = images || [];
-            let list = self.dealListData(images || []);
+            let list = self.utils.deepCopy(self.dealListData(images || []));
             if (self.refreshType === DELETE_REFRESH_TYPE) {
                 if (self.shareIndex > 0) {
                     self.shareIndex--;
@@ -384,7 +384,6 @@ export default {
         if (self.list.length > 0) {
             let item = self.list[self.shareIndex];
             self.currentItem = item;
-            self.utils.logDebug(' ===  > ' + JSON.stringify(self.currentItem) + '      ');
             self.topBarSource.title = self.currentItem.name;
             if (self.currentItem.mediaType === VIDEO_TYPE) {
                 self.showScale = false;
@@ -438,7 +437,6 @@ export default {
     * 滑动回调
     *
     * @param {Object} item - 滑动后当前显示项
-    * @return {boolean} Verify result
     */
     swiperChange(item) {
         this.utils.logDebug('photoDetail => swiperChange');
@@ -461,6 +459,15 @@ export default {
         } else {
             this.topBarSource.title = this.currentItem.name;
         }
+        this.swiperBottom();
+    },
+
+    /**
+    * 滑动到最后
+    *
+    * @return {boolean} Verify result
+    */
+    swiperBottom() {
         let cacheLen = this.cacheSource.length;
         let listLen = this.list.length;
         if (this.shareIndex === listLen - 1) {
@@ -886,7 +893,6 @@ export default {
     * @param {Object} item - 列表点击当前项
     */
     videoPause(item) {
-        item.isPause = true;
         this.utils.logDebug('videoPause');
     },
 

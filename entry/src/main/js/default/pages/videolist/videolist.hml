@@ -42,9 +42,6 @@
                     </image>
                     <image if="{{ selectMode }}" class="select" src="{{ item.icon }}">
                     </image>
-                    <text else class="video-duration" onclick="videoClick({{ item }},{{ index }})">
-                        {{ item.duration }}
-                    </text>
                 </stack>
             </div>
         </list-item>
