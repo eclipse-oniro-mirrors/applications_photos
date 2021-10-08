@@ -541,6 +541,7 @@ export default {
                 if (commitFlag) {
                     self.$app.$def.dataManage.isRefreshed(true);
                     self.selectMode = false;
+                    self.$app.$def.dataManage.setPhotoList([]);
                     setTimeout(() => {
                         if (choose.length === self.listData.length) {
                             self.listData = [];

@@ -26,7 +26,7 @@ let media = mediaLibrary.getMediaLibraryHelper();
 const PROGRESS = 100;
 
 // 调用operations延时
-const OPERATION_TIME = 50;
+const OPERATION_TIME = 200;
 
 // 照片类型
 const PHOTO_TYPE = 3;
@@ -86,7 +86,9 @@ export default {
         let self = this;
         setTimeout(() => {
             self.$element('progress_dialog').show();
-            this.operations();
+            setTimeout(() => {
+                self.operations();
+            }, OPERATION_TIME);
         }, OPERATION_TIME);
     },
 

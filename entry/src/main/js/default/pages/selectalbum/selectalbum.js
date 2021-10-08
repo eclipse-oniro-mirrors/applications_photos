@@ -31,6 +31,9 @@ const PAGE_SIZE = 10;
 // 视频类型
 const VIDEO_TYPE = 4;
 
+// promise执行延时
+const PROMISE_TIME = 100;
+
 export default {
     data: {
         listData: [],
@@ -85,50 +88,125 @@ export default {
     },
 
     /**
-    * 获取相册
+    * 获取所有视频数据
+    *
+    * @return {Promise} - 返回获取视频promise
     */
-    getAlbums() {
+    getAllVideoAlbum() {
         let self = this;
+        self.utils.logDebug('selectAlbum => getAllVideoAlbum => startTime');
         let args = {
             selections: '',
-            selectionArgs: ['imagealbum'],
+            selectionArgs: ['imagealbum', 'videoalbum'],
         };
-        self.utils.logDebug('selectAlbum => getImageAlbums => startTime');
-        media.getImageAlbums(args, (error, albums) => {
-            self.utils.logDebug('selectAlbum => getImageAlbums => endTime');
-            if (albums) {
-                let list = [];
-                let others = [];
-                for (let i = 0; i < albums.length; i++) {
-                    let album = albums[i];
-                    let gridObj = {
-                        name: album.albumName,
-                        id: album.albumId,
-                        icon: '/common/image/svg/arrow-right.svg',
-                        checked: false,
-                        showNumber: true,
-                        src: self.$app.$def.utils.getIcon('default'),
-                        list: []
-                    };
-                    setTimeout(() => {
-                        self.getMediaAssets(gridObj, album, list, others);
-                    }, (i + 1) * LOAD_DATA_TIME);
+        return new Promise((resolve, reject) => {
+            media.getVideoAlbums(args, (error, albums) => {
+                self.utils.logDebug('selectAlbum => getAllVideoAlbum => endTime');
+                if (albums) {
+                    resolve(albums);
+                } else {
+                    resolve([]);
                 }
-                setTimeout(() => {
-                    if (others.length > PAGE_SIZE) {
-                        self.otherList = others.slice(0, PAGE_SIZE);
-                    } else {
-                        self.otherList = others;
-                    }
-                    self.cacheList = others;
-                    self.listData = list;
-                }, (albums.length + 1) * LOAD_DATA_TIME);
-            }
+            });
+        });
+    },
+
+    /**
+    * 获取所有照片数据
+    *
+    * @return {Promise} - 返回获取照片promise
+    */
+    getAllImageAlbum() {
+        let self = this;
+        self.utils.logDebug('selectAlbum => getAllImageAlbum => startTime');
+        let args = {
+            selections: '',
+            selectionArgs: ['imagealbum', 'videoalbum'],
+        };
+        return new Promise((resolve, reject) => {
+            media.getImageAlbums(args, (error, albums) => {
+                self.utils.logDebug('selectAlbum => getAllImageAlbum => endTime');
+                if (albums) {
+                    resolve(albums);
+                } else {
+                    resolve([]);
+                }
+            });
         });
     },
 
     /**
     * 获取相册
+    */
+    getAlbums() {
+        let self = this;
+        self.utils.logDebug('selectAlbum => getAlbums => startTime');
+        let videoPromise = self.getAllVideoAlbum();
+        let imagePromise = self.getAllImageAlbum();
+        setTimeout(() => {
+            Promise.all([videoPromise, imagePromise]).then(result => {
+                let allAlbums = result[0].concat(result[1]) || [];
+                let array = [];
+                let obj = {};
+                allAlbums.forEach(item => {
+                    if (!obj[item.albumName]) {
+                        array.push(item);
+                        obj[item.albumName] = 1;
+                    } else {
+                        obj[item.albumName]++;
+                    }
+                });
+                allAlbums = array;
+                self.setAlbumList(allAlbums);
+                self.utils.logDebug('selectAlbum => getAlbums => endTime');
+            });
+        }, PROMISE_TIME);
+    },
+
+    /**
+    * 获取相册
+    *
+    * @param {Array} allAlbums - 相册数据
+    */
+    setAlbumList(allAlbums) {
+        let self = this;
+        if (allAlbums.length > 0) {
+            let list = [];
+            let others = [];
+            for (let i = 0; i < allAlbums.length; i++) {
+                let album = allAlbums[i];
+                let gridObj = {
+                    name: album.albumName,
+                    id: album.albumId,
+                    icon: '/common/image/svg/arrow-right.svg',
+                    checked: false,
+                    showNumber: true,
+                    src: self.$app.$def.utils.getIcon('default'),
+                    list: []
+                };
+                setTimeout(() => {
+                    self.getMediaAssets(gridObj, album, list, others);
+                }, (i + 1) * LOAD_DATA_TIME);
+            }
+            setTimeout(() => {
+                if (others.length > PAGE_SIZE) {
+                    self.otherList = others.slice(0, PAGE_SIZE);
+                } else {
+                    self.otherList = others;
+                }
+                self.cacheList = others;
+                self.listData = list;
+            }, (allAlbums.length + 1) * LOAD_DATA_TIME);
+        }
+    },
+
+    /**
+    * 获取相册
+    *
+    * @param {Object} gridObj - 数据对象
+    * @param {Object} album - 被操作对象
+    * @param {Array} list - 相册数据
+    * @param {Array} others - 其他相册数据
     */
     getMediaAssets(gridObj, album, list, others) {
         let self = this;
@@ -141,7 +219,8 @@ export default {
             self.utils.logDebug('selectAlbum => getMediaAssets => endTime =>');
             if (images && images.length > 0) {
                 gridObj.src = images[0].mediaType === VIDEO_TYPE
-                    ? '/common/image/icon/video_poster.png' : 'file://' + images[0].URI;
+                    ? '/common/image/icon/video_poster.png'
+                    : 'file://' + images[0].URI;
                 gridObj.list = images;
             }
             // 判断是新建选相册  还是操作选相册
