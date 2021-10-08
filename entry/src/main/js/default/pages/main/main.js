@@ -54,6 +54,9 @@ const PAGE_SIZE = 10;
 // 视频类型
 const VIDEO_TYPE = 4;
 
+// promise执行延时
+const PROMISE_TIME = 100;
+
 export default {
     data: {
         headTitle: '',
@@ -152,6 +155,8 @@ export default {
     onShow() {
         this.utils.logDebug('main => onShow');
         if (this.$app.$def.dataManage.getRefreshed()) {
+            this.showEmptyDiv = true;
+            this.showEmptyDiv = false;
             this.loadData();
         }
     },
@@ -225,24 +230,7 @@ export default {
                 self.headSource = allRes;
             }
         });
-        self.getAlbums().then(albumRes => {
-            if (albumRes.grid || albumRes.list) {
-                self.gridData = albumRes.grid;
-                self.cacheOtherList = albumRes.list;
-                if (albumRes.list && albumRes.list.length > PAGE_SIZE) {
-                    self.listData = albumRes.list.slice(0, PAGE_SIZE);
-                } else {
-                    self.listData = albumRes.list;
-                }
-                self.getVideoAlbum().then(videoRes => {
-                    if (videoRes.src) {
-                        self.cacheAlbums.push(videoRes);
-                        self.gridData.push(videoRes);
-                    }
-                });
-                self.utils.logDebug('main albumRes' + self.listData.length);
-            }
-        });
+        self.getAlbums();
         self.$app.$def.dataManage.isRefreshed(false);
     },
 
@@ -278,29 +266,102 @@ export default {
     },
 
     /**
-    * 获取所有相册数据
+    * 获取所有视频数据
     *
-    * @return {Promise} - 返回获取所有相册promise
+    * @return {Promise} - 返回获取视频promise
     */
-    getAlbums() {
-        this.utils.logDebug('main => getAlbums => startTime');
+    getAllVideoAlbum() {
         let self = this;
+        self.utils.logDebug('main => getAllVideoAlbum => startTime');
         let args = {
             selections: '',
-            selectionArgs: ['imagealbum'],
+            selectionArgs: ['imagealbum', 'videoalbum'],
         };
-        return new Promise(function (resolve, reject) {
-            media.getImageAlbums(args, (error, albums) => {
-                self.utils.logDebug('main => getAlbums => endTime');
+        return new Promise((resolve, reject) => {
+            media.getVideoAlbums(args, (error, albums) => {
+                self.utils.logDebug('main => getAllVideoAlbum => endTime');
                 if (albums) {
-                    self.cacheAlbums = albums;
-                    self.dealImageAlbums(albums).then(res => {
-                        resolve(res);
-                    });
+                    resolve(albums);
                 } else {
-                    reject(new Error('get data error'));
+                    resolve([]);
                 }
             });
+        });
+    },
+
+    /**
+    * 获取所有照片数据
+    *
+    * @return {Promise} - 返回获取照片promise
+    */
+    getAllImageAlbum() {
+        let self = this;
+        self.utils.logDebug('main => getAllImageAlbum => startTime');
+        let args = {
+            selections: '',
+            selectionArgs: ['imagealbum', 'videoalbum'],
+        };
+        return new Promise((resolve, reject) => {
+            media.getImageAlbums(args, (error, albums) => {
+                self.utils.logDebug('main => getAllImageAlbum => endTime');
+                if (albums) {
+                    resolve(albums);
+                } else {
+                    resolve([]);
+                }
+            });
+        });
+    },
+
+
+    /**
+    * 获取所有相册数据
+    */
+    getAlbums() {
+        let self = this;
+        self.utils.logDebug('main => getAlbums => startTime');
+        let videoPromise = self.getAllVideoAlbum();
+        let imagePromise = self.getAllImageAlbum();
+        Promise.all([videoPromise, imagePromise]).then(result => {
+            let allAlbums = result[0].concat(result[1]) || [];
+            let array = [];
+            let obj = {};
+            allAlbums.forEach(item => {
+                if (!obj[item.albumName]) {
+                    array.push(item);
+                    obj[item.albumName] = 1;
+                } else {
+                    obj[item.albumName]++;
+                }
+            });
+            allAlbums = array;
+            self.cacheAlbums = allAlbums;
+            self.dealImageAlbums(allAlbums).then(albumRes => {
+                if (albumRes.grid || albumRes.list) {
+                    self.gridData = albumRes.grid;
+                    self.cacheOtherList = albumRes.list;
+                    if (albumRes.list && albumRes.list.length > PAGE_SIZE) {
+                        self.listData = albumRes.list.slice(0, PAGE_SIZE);
+                    } else {
+                        self.listData = albumRes.list;
+                    }
+                    self.dealGetVideoAlbum();
+                }
+            });
+        });
+    },
+
+    /**
+    * 获取视频数据
+    */
+    dealGetVideoAlbum() {
+        let self = this;
+        self.getVideoAlbum().then(videoRes => {
+            self.utils.logDebug('main => getAlbums => endTime');
+            if (videoRes.src && self.gridData.length < 2) {
+                self.cacheAlbums.push(videoRes);
+                self.gridData.push(videoRes);
+            }
         });
     },
 
@@ -311,6 +372,7 @@ export default {
     */
     dealImageAlbums(albums) {
         let self = this;
+        self.utils.logDebug('main => dealImageAlbums => startTime');
         return new Promise(function (resolve, reject) {
             let list = [];
             let grid = [];
@@ -328,6 +390,7 @@ export default {
                         list: []
                     };
                     self.getAlbumImage(album).then((res) => {
+                        self.utils.logDebug('main => dealImageAlbums => endTime');
                         if (res && res.length > 0) {
                             if (res[0].mediaType === VIDEO_TYPE) {
                                 gridObj.src = '/common/image/icon/video_poster.png';
@@ -361,13 +424,15 @@ export default {
     * @return {Promise} - 返回获取相册图片promise
     */
     getAlbumImage(album) {
-        this.utils.logDebug('main => getAlbumImage => startTime');
+        let self = this;
+        self.utils.logDebug('main => getAlbumImage => startTime');
         let args = {
             selections: album.albumName,
             selectionArgs: ['imagealbum', 'videoalbum'],
         };
         return new Promise(function (resolve, reject) {
             media.getMediaAssets(args, (error, images) => {
+                self.utils.logDebug('main => getAlbumImage => endTime');
                 if (images !== null || images !== undefined) {
                     resolve(images);
                 } else {
@@ -430,8 +495,8 @@ export default {
     * @param {string} albumName - 新建相册名
     */
     createAlbum(albumName) {
-        this.utils.logDebug('main => createAlbum => startTime');
         let self = this;
+        self.utils.logDebug('main => createAlbum => startTime');
         self.$element('create_dialog').close();
         media.createAlbum((err, album) => {
             this.utils.logDebug('main => createAlbum => err' + err);
@@ -499,21 +564,31 @@ export default {
     * @param {string} albumName - 相册名
     */
     modifyAlbumName(albumName) {
-        this.utils.logDebug('main => modifyAlbumName => startTime');
         let self = this;
+        self.utils.logDebug('main => modifyAlbumName => startTime');
         self.$element('rename_dialog').close();
-        let args = {
-            selections: '',
-            selectionArgs: ['imagealbum'],
-        };
-        media.getImageAlbums(args, (error, albums) => {
-            if (albums) {
-                for (let j = 0; j < albums.length; j++) {
-                    let item = albums[j];
+        let videoPromise = self.getAllVideoAlbum();
+        let imagePromise = self.getAllImageAlbum();
+        setTimeout(() => {
+            Promise.all([videoPromise, imagePromise]).then(result => {
+                let allAlbums = result[0].concat(result[1]) || [];
+                let array = [];
+                let obj = {};
+                allAlbums.forEach(item => {
+                    if (!obj[item.albumName]) {
+                        array.push(item);
+                        obj[item.albumName] = 1;
+                    } else {
+                        obj[item.albumName]++;
+                    }
+                });
+                allAlbums = array;
+                for (let j = 0; j < allAlbums.length; j++) {
+                    let item = allAlbums[j];
                     self.dealCommitModifyAlbum(item, albumName);
                 }
-            }
-        });
+            });
+        }, PROMISE_TIME);
     },
 
     /**
