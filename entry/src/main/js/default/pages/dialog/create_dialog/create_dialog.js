@@ -19,33 +19,12 @@
 
 import prompt from '@system.prompt';
 
-// 新建相册命名随机数
-const GET_RANDOM_NAME = 5;
+// input输入框长度
+const NAME_LENGTH = 51;
 
 export default {
     data: {
         inputName: ''
-    },
-
-    /**
-    * 新建相册名
-    */
-    onReady() {
-        let str = 'abcdefghijklmnopqrstuvwxyz';
-        for (let i = 0; i < GET_RANDOM_NAME; i++) {
-            this.inputName += str[this.getRandomInt(0, GET_RANDOM_NAME)];
-        }
-    },
-
-    /**
-    * 随机获取新建相册名
-    *
-    * @param {number} min - 随机最小数
-    * @param {number} max - 随机最大数
-    * @return {number} - 随机数
-    */
-    getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
     },
 
     /**
@@ -68,7 +47,11 @@ export default {
     * @param {string} value - 相册名
     */
     valueChange(value) {
-        this.inputName = value.value;
+        if (value.value.length < NAME_LENGTH) {
+            this.inputName = value.value;
+        } else {
+            this.inputName = value.value.substring(0, NAME_LENGTH);
+        }
     },
 
     /**
@@ -102,6 +85,9 @@ export default {
             return false;
         }
         this.$emit('createDialogAlbum', this.inputName);
+        setTimeout(() => {
+            this.inputName = '';
+        }, NAME_LENGTH);
     },
 
     /**
@@ -109,5 +95,8 @@ export default {
     */
     cancel() {
         this.close();
+        setTimeout(() => {
+            this.inputName = '';
+        }, NAME_LENGTH);
     }
 };
