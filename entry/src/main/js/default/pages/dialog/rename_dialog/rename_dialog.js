@@ -55,6 +55,15 @@ export default {
     },
 
     /**
+    * 输入框改变事件
+    *
+    * @param {Object} e - 事件对象
+    */
+    valueChange(e) {
+        this.inputName = e.value;
+    },
+
+    /**
     * 重命名确定
     */
     query() {

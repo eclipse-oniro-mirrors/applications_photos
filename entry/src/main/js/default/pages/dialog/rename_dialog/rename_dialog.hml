@@ -18,7 +18,8 @@
 <dialog id="renameDialog" class="rename-dialog-main" oncancel="cancelDialog">
     <div class="dialog-div">
         <text class="title">{{ $t('strings.rename') }}</text>
-        <input class="input" type="text" value="{{ inputName }}" placeholder="{{ $t('strings.inputPlaceholder') }}">
+        <input class="input" type="text" value="{{ inputName }}" maxlength="50"
+               placeholder="{{ $t('strings.inputPlaceholder') }}" @change="valueChange">
         </input>
         <div class="bottom-div">
             <text onclick="cancel" class="btn-txt">{{ $t('strings.cancel') }}</text>

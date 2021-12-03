@@ -67,7 +67,7 @@
                 </stack>
             </div>
         </swiper>
-        <div class="scale-div" show="{{ showScale }}">
+        <div class="scale-div" if="{{ showScale }}">
             <div class="scale-top" on:click="leftScale">
                 <image class="scale-image" if="{{ ! isScaleAddDisable }}" src="/common/image/svg/scaleadd.svg"></image>
                 <image class="scale-image" else style="opacity : 0.5;" src="/common/image/svg/scaleadd.svg"></image>
