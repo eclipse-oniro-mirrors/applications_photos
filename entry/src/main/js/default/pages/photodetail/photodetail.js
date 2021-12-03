@@ -588,13 +588,15 @@ export default {
         if (item.detail.id === MOVE_ID) {
             let arrData = self.currentItem.name.split('.');
             let firstName = arrData[0];
-            let lastName = arrData[1];
+            self.lastName = arrData[1];
             if (self.currentItem.mediaType === PHOTO_TYPE) {
-                self.inputName = firstName + Math.round(Math.random() * RANDOM_NAME) + '.' + lastName;
+                self.inputName = firstName;
             } else if (self.currentItem.mediaType === VIDEO_TYPE) {
-                self.inputName = lastName + Math.round(Math.random() * RANDOM_NAME) + '.' + lastName;
+                self.inputName = firstName;
             }
-            self.$element('rename_dialog').show();
+            setTimeout(() => {
+                self.$element('rename_dialog').show();
+            }, POP_TIME);
         } else if (item.detail.id === COPY_ID) {
             self.currentItem.scale = 1;
             self.isScaleAddDisable = false;
