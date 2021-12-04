@@ -42,8 +42,8 @@ const VIDEO_ALBUM_ID = -2;
 // 命名重复弹框停留时长
 const REPEAT_NAME_TIME = 1000;
 
-// 获取重命名的随机数
-const RANDOM_INPUT_NAME = 10;
+// 弹窗延迟
+const DIALOG_TIME = 20;
 
 // 删除相册延时
 const DELETE_ALBUM_TIME = 200;
@@ -650,20 +650,23 @@ export default {
     */
     bottomTabClick(item) {
         this.utils.logDebug('main => bottomTabClick');
-        let length = this.getCheckedData().length;
+        let self = this;
+        let length = self.getCheckedData().length;
         if (item.detail.id === DELETE_ID) {
             if (length === 0) {
                 return false;
             }
-            let child = this.$child('delete_dialog');
-            child.setTitle(this.$t('strings.deleteInfo') + length + this.$t('strings.items'));
+            let child = self.$child('delete_dialog');
+            child.setTitle(self.$t('strings.deleteInfo') + length + self.$t('strings.items'));
             child.show();
         } else if (item.detail.id === RENAME_ID) {
             if (length !== 1) {
                 return false;
             }
-            this.inputName = this.getCheckedData()[0].name + Math.round(Math.random() * RANDOM_INPUT_NAME);
-            this.$element('rename_dialog').show();
+            self.inputName = self.getCheckedData()[0].name;
+            setTimeout(() => {
+                self.$element('rename_dialog').show();
+            }, DIALOG_TIME);
         }
     },
 
