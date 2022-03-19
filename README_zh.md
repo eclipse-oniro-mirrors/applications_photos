@@ -1,10 +1,50 @@
 # 图库源码开发说明
-## 1. 项目介绍
+## 1. 简介
 图库是系统内置的可视资源访问应用，提供图片和视频的管理、浏览、显示、编辑操作等功能，并支持默认相册和用户相册管理。  
 图库项目采用 TS 语言开发。
 
-## 2. 工程结构
-### 目录结构
+![](./figures/1层逻辑.png)
+
+
+
+图库整体以 OpenHarmony 既有的 MVVM 的 App 架构设计为基础，向下扩展出一套 MVP（View, Presenter, Model）分层架构（既有的 MVVM 框架整体理解为新扩展的 MVP 框架的 View 层），用于处理图库的业务逻辑与数据管理。
+
+各层的作用分别如下：
+
+- 视图层（View）：负责更新 UI 显示以及触摸与点击事件的监听。
+- 展现层（Presenter）：负责处理视图层（View）发送的业务逻辑处理请求，并连通 Model 层获取数据。
+- 模型层（Model）：负责处理展现层（Presenter） 中关于数据处理的请求以及返回数据请求结果。
+
+应用各层中重要类及其功能如下表所示
+
+| 模块   | 层级   | 类名                     | 作用                                 |
+| ------ | ------ | ------------------------ | ------------------------------------ |
+| photos | 视图层 | phone.view.Index         | phone图库入口画面的视图层逻辑控制类  |
+| photos | 视图层 | pad.view.Index           | pad图库入口画面的视图层逻辑控制类    |
+| photos | 视图层 | TimelinePage             | 图库图片视图层逻辑控制类             |
+| photos | 视图层 | AlbumSetPage             | 图库相册视图层逻辑控制类             |
+| photos | 视图层 | PhotoBrowser             | 图库大图浏览视图层逻辑控制类         |
+| photos | 视图层 | PhotoGridPage            | 图库宫格视图层逻辑控制类             |
+| photos | 视图层 | ThirdSelectAlbumSetPage  | 图库三方选择相册视图层逻辑控制类     |
+| photos | 视图层 | ThirdSelectPhotoGridPage | 图库三方选择宫格视图层逻辑控制类     |
+| photos | 视图层 | ThirdSelectPhotoBrowser  | 图库三方选择大图浏览视图层逻辑控制类 |
+| photos | 展现层 | PhotoDataSource          | 图库列大图浏览展现层数据逻辑类       |
+| photos | 展现层 | TimelineDataSource       | 图库日试图展现层数据逻辑类           |
+| photos | 展现层 | AlbumSetDataSource       | 图库相册展现层数据逻辑类             |
+| photos | 展现层 | MediaDataSource          | 图库宫格展现层数据逻辑类             |
+| photos | 展现层 | TimelineSelectManager    | 图库日试图展现层选择逻辑类           |
+| photos | 展现层 | ThirdSelectManager       | 图库三方选择展现层选择逻辑类         |
+| photos | 展现层 | AlbumSetSelectManager    | 图库相册展现层选择逻辑类             |
+| photos | 展现层 | SelectManager            | 图库展现层选择逻辑类                 |
+| photos | 展现层 | BroadCast                | 图库展现层消息分发类                 |
+| photos | 模型层 | AlbumInfo                | 图库模型层相册信息类                 |
+| photos | 模型层 | MediaItem                | 图库模型层媒体信息类                 |
+| photos | 模型层 | Thumbnail                | 图库模型层媒体缩略信息类             |
+
+
+
+## 2. 目录
+
 ```
 /applications
 ├── src
@@ -48,45 +88,7 @@
 │       ├── resources    # 资源目录
 │       └── config.json    # 项目配置信息
 ```
-### 整体架构
-![](./figures/1层逻辑.png)
-
-
-
-图库整体以 OpenHarmony 既有的 MVVM 的 App 架构设计为基础，向下扩展出一套 MVP（View, Presenter, Model）分层架构（既有的 MVVM 框架整体理解为新扩展的 MVP 框架的 View 层），用于处理图库的业务逻辑与数据管理。
-
-各层的作用分别如下：
-- 视图层（View）：负责更新 UI 显示以及触摸与点击事件的监听。
-- 展现层（Presenter）：负责处理视图层（View）发送的业务逻辑处理请求，并连通 Model 层获取数据。
-- 模型层（Model）：负责处理展现层（Presenter） 中关于数据处理的请求以及返回数据请求结果。
-
-应用各层中重要类及其功能如下表所示
-
-| 模块     | 层级   | 类名                       | 作用                   |
-| ------ | ---- | ------------------------ | -------------------- |
-| photos | 视图层  | phone.view.Index         | phone图库入口画面的视图层逻辑控制类 |
-| photos | 视图层  | pad.view.Index           | pad图库入口画面的视图层逻辑控制类   |
-| photos | 视图层  | TimelinePage             | 图库图片视图层逻辑控制类         |
-| photos | 视图层  | AlbumSetPage             | 图库相册视图层逻辑控制类         |
-| photos | 视图层  | PhotoBrowser             | 图库大图浏览视图层逻辑控制类       |
-| photos | 视图层  | PhotoGridPage            | 图库宫格视图层逻辑控制类         |
-| photos | 视图层  | ThirdSelectAlbumSetPage  | 图库三方选择相册视图层逻辑控制类     |
-| photos | 视图层  | ThirdSelectPhotoGridPage | 图库三方选择宫格视图层逻辑控制类     |
-| photos | 视图层  | ThirdSelectPhotoBrowser  | 图库三方选择大图浏览视图层逻辑控制类   |
-| photos | 展现层  | PhotoDataSource          | 图库列大图浏览展现层数据逻辑类      |
-| photos | 展现层  | TimelineDataSource       | 图库日试图展现层数据逻辑类        |
-| photos | 展现层  | AlbumSetDataSource       | 图库相册展现层数据逻辑类         |
-| photos | 展现层  | MediaDataSource          | 图库宫格展现层数据逻辑类         |
-| photos | 展现层  | TimelineSelectManager    | 图库日试图展现层选择逻辑类        |
-| photos | 展现层  | ThirdSelectManager       | 图库三方选择展现层选择逻辑类       |
-| photos | 展现层  | AlbumSetSelectManager    | 图库相册展现层选择逻辑类         |
-| photos | 展现层  | SelectManager            | 图库展现层选择逻辑类           |
-| photos | 展现层  | BroadCast                | 图库展现层消息分发类           |
-| photos | 模型层  | AlbumInfo                | 图库模型层相册信息类           |
-| photos | 模型层  | MediaItem                | 图库模型层媒体信息类           |
-| photos | 模型层  | Thumbnail                | 图库模型层媒体缩略信息类         |
-|        |      |                          |                      |
-
+### 
 
 ## 3. 基础开发说明
 ### 资源引用
