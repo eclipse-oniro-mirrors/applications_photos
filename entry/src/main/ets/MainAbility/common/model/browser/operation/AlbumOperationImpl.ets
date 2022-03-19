@@ -42,7 +42,6 @@ export class AlbumOperationImpl extends OperationImpl {
             sourceAlbum[0].albumName = newName;
             await sourceAlbum[0].commitModify();
 
-            BroadCastManager.getInstance().getBroadCast().emit(BroadCastConstants.ON_OPERATION_FINISHED,['rename']);
         } catch (err) {
             this.logger.error(`rename ex: ${err}`);
         }

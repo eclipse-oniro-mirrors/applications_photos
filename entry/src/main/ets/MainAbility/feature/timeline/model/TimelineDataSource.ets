@@ -92,7 +92,6 @@ export class TimelineDataSource extends MediaDataSource {
      */
     updateGroupSize(requestTime: number, groups: TimelineData[]): void {
         this.logger.info('updateGroupSize');
-        this.isCountChanged = true;
         let previousSize = this.size;
         let previousMediaCount = this.mediaCount;
         this.groups = groups;
@@ -124,9 +123,13 @@ export class TimelineDataSource extends MediaDataSource {
                 dataIndex++;
             }
         }
+
+        this.isCountChanged = (previousSize != this.size);
         this.logger.info(`updateGroupSize, old size: ${previousSize} , old mediaCount: ${previousMediaCount},\
             new size: ${this.size}, new mediaCount: ${this.mediaCount}`);
 
+        this.isCountChanged = previousSize != this.size;
+        this.isCountReduced = previousSize > this.size;
         this.updateCountPostProcess();
     }
 
@@ -214,6 +217,21 @@ export class TimelineDataSource extends MediaDataSource {
         let pos = (this.dataIndexes || []).findIndex((item) => item === index);
         this.logger.info(`pos ${index}, ${this.dataIndexes[pos]} , ${this.groupIndexes[pos]}`);
         return this.dataIndexes[pos] + this.groupIndexes[pos] + 1;
+    }
+
+    getMediaItemByPosition(position: number): MediaItem {
+        // title
+        let index = position
+        if (this.dataIndexes[position] == TITLE_DATA_INDEX) {
+            index = index + 1
+        }
+        let dataIndexInWindow = this.dataIndexes[index] - this.activeStart;
+        if (dataIndexInWindow > this.items.length || dataIndexInWindow < 0) {
+            this.logger.error('index out of active window');
+            return undefined;
+        } else {
+            return this.getMediaItemSafely(dataIndexInWindow)
+        }
     }
 
     onPhotoBrowserActive(isActive: boolean, transition: string): void {

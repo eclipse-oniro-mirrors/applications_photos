@@ -49,7 +49,7 @@ export struct PhotoGridPageActionBar {
                     Boolean(this.selectedCount) ? Action.RECOVER : Action.RECOVER_INVALID,
                     Boolean(this.selectedCount) ? Action.DELETE : Action.DELETE_INVALID,
                         this.isAllSelected ? Action.DESELECT_ALL : Action.SELECT_ALL);
-            } else if (this.isDistributedAlbum){
+            } else if (this.isDistributedAlbum) {
                 menuList.push(
                     (this.isAllSelected ? Action.DESELECT_ALL : Action.SELECT_ALL),
                     (Boolean(this.selectedCount) ? Action.SHARE : Action.SHARE_INVALID),

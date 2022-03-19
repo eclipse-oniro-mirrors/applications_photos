@@ -68,9 +68,9 @@ export class PhotoDataImpl extends BrowserDataImpl {
 
     async getObjectById(id, deviceId, isTrash: boolean = false) {
         this.logger.debug(`getObjectById: ${id} deviceID: ${deviceId} isTrash: ${isTrash}`);
-        if(isTrash){
+        if (isTrash) {
             return await this.getTrashObjectById(id);
-        }else{
+        } else {
             let obj = await this.getFirstObject(AlbumDefine.getFileFetchOpt(id, deviceId));
             if (obj == null) {
                 this.logger.error('getFirstObject fail!');

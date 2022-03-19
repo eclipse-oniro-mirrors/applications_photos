@@ -48,43 +48,46 @@ export class OperationImpl implements BrowserOperationInterface {
         let id = uri.substring(lastIndex + 1, uri.length);
         let fileAsset = await this.getFileAssetById(id);
 
-        if(isReplace) {
+        if (isReplace) {
             let delCallback = {
                 onCompleted: () => {
                     this.logger.info('delete completed');
-                    let path = this.getPathByMediaTypeAndAlbumName(fileAsset.mediaType, AlbumDefine.getAlbumPath(albumName));
+                    let path = this.getPathByMediaTypeAndAlbumName(AlbumDefine.getAlbumPath(albumName));
                     fileAsset.relativePath = path;
                     this.logger.info(`move commitModify start ${path}`);
                     fileAsset.commitModify().then(() => {
                         this.logger.info('move get result finish');
                         callback && callback.onCompleted();
+                    }).catch((err) => {
+                        this.logger.error(`move replace error msg: ${err}`);
                     });
                 },
                 onError: () => {
-                    this.logger.error('delete error');
+                    this.logger.error('move replace error');
                     callback && callback.onError();
                 },
             };
 
             MediaLibraryAccess.deleteAsset(replaceUri, delCallback);
         } else {
-            let path = this.getPathByMediaTypeAndAlbumName(fileAsset.mediaType, AlbumDefine.getAlbumPath(albumName));
+            let path = this.getPathByMediaTypeAndAlbumName(AlbumDefine.getAlbumPath(albumName));
             fileAsset.relativePath = path;
             this.logger.debug(`move commitModify start ${path}`);
-            await fileAsset.commitModify();
-            this.logger.info('move get result');
-            callback && callback.onCompleted();
+            try {
+                await fileAsset.commitModify();
+                this.logger.info('move get result');
+                callback && callback.onCompleted();
+            } catch(err) {
+                this.logger.error(`move error msg: ${err}`);
+                callback && callback.onError();
+            }
         }
     }
 
-    getPathByMediaTypeAndAlbumName(mediaType: string, albumName: string): string {
+    getPathByMediaTypeAndAlbumName(albumName: string): string {
         let path = '';
         let publicPath = '';
-        if (mediaType == MediaLibraryAccess.MEDIA_TYPE_IMAGE) {
-            publicPath = `${MediaLibraryAccess.PUBLIC_PATH_IMAGE}`
-        } else {
-            publicPath = `${MediaLibraryAccess.PUBLIC_PATH_VIDEO}`
-        }
+        publicPath = `${MediaLibraryAccess.PUBLIC_PATH_IMAGE}`
         if (albumName != '') {
           path = `${publicPath}${albumName}/`
         }
@@ -132,7 +135,7 @@ export class OperationImpl implements BrowserOperationInterface {
     async getFileAsset(fileAsset: any, albumName: string)  {
         this.logger.debug('getFileAsset start');
 
-        let dataList = await MediaLibraryAccess.getEntityAlbumObject(AlbumDefine.getFetchOpt(albumName),
+        let dataList = await MediaLibraryAccess.getEntityAlbumObject(AlbumDefine.getAlbumFetchOpt(albumName),
             AlbumDefine.getFileFetchOptByName(fileAsset.displayName));
         if (dataList != null) {
             if (dataList.length > 0) {
@@ -151,7 +154,7 @@ export class OperationImpl implements BrowserOperationInterface {
        if (isReplace) {
             return await this.getFileAsset(fileAsset, albumName);
        } else {
-           let showPath = this.getPathByMediaTypeAndAlbumName(fileAsset.mediaType, AlbumDefine.getAlbumPath(albumName));
+           let showPath = this.getPathByMediaTypeAndAlbumName(AlbumDefine.getAlbumPath(albumName));
            let displayName = fileAsset.displayName;
            let index = displayName.lastIndexOf('.');
            displayName = `${displayName.slice(0, index)}${new Date().getTime()}${displayName.slice(index)}`;
@@ -282,7 +285,7 @@ export class OperationImpl implements BrowserOperationInterface {
         }
     }
 
-    async recover(uri: string, callback: any){
+    async recover(uri: string, callback: any) {
         this.logger.debug(`recover start ${JSON.stringify(uri)}`);
         if (callback == null || callback == undefined) {
             this.logger.debug('recover callback is null or undefined');
@@ -339,7 +342,7 @@ export class OperationImpl implements BrowserOperationInterface {
         this.logger.info('changeOrientation finish');
     }
 
-    async getFileAssetById(id, deviceId?){
+    async getFileAssetById(id, deviceId?) {
         this.logger.info('getFileAssetById');
         try {
             let result = await MediaLibraryAccess.getFirstObject(AlbumDefine.getFileFetchOpt(id, deviceId));

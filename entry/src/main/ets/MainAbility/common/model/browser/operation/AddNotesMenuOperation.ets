@@ -62,8 +62,6 @@ export class AddNotesMenuOperation implements MenuOperation, MenuOperationCallba
             this.logger.error('Add notes is null, return');
             return;
         }
-        let uri = mediaItem.uri;
-        await operationImpl.renameSinglePhoto(uri, '');
     }
 
     private cancelCallback(): void {

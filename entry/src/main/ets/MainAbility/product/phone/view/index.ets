@@ -62,7 +62,7 @@ struct IndexPage {
 
     private aboutToAppear(): void {
         TraceControllerUtils.startTrace('indexPageAppearToShow');
-        ScreenManager.getInstance().setFullScreen();
+        ScreenManager.getInstance().initWindowMode();
         let param = router.getParams();
         this.logger.info(`param: ${JSON.stringify(param)}`);
         if (param != null) {
@@ -180,7 +180,7 @@ struct IndexPage {
             }
         }
         .backgroundColor($r('app.color.default_background_color'))
-            .margin({
+            .padding({
                 top: this.leftBlank[1],
                 bottom: this.leftBlank[3]
             })

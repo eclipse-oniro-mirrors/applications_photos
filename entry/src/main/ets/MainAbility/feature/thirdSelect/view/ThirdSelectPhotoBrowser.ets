@@ -44,6 +44,7 @@ struct ThirdSelectPhotoBrowser {
     @Provide isShowBar: boolean = true;
     @Provide isPullingDown: boolean = false;
     @Provide moreMenuList: Array<Action> = new Array<Action>();
+    @Provide pageFrom: number = Constants.ENTRY_FROM.NORMAL;
     selectManager: ThirdSelectManager;
     isMultiPick = true;
     transition: string;

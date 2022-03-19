@@ -14,7 +14,6 @@
  */
 
 import {Logger} from '../../utils/Logger.ets'
-import {CommonObserverCallback} from './CommonObserverCallback.ets'
 import {LoadingListener} from './LoadingListener'
 
 // Abs DataSource
@@ -45,9 +44,6 @@ export abstract class AbsDataSource implements IDataSource {
 
     // Whether the page is in the foreground, and the data can be refreshed in the foreground
     isActive = true;
-
-    // Observer callback
-    observerCallback: CommonObserverCallback = new CommonObserverCallback(this);
 
     // Data loading listener
     private loadingListeners: Array<LoadingListener> = new Array<LoadingListener>();

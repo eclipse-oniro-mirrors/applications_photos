@@ -19,7 +19,7 @@ export class TabItem {
     iconDefault: Resource;
     iconSelected: Resource;
     textColorDefault: Resource = $r('sys.color.ohos_id_color_bottom_tab_text_off');
-    textColorSelected: Resource = $r('sys.color.ohos_id_color_bottom_tab_text_on');
+    textColorSelected: Resource = $r('app.color.color_system_highlight');
     isSelected: boolean;
 
     constructor(name: Resource, iconDefault: Resource, iconSelected: Resource, isSelected: boolean) {
@@ -54,7 +54,7 @@ export class TabItemWithText {
     textWeightDefault: FontWeight = FontWeight.Regular;
     textWeightSelected: FontWeight = FontWeight.Medium;
     textColorDefault: Resource = $r('sys.color.ohos_id_color_bottom_tab_text_off');
-    textColorSelected: Resource = $r('sys.color.ohos_id_color_bottom_tab_text_on');
+    textColorSelected: Resource = $r('app.color.color_system_highlight');
 
     constructor (name: Resource, isSelected: boolean) {
         this.name = name;

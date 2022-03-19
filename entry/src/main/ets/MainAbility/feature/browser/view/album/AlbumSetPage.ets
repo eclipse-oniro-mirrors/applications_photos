@@ -41,7 +41,7 @@ import {AlbumSetDeleteMenuOperation} from '../../../../common/model/browser/oper
 import {CustomDialogView} from '../../../../common/view/dialog/CustomDialogView.ets'
 import {Action} from '../../../../common/model/browser/operation/Action'
 
-import { AlbumSetObserverCallback } from '../../../../common/model/browser/album/AlbumSetObserverCallback.ets'
+import { CommonObserverCallback } from '../../../../common/model/browser/CommonObserverCallback.ets'
 import { MediaObserver } from '../../../../common/model/browser/dataObserver/MediaObserver.ets'
 import {UiUtil} from '../../../../common/utils/UiUtil.ets';
 
@@ -68,7 +68,7 @@ export struct AlbumSetPage {
 
     albums: AlbumSetDataSource= new AlbumSetDataSource(this.broadCast);
     distributed: DistributedDataSource = new DistributedDataSource(this.broadCast);
-    private dataObserver: AlbumSetObserverCallback  = new AlbumSetObserverCallback(this);
+    private dataObserver: CommonObserverCallback  = new CommonObserverCallback(this);
 
     appBroadCast: BroadCast = BroadCastManager.getInstance().getBroadCast();
 
@@ -172,8 +172,6 @@ export struct AlbumSetPage {
         });
 
         this.appBroadCast.on(BroadCastConstants.RESET_ZERO, this.onResetZero.bind(this));
-        this.appBroadCast.on(BroadCastConstants.ON_OPERATION_FINISHED, this.onOperationFinished.bind(this));
-        this.appBroadCast.on(BroadCastConstants.UPDATE_DATA_SOURCE, this.onOperationFinished.bind(this));
         this.appBroadCast.on(BroadCastConstants.ON_REMOTE_CHANGED, this.onUpdateRemoteDevice.bind(this));
 
         this.distributed.initialize();
@@ -220,9 +218,7 @@ export struct AlbumSetPage {
         this.appBroadCast.off(BroadCastConstants.ON_TAB_CHANGED, this.onTabChanged.bind(this));
         this.appBroadCast.off(BroadCastConstants.RESET_STATE_EVENT, this.onStateReset.bind(this));
         this.appBroadCast.off(BroadCastConstants.RESET_ZERO, this.onResetZero.bind(this));
-        this.appBroadCast.off(BroadCastConstants.ON_OPERATION_FINISHED, this.onOperationFinished.bind(this));
         this.appBroadCast.off(BroadCastConstants.ON_REMOTE_CHANGED, this.onUpdateRemoteDevice.bind(this));
-        this.appBroadCast.off(BroadCastConstants.UPDATE_DATA_SOURCE, this.onOperationFinished.bind(this));
         MediaObserver.getInstance().unregisterObserver(this.dataObserver);
     }
 
@@ -349,11 +345,11 @@ export struct AlbumSetPage {
     }
 
     onOperationFinished(changeType) {
-        this.logger.info(`ON_OPERATION_FINISHED type: ${changeType}`);
+        this.logger.info(`onOperationFinished type: ${changeType}`);
         this.albums.onChange('image');
     }
 
-    initGridRowCount(){
+    initGridRowCount() {
         this.logger.info(`get screen width is : ${ScreenManager.getInstance().getWinWidth()}`);
         this.logger.info(`get screen height is : ${ScreenManager.getInstance().getWinHeight()}`);
 
@@ -367,7 +363,7 @@ export struct AlbumSetPage {
 
     }
 
-    onMediaLibDataChange(changeType){
+    onMediaLibDataChange(changeType) {
         this.logger.info(`onMediaLibDataChange type: ${changeType}`);
         this.albums.onChange(changeType);
         this.distributed.onChange(changeType);
@@ -400,9 +396,6 @@ export struct AlbumSetPage {
 
     @Builder LocalAlbumSet() {
         Stack() {
-            if (this.isEmpty) {
-                NoPhotoIndexComponent({index: Constants.ALBUM_PAGE_INDEX})
-            }
             Grid(this.scroller) {
                 LazyForEach(this.albums, (item) => {
                     if (this.albums.mediaSetList.indexOf(item) == 0) {
@@ -422,6 +415,7 @@ export struct AlbumSetPage {
                     }
                 }, item => 'uri:' + item.name)
             }
+            .visibility(this.isEmpty ? Visibility.None : Visibility.Visible)
             .columnsTemplate('1fr '.repeat(this.gridColumnsCount))
             .padding({
                 left: $r('app.float.max_padding_start'),
@@ -493,11 +487,15 @@ export struct AlbumSetPage {
                     this.onDistributedTabChanged(index);
                 })
 
-                if(this.isAlbumSetSelectedMode){
+                if (this.isAlbumSetSelectedMode) {
                     AlbumSetPageToolBar({onMenuClicked: this.onMenuClicked})
                 }
 
+                if (this.isEmpty && !this.isTabBarShow) {
+                    NoPhotoIndexComponent({index: Constants.ALBUM_PAGE_INDEX})
+                }
             }
+
             CustomDialogView()
         }
     }

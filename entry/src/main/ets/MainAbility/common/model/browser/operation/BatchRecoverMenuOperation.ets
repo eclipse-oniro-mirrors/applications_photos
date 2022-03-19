@@ -54,8 +54,9 @@ export class BatchRecoverMenuOperation extends ProcessMenuOperation {
         let onOperationStart: Function = this.menuContext.onOperationStart;
         onOperationStart && onOperationStart();
 
-        this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
-            [$r('app.string.action_recover'), MediaOperationType.Recover]);
+        this.menuContext.broadCast.emit(BroadCastConstants.DELETE_PROGRESS_DIALOG,
+            [$r('app.string.action_recover'), this.count]);
+
     }
 
     // Asynchronous callback for getSelection

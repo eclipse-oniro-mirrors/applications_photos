@@ -72,7 +72,7 @@ export struct AddNotesDialog {
                     .onClick(() => {
                         let check = /[\\.\\\\/:*?<>\"|\[\]{}\s]/;
                         let passCheck = check.test(this.inputNote)
-                        if (passCheck){
+                        if (passCheck) {
                             UiUtil.showToast($r('app.string.specific_characters_not_supported'));
                             this.controller.close()
                             return

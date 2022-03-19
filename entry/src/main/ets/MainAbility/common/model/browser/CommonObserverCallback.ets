@@ -13,17 +13,16 @@
  * limitations under the License.
  */
 
-import {AbsDataSource} from './AbsDataSource.ets'
 import {MediaObserverCallback} from './dataObserver/MediaObserverCallback'
 
 export class CommonObserverCallback implements MediaObserverCallback {
-    source: AbsDataSource;
+    source: any;
 
-    constructor(source: AbsDataSource) {
+    constructor(source: any) {
         this.source = source;
     }
 
     onChange(mediaType: string) {
-        this.source.onChange(mediaType);
+        this.source.onMediaLibDataChange(mediaType);
     }
 }

@@ -546,7 +546,15 @@
     },
     {
       "name": "download_failed_single",
-      "value": "Saving has been cancelled."
+      "value": "Saving has been failed."
+    },
+    {
+      "name": "copy_failed_single",
+      "value": "Copy has been failed"
+    },
+    {
+      "name": "move_failed_single",
+      "value": "Move has been failed"
     },
     {
       "name": "download_failed_multi",
@@ -751,6 +759,14 @@
     {
       "name": "no_photo_sub_title_album",
       "value": "Reliving your best memories has never been easier"
+    },
+    {
+      "name": "no_distributed_photo_head_title_album",
+      "value": "No photos and videos"
+    },
+    {
+      "name": "no_distributed_photo_show_image",
+      "value": "Please open the picture in the opposite picture library first, and then browse at this end"
     },
     {
       "name": "distribute_album_title_holder",

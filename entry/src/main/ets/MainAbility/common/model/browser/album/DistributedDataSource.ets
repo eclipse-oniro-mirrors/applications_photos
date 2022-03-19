@@ -68,10 +68,14 @@ export class DistributedDataSource extends AbsDataSource {
         this.peerInfoList = devices;
         sendParams.push(this.peerInfoList.length);
         BroadCastManager.getInstance().getBroadCast().emit(BroadCastConstants.ON_REMOTE_CHANGED, sendParams);
+
+        if (this.isActive) {
+            this.onDataReloaded();
+        }
     }
 
     onChange(mediaType: string) {
-        if(mediaType == 'device') {
+        if (mediaType == 'device'|| mediaType == 'remote') {
             this.logger.info(`onChange: ${mediaType}`);
             this.lastChangeTime = Date.now();
             this.loadData();
@@ -85,18 +89,17 @@ export class DistributedDataSource extends AbsDataSource {
     }
 
     private getDevicesStatus(devices, params) {
-        if(this.peerInfoList.length <= 0) {
+        if (this.peerInfoList.length <= 0) {
             params.push('online');
             params.push('');
         }
 
         for (let device of this.peerInfoList) {
-            if (this.hasDevice(device.networkId, devices)) {
-                this.logger.debug(`changed: ${device.networkId}`);
-                params.push('change');
-            }else{
+            if (!this.hasDevice(device.networkId, devices)) {
                 this.logger.debug(`offline: ${device.networkId}`);
                 params.push('offline');
+            }else{
+                params.push('changed');
             }
             params.push(device.networkId);
         }

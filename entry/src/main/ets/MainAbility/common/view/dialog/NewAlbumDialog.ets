@@ -99,6 +99,7 @@ export struct NewAlbumDialog {
                             .fontSize($r('sys.float.ohos_id_text_size_button1'))
                             .fontColor($r('app.color.color_control_highlight'))
                             .width('50%')
+                            .fontWeight(FontWeight.Medium)
                             .textAlign(TextAlign.Center)
                     }
                     .margin({right: $r('app.float.details_dialog_button_margin_right')})
@@ -118,6 +119,7 @@ export struct NewAlbumDialog {
                             .fontSize($r('sys.float.ohos_id_text_size_button1'))
                             .fontColor($r('app.color.color_control_highlight'))
                             .width('50%')
+                            .fontWeight(FontWeight.Medium)
                             .textAlign(TextAlign.Center)
                     }
                     .enabled(!this.isNull)
@@ -128,7 +130,7 @@ export struct NewAlbumDialog {
                     .onClick(() => {
                         let check = /[\\.\\\\/:*?<>\"|\[\]{}\s]/;
                         let passCheck = check.test(this.inputName)
-                        if (passCheck){
+                        if (passCheck) {
                             UiUtil.showToast($r('app.string.specific_characters_not_supported'));
                             return
                         }

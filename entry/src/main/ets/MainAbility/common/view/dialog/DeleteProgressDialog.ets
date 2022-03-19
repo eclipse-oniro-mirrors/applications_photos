@@ -13,39 +13,44 @@
  * limitations under the License.
  */
 
-import {MediaOperationType} from '../../model/common/MediaOperationType'
 import {Logger} from '../../utils/Logger.ets';
 import {ScreenManager} from '../../model/common/ScreenManager.ets';
 import {Constants} from '../../model/common/Constants.ets';
 
 @Observed
-export class ProgressParam {
-    cancelFunc: Function
-    operationType: string
+export class DeleteProgressParam {
+    currentCount: number
+    totalCount: number
+    message: Resource
 }
 
 @CustomDialog
-export struct ProgressDialog {
+export struct DeleteProgressDialog {
     @StorageLink('isHorizontal') isHorizontal: boolean = ScreenManager.getInstance().isHorizontal();
     @StorageLink('isSidebar') isSidebar: boolean = ScreenManager.getInstance().isSidebar();
     @StorageLink('leftBlank') leftBlank: [number, number, number, number]
         = [0, ScreenManager.getInstance().getStatusBarHeight(), 0, ScreenManager.getInstance().getNaviBarHeight()];
     controller: CustomDialogController
-    @Consume progressMessage: Resource;
     @Consume deleteProgress: number;
-    @Consume progressParam: ProgressParam;
+    @Consume deleteProgressParam: DeleteProgressParam;
 
     logger: Logger = new Logger('ProgressDialog');
+
+
 
     build() {
         Column() {
             Row() {
-                Text(this.progressMessage)
+                Text(this.deleteProgressParam.message)
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .fontFamily($r('app.string.id_text_font_family_regular'))
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                Text(`${this.deleteProgressParam.currentCount}/${this.deleteProgressParam.totalCount}`)
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .fontFamily($r('app.string.id_text_font_family_regular'))
                     .flexGrow(1)
                     .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                    .maxLines(2)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                 Text(`${this.deleteProgress}%`)
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -53,7 +58,7 @@ export struct ProgressDialog {
                     .fontColor($r('sys.color.ohos_id_color_text_secondary'))
                     .margin({
                         left: $r('app.float.process_bar_margin_left'),
-                        right: $r('app.float.process_bar_margin_right'),
+                        right: $r('app.float.process_bar_margin_left'),
                     })
             }
             .width('100%')
@@ -66,16 +71,6 @@ export struct ProgressDialog {
                     .padding({
                         right: 16
                     })
-                if (this.progressParam.operationType != MediaOperationType.Delete &&
-                    this.progressParam.operationType != MediaOperationType.Recover) {
-                    Image($r('app.media.ic_progress_cancel'))
-                        .width($r('app.float.icon_size'))
-                        .height($r('app.float.icon_size'))
-                        .onClick(() => {
-                            this.progressParam.cancelFunc();
-                            this.controller.close();
-                        })
-                }
             }
             .width('100%')
             .margin({ top: $r('app.float.id_icon_margin_horizontal') })

@@ -49,6 +49,7 @@ export struct DeleteDialog {
                         Text($r('app.string.dialog_cancel'))
                             .fontSize($r('sys.float.ohos_id_text_size_button1'))
                             .fontColor($r('app.color.color_control_highlight'))
+                            .fontWeight(FontWeight.Medium)
                             .width('50%')
                             .textAlign(TextAlign.Center)
                     }
@@ -77,6 +78,7 @@ export struct DeleteDialog {
                         Text($r('app.string.dialog_delete'))
                             .fontSize($r('sys.float.ohos_id_text_size_button1'))
                             .fontColor($r('sys.color.ohos_id_color_warning'))
+                            .fontWeight(FontWeight.Medium)
                             .width('50%')
                             .textAlign(TextAlign.Center)
                     }

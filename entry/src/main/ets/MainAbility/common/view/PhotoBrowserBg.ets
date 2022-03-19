@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import Curves from '@system.curves'
 import {Constants as PhotoConstants} from '../../common/model/browser/photo/Constants'
 
 @Component
@@ -28,8 +26,7 @@ export struct PhotoBrowserBg {
             .width('100%')
             .height('100%')
             .animation({
-                duration: PhotoConstants.IMMERSE_ANIM_DURATION,
-                curve: this.isShowBar ? Curves.init(Curve.EaseIn) : Curves.init(Curve.EaseOut)
+                duration: PhotoConstants.IMMERSE_ANIM_DURATION
             })
     }
 }

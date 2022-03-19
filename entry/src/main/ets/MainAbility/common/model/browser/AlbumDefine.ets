@@ -109,7 +109,7 @@ export class AlbumDefine {
             order: ''
         };
 
-        if (opt){
+        if (opt) {
             fetchOpt = {
                 selections: opt.selections,
                 selectionArgs: opt.selectionArgs,
@@ -123,7 +123,7 @@ export class AlbumDefine {
             };
         }
 
-        if (deviceId != undefined && deviceId != ''){
+        if (deviceId != undefined && deviceId != '') {
             fetchOpt['networkId'] = deviceId;
         }
 
@@ -137,14 +137,14 @@ export class AlbumDefine {
             order: ''
         };
 
-        if (deviceId != undefined && deviceId != ''){
+        if (deviceId != undefined && deviceId != '') {
             fetchOpt['networkId'] = deviceId;
         }
 
         return fetchOpt;
     }
 
-    static getFileFetchOptByName(displayName){
+    static getFileFetchOptByName(displayName) {
         let fetchOpt = {
             selections: 'display_name =?',
             selectionArgs: [`${displayName}`],
@@ -153,7 +153,7 @@ export class AlbumDefine {
         return fetchOpt;
     }
 
-    static getAlbumFetchOpt(displayName?, deviceId?){
+    static getAlbumFetchOpt(displayName?, deviceId?) {
         let fetchOpt = {
             selections: '',
             selectionArgs: []
@@ -166,7 +166,7 @@ export class AlbumDefine {
 
         if (displayName == AlbumDefine.ALBUM_NAME_CAMERA) {
             let opt = AlbumDefine.DEFAULT_ALBUM_FETCH_OPTIONS.get(displayName);
-            if(!opt.selectionArgs[0]){
+            if (!opt.selectionArgs[0]) {
                 opt.selectionArgs[0] = MediaLibraryAccess.PUBLIC_PATH_IMAGE
             }
 
@@ -181,8 +181,8 @@ export class AlbumDefine {
         return fetchOpt;
     }
 
-    static getAlbumPath(albumName){
-        if (albumName == AlbumDefine.ALBUM_NAME_CAMERA){
+    static getAlbumPath(albumName) {
+        if (albumName == AlbumDefine.ALBUM_NAME_CAMERA) {
             return AlbumDefine.CAMERA_ALBUM_PATH;
         }
 

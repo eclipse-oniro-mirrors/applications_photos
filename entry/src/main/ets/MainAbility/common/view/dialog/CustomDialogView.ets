@@ -27,6 +27,7 @@ import {CancelOperationDialog, CancelParam} from './CancelOperationDialog.ets';
 import {RenameDialog} from './RenameDialog.ets';
 import {AddNotesDialog} from './AddNotesDialog.ets';
 import {ProgressDialog, ProgressParam} from './ProgressDialog.ets';
+import {DeleteProgressDialog, DeleteProgressParam} from './DeleteProgressDialog.ets';
 import {SaveDialog, SaveDialogCallback} from './SaveDialog.ets'
 import {EditExitDialog, EditExitDialogCallback} from './EditExitDialog.ets'
 import {NewAlbumDialog} from './NewAlbumDialog.ets'
@@ -46,6 +47,7 @@ export struct CustomDialogView {
     @Provide editExitDialogCallback: EditExitDialogCallback = {discardCallback: null};
     @Consume broadCast: BroadCast;
     @Provide progressParam: ProgressParam = {cancelFunc: null, operationType: ''};
+    @Provide deleteProgressParam: DeleteProgressParam = {currentCount: 0, totalCount: 0, message: null};
     @Provide cancelParam: CancelParam = {continueFunc: null, cancelFunc: null};
     @Provide operateParam: OperateParam = {moveFunc: null, copyFunc: null};
     @Provide findSameNameParam: FindSameNameParam = {sourceFileAsset: null, targetFileAsset: null,
@@ -114,6 +116,17 @@ export struct CustomDialogView {
 
     deleteDialogController: CustomDialogController = new CustomDialogController({
         builder: DeleteDialog(),
+        autoCancel: false,
+        alignment: this.isHorizontal || this.isSidebar ? DialogAlignment.Center : DialogAlignment.Bottom,
+        offset: {
+            dx: 0,
+            dy: this.isHorizontal || this.isSidebar ? 0 : $r('app.float.dialog_offset_bottom')
+        },
+        customStyle: true
+    });
+
+    deleteProgressDialogController: CustomDialogController = new CustomDialogController({
+        builder: DeleteProgressDialog(),
         autoCancel: false,
         alignment: this.isHorizontal || this.isSidebar ? DialogAlignment.Center : DialogAlignment.Bottom,
         offset: {
@@ -303,13 +316,16 @@ export struct CustomDialogView {
             });
 
         this.broadCast.on(BroadCastConstants.UPDATE_PROGRESS,
-            function(progress: number) {
+            function(progress: number, currentCount: number) {
                 self.logger.info(`UPDATE_PROGRESS ${progress}`);
                 self.deleteProgress = progress;
+                self.deleteProgressParam.currentCount = currentCount;
                 if (progress == 100) {
                     self.logger.info('Update progress 100%');
                     self.progressDialogController.close();
                     self.deleteProgress = 0;
+                    self.deleteProgressDialogController.close();
+                    self.deleteProgressParam.currentCount = 0;
                 }
             });
 
@@ -379,11 +395,16 @@ export struct CustomDialogView {
                 self.findSameNameParam.cancelFunc = cancelFunc;
                 self.findSameNameParam.singlePhoto = (count == 1);
                 self.findSameNameParam.doSameFunc = doSameFunc;
-                self.logger.info('FIND_SAME_FILE_DIALOG open start');
-                setTimeout(() => {
-                    self.findSameNameDialog.open();
-                }, 500);
-                self.logger.info('FIND_SAME_FILE_DIALOG open over');
+                self.findSameNameDialog.open();
+            });
+
+        this.broadCast.on(BroadCastConstants.DELETE_PROGRESS_DIALOG,
+            function(message: Resource, totalCount: number) {
+                self.logger.info('DELETE_PROGRESS_DIALOG');
+                self.deleteProgressParam.currentCount = 0;
+                self.deleteProgressParam.totalCount = totalCount;
+                self.deleteProgressParam.message = message;
+                self.deleteProgressDialogController.open();
             });
     }
 

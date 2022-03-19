@@ -45,11 +45,12 @@ import {JumpSourceToMain} from '../../../../common/model/browser/photo/JumpSourc
 import {RenameMenuOperation} from '../../../../common/model/browser/operation/RenameMenuOperation'
 import {RotateMenuOperation} from '../../../../common/model/browser/operation/RotateMenuOperation'
 import {AddNotesMenuOperation} from '../../../../common/model/browser/operation/AddNotesMenuOperation'
-import {DetailsDialog} from '../../../../common/view/dialog/DetailsDialog.ets'
 import {MediaLibraryAccess} from '../../../../common/access/MediaLibraryAccess'
 import {MediaOperationType} from '../../../../common/model/common/MediaOperationType'
 import {AlbumDefine} from '../../../../common/model/browser/AlbumDefine.ets'
 import {UiUtil} from '../../../../common/utils/UiUtil.ets';
+import {CommonObserverCallback} from '../../../../common/model/browser/CommonObserverCallback.ets';
+import {MediaObserver} from '../../../../common/model/browser/dataObserver/MediaObserver.ets';
 import mMultimodalInputManager from '../../../../common/model/common/MultimodalInputManager.ets'
 
 
@@ -69,6 +70,7 @@ struct PhotoBrowser {
     @Provide broadCast: BroadCast = new BroadCast();
     @Provide isShowBar: boolean = true;
     @Provide isPullingDown: boolean = false;
+    @Provide pageFrom: number = Constants.ENTRY_FROM.NORMAL;
     @StorageLink('isHorizontal') isHorizontal: boolean = ScreenManager.getInstance().isHorizontal();
     @StorageLink('TimelinePageIndex') TimelinePageIndex: number = Constants.INVALID;
     @StorageLink('PhotoGridPageIndex') PhotoGridPageIndex: number = Constants.INVALID;
@@ -89,6 +91,7 @@ struct PhotoBrowser {
 
     // DataSource
     private dataSource: PhotoDataSource = new PhotoDataSource();
+    private dataObserver: CommonObserverCallback  = new CommonObserverCallback(this);
 
     // is in animation
     private isInAnimation = true;
@@ -99,8 +102,6 @@ struct PhotoBrowser {
     // The global BroadCast of the application process. Event registration and destruction should be paired
     private appBroadCast: BroadCast = BroadCastManager.getInstance().getBroadCast();
     private isFromCamera = false;
-
-    private pageFrom: number = Constants.ENTRY_FROM.NORMAL;
 
     // the source of jump to the index page
     private jumpSourceToMain: number = JumpSourceToMain.None;
@@ -117,15 +118,6 @@ struct PhotoBrowser {
 
     private deviceId = '';
     private deviceName = '';
-
-    private dialogController: CustomDialogController = new CustomDialogController({
-        builder: DetailsDialog(),
-        autoCancel: true,
-        alignment: DialogAlignment.Bottom,
-        offset: { dx: 0,
-            dy: $r('app.float.dialog_offset_bottom')
-        }
-    });
 
     onMenuClicked(action: Action) {
         this.logger.info(`onMenuClicked, action: ${action.actionID}, isPullingDown: ${this.isPullingDown}`);
@@ -336,7 +328,7 @@ struct PhotoBrowser {
         this.moreMenuList = [];
 
         let list: Array<Action> = new Array<Action>();
-        switch (this.pageFrom){
+        switch (this.pageFrom) {
             case Constants.ENTRY_FROM.NORMAL:
             case Constants.ENTRY_FROM.CAMERA:
                 list.push(Action.SHARE, currentPhoto.isFavor
@@ -376,14 +368,23 @@ struct PhotoBrowser {
         return this.dataSource.getRawData(index).data;
     }
 
-    onMoveEnd(): void {
-        this.logger.debug('move finish');
+    onMoveEnd(err, count, total): void {
+        this.logger.debug(`onMoveEnd count: ${count}, total: ${total}`);
+        if (err) {
+            UiUtil.showToast($r('app.string.move_failed_single'));
+        }
+    }
+
+    onCopyEnd(err, count, total): void {
+        this.logger.debug(`onCopyEnd count: ${count}, total: ${total}`);
+        if (err) {
+            UiUtil.showToast($r('app.string.copy_failed_single'));
+        }
     }
 
     async onDownloadEnd(err, count, total) {
-        this.logger.debug('onDownloadEnd');
-
-        if(err) {
+        this.logger.debug(`onDownloadEnd count: ${count}, total: ${total}`);
+        if (err) {
             UiUtil.showToast($r('app.string.download_failed_single'));
         } else {
             UiUtil.showToast($r('app.string.download_progress_done'));
@@ -441,6 +442,7 @@ struct PhotoBrowser {
             return;
         }
         this.dataSource.release();
+        MediaObserver.getInstance().unregisterObserver(this.dataObserver);
         mMultimodalInputManager.unregisterListener();
     }
 
@@ -479,6 +481,7 @@ struct PhotoBrowser {
             this.clickThumbnailTime = param.clickThumbnailTime;
             this.albumName = AlbumDefine.ALBUM_NAME_CAMERA;
             this.jumpSourceToMain = JumpSourceToMain.CAMERA;
+            MediaObserver.getInstance().registerObserver(this.dataObserver);
         } else if (this.pageFrom == Constants.ENTRY_FROM.CARD) {
             this.dataSource = new PhotoDataSource(param.albumName);
             this.dataSource.initData();
@@ -578,7 +581,6 @@ struct PhotoBrowser {
 
         this.broadCast.on(PhotoConstants.DELETE, () => {
             this.logger.info('delete finish now update data');
-            this.appBroadCast.emit(BroadCastConstants.ON_OPERATION_FINISHED, []);
         });
     }
 
@@ -594,7 +596,7 @@ struct PhotoBrowser {
         this.viewTime = Date.now();
 
         let params = router.getParams();
-        if(params != null && params.pageType != null) {
+        if (params != null && params.pageType != null) {
             this.logger.debug(`MediaOperation back ${JSON.stringify(params)}`)
             let menuContext = new MenuContext();
             let menuOperation: MenuOperation;
@@ -613,7 +615,11 @@ struct PhotoBrowser {
                     menuOperation = MenuOperationFactory.getInstance().createMenuOperation(MoveMenuOperation, menuContext);
                     break;
                 case MediaOperationType.Copy:
-                    menuContext.withMediaItem(currentPhoto).withBroadCast(this.broadCast).withAlbumName(params.albumName);
+                    this.onCopyEnd = this.onCopyEnd.bind(this);
+                    menuContext.withMediaItem(currentPhoto)
+                        .withBroadCast(this.broadCast)
+                        .withAlbumName(params.albumName)
+                        .withOperationEndCallback(this.onCopyEnd);
                     menuOperation = MenuOperationFactory.getInstance().createMenuOperation(CopyMenuOperation, menuContext);
                     break;
             }
@@ -643,6 +649,11 @@ struct PhotoBrowser {
 
     private onPageHide() {
         this.appBroadCast.emit(BroadCastConstants.PHOTO_BROWSER_ACTIVE, [false, this.checkedTransition]);
+    }
+
+    onMediaLibDataChange(changeType){
+        this.logger.info(`onMediaLibDataChange type: ${changeType}`);
+        this.dataSource.onChange(changeType);
     }
 
     private releasePixMap(key: string) {

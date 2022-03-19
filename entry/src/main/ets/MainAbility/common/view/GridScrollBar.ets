@@ -23,12 +23,11 @@ export struct GridScrollBar {
     build() {
         ScrollBar({ scroller: this.scroller, direction: ScrollBarDirection.Vertical,
             state: this.isHideScrollBar? BarState.Off: BarState.Auto }) {
-            Row(){
-                if (this.isClickScrollBar){
+            Row() {
+                if (this.isClickScrollBar) {
                     Image($r('app.media.scroll_press_light_hdpi'))
                         .width($r('app.float.scroll_bar_big_width'))
                         .height($r('app.float.scroll_bar_big_height'))
-                        .margin({left: $r('app.float.scroll_bar_side_gap')})
                 } else {
                     Image($r('app.media.scroll_light_hdpi'))
                         .width($r('app.float.scroll_bar_small_width'))
@@ -44,9 +43,9 @@ export struct GridScrollBar {
             y: 0
         })
         .onTouch((event: TouchEvent)=> {
-            if(event.type == TouchType.Down){
+            if (event.type == TouchType.Down) {
                 this.isClickScrollBar = true;
-            } else if(event.type == TouchType.Up){
+            } else if (event.type == TouchType.Up) {
                 this.isClickScrollBar = false;
             }
         })

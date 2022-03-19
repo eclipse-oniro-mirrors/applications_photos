@@ -55,7 +55,7 @@ export struct AlbumSelectActionBar {
 
     build() {
         Column() {
-            if (this.isHorizontal){
+            if (this.isHorizontal) {
                 ActionBar({
                     isShowBar: true,
                     actionBarProp: this.createHorizontalActionBar(),

@@ -126,7 +126,17 @@ export struct ThirdSelectAlbumSetPage {
         switch (action) {
             case Action.CANCEL:
                 this.logger.info('click cancel');
-                app.terminate();
+                let abilityResult = {
+                    'resultCode': 0,
+                    'want': {
+                        'parameters': {
+                            'select-item-list': ''
+                        }
+                    }
+                };
+                globalThis.photosAbilityContext.terminateSelfWithResult(abilityResult).then((result) => {
+                    this.logger.info(`terminateSelfWithResult result: ${result}`);
+                });
                 break;
             case Action.OK:
                 this.logger.info('click ok');

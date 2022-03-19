@@ -32,6 +32,7 @@ export class AlbumSetDataSource extends AbsDataSource {
 
     private broadCast_: BroadCast;
     private blackList: Array<string> = [];
+    private deviceId = ''
 
     constructor(broadCast: BroadCast, device?) {
         super();
@@ -39,6 +40,10 @@ export class AlbumSetDataSource extends AbsDataSource {
         this.logger.debug(`constructor ${JSON.stringify(device)}`);
         this.broadCast_ = broadCast;
         this.albumBrowserDataImpl = BrowserDataFactory.getFeature(BrowserDataFactory.TYPE_ALBUM_SET, device);
+
+        if (device != undefined){
+            this.deviceId = device.deviceId;
+        }
     }
 
     initData(): void {
@@ -48,7 +53,7 @@ export class AlbumSetDataSource extends AbsDataSource {
     }
 
     loadData(): Promise<void> {
-        this.logger.debug('load data');
+        this.logger.info('load data');
         if (this.albumBrowserDataImpl != null) {
             let callback: AlbumSetCallback = new AlbumSetCallback(this);
             return this.albumBrowserDataImpl.getData(callback, null);
@@ -62,7 +67,7 @@ export class AlbumSetDataSource extends AbsDataSource {
     }
 
     getData(index: number): AlbumInfo {
-        this.logger.debug(`getData index: ${index}, item: ${JSON.stringify(this.mediaSetList[index])}`);
+        this.logger.info(`getData index: ${index}, item: ${JSON.stringify(this.mediaSetList[index])}`);
         if (index < 0 || index >= this.mediaSetList.length) {
             this.logger.error(`index out of the total size, index: ${index} total size: ${this.mediaSetList.length}`);
             return undefined;
@@ -72,7 +77,7 @@ export class AlbumSetDataSource extends AbsDataSource {
 
     updateAlbumSetData(requestTime: number, mediaSetList: AlbumInfo[]): void {
         TraceControllerUtils.startTraceWithTaskId('updateAlbumSetData', requestTime);
-        this.logger.debug(`updateMediaItems size: ${mediaSetList.length}`);
+        this.logger.info(`updateMediaItems size: ${mediaSetList.length}`);
         this.lastUpdateTime = requestTime;
         if (this.lastUpdateTime < this.lastChangeTime && this.isActive) {
             // If there is a new media library change callback,
@@ -103,8 +108,14 @@ export class AlbumSetDataSource extends AbsDataSource {
     }
 
     onChange(mediaType: string) {
-        if(mediaType == 'image' || mediaType == 'video') {
-            super.onChange(mediaType);
+        if(this.deviceId == '' || this.deviceId == undefined) {
+            if (mediaType == 'image' || mediaType == 'video' || mediaType == 'album'){
+                super.onChange(mediaType);
+            }
+        }else{
+            if (mediaType == 'remote'){
+                super.onChange(mediaType);
+            }
         }
     }
 
@@ -146,8 +157,8 @@ export class AlbumSetDataSource extends AbsDataSource {
     }
 
     isRepeatedName(albumName) {
-        for (let album of this.mediaSetList){
-            if (album.name == albumName){
+        for (let album of this.mediaSetList) {
+            if (album.name == albumName) {
                 return true;
             }
         }

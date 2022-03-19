@@ -49,7 +49,7 @@ export class BatchDeleteMenuOperation extends ProcessMenuOperation {
         this.confirmCallback = this.confirmCallback.bind(this);
         this.cancelCallback = this.cancelCallback.bind(this);
 
-        if(this.menuContext.albumName == AlbumDefine.ALBUM_NAME_RECYCLE) {
+        if (this.menuContext.albumName == AlbumDefine.ALBUM_NAME_RECYCLE) {
             this.menuContext.broadCast.emit(BroadCastConstants.SHOW_DELETE_DIALOG,
                 [$r('app.string.recycleAlbum_delete_message'), this.confirmCallback, this.cancelCallback]);
         } else {
@@ -102,8 +102,8 @@ export class BatchDeleteMenuOperation extends ProcessMenuOperation {
         let onOperationStart: Function = this.menuContext.onOperationStart;
         onOperationStart && onOperationStart();
 
-        this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
-            [$r('app.string.action_delete'), MediaOperationType.Delete]);
+        this.menuContext.broadCast.emit(BroadCastConstants.DELETE_PROGRESS_DIALOG,
+            [$r('app.string.action_delete'), this.count]);
     }
 
     cancelCallback(): void {

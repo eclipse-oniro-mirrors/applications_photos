@@ -92,6 +92,7 @@ export struct MultiSelectDialog {
                     .fontSize($r('sys.float.ohos_id_text_size_button1'))
                         .fontColor($r('app.color.color_control_highlight'))
                         .width('100%')
+                        .fontWeight(FontWeight.Medium)
                         .textAlign(TextAlign.Center)
                 }
                 .backgroundColor($r('app.color.transparent'))

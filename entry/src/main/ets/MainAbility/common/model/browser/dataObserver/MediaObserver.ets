@@ -47,9 +47,11 @@ export class MediaObserver {
             this.logger.info('registerObserver register media');
             MediaLibraryAccess.getMediaLibrary().on('imageChange', () => {
                 this.logger.info('registerObserver on image');
+                this.sendNotify('image');
             })
             MediaLibraryAccess.getMediaLibrary().on('videoChange', () => {
                 this.logger.info('registerObserver on video');
+                this.sendNotify('video');
             })
             MediaLibraryAccess.getMediaLibrary().on('deviceChange', () => {
                 this.logger.info('registerObserver on device');
@@ -61,7 +63,7 @@ export class MediaObserver {
             })
             MediaLibraryAccess.getMediaLibrary().on('remoteFileChange', () => {
                 this.logger.info('registerObserver on remoteFile');
-                this.sendNotify('remoteFile');
+                this.sendNotify('remote');
             })
         }
     }

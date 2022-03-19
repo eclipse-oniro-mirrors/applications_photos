@@ -136,18 +136,18 @@ export struct CropImageShow {
         .width(this.flexWidth)
         .height(this.flexHeight)
         .onTouch((event) => {
-            this.onTouchStart(event)
+            this.onTouchStart(event);
         })
         .gesture(
         PinchGesture()
             .onActionStart((event: PinchGestureEvent) => {
-                this.onPinchGestureStart(event)
+                this.onPinchGestureStart(event);
             })
             .onActionUpdate((event: PinchGestureEvent) => {
-                this.onPinchGestureUpdate(event)
+                this.onPinchGestureUpdate(event);
             })
             .onActionEnd(() => {
-                this.onPinchGestureEnd()
+                this.onPinchGestureEnd();
             })
         )
     }

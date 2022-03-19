@@ -15,11 +15,12 @@
 
 import {AlbumDefine} from '../../../../common/model/browser/AlbumDefine.ets'
 import {AlbumInfo} from '../../../../common/model/browser/album/AlbumInfo';
-import {EmptyAlbumComponentForTraditionalStyle} from './EmptyAlbumComponent';
+import {EmptyAlbumComponent} from './EmptyAlbumComponent';
 import {ScreenManager} from '../../../../common/model/common/ScreenManager.ets';
 import {Logger} from '../../utils/Logger'
 import {Constants} from '../../../../common/model/common/Constants.ets'
 import router from '@system.router';
+import {UiUtil} from '../../../../common/utils/UiUtil'
 
 let static_icon_list = new Map([
     [AlbumDefine.ALBUM_NAME_VIDEO , $r('app.media.ic_video')],
@@ -49,7 +50,7 @@ export struct AlbumGridItemTraditionalStyle {
         this.updateCardSize();
     }
 
-    updateCardSize(){
+    updateCardSize() {
         let contentWidth = ScreenManager.getInstance().getWinWidth();
         let maxCardWidth = Constants.ALBUM_SET_COVER_SIZE * Constants.GRID_MAX_SIZE_RATIO;
         let count: number = Math.ceil((contentWidth - Constants.ALBUM_SET_MARGIN * 2 + Constants.ALBUM_SET_GUTTER) /
@@ -63,7 +64,7 @@ export struct AlbumGridItemTraditionalStyle {
         Column() {
             Stack({alignContent:Alignment.Bottom}) {
                 if (this.isEmptyAlbum) {
-                    EmptyAlbumComponentForTraditionalStyle()
+                    EmptyAlbumComponent()
                 }
 
                 if (this.isBigCard) {
@@ -132,9 +133,12 @@ export struct AlbumGridItemTraditionalStyle {
                 width: $r('app.float.album_cover_stroke_width'),
                 color: $r('app.color.album_cover_stroke_color')
             })
-            .onClick(() => {
+            .onClick(async () => {
                 this.logger.info(`After onClick : ${JSON.stringify(this.item)}`);
-                let name = this.item.deviceName ? `${this.item.name}(${this.item.deviceName})` : this.item.name;
+                let display = typeof this.item.displayName == 'string'
+                    ? this.item.displayName
+                    : await UiUtil.getResourceString(this.item.displayName);
+                let name = this.item.deviceName ? `${display}(${this.item.deviceName})` : this.item.name;
                 router.push({
                     uri: 'feature/browser/view/photoGrid/PhotoGridPage',
                     params: {

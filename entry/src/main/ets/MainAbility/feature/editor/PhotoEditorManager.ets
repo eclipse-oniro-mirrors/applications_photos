@@ -27,14 +27,15 @@ import {Logger} from './utils/Logger'
 
 export class PhotoEditorManager {
     private currentMode: PhotoEditMode = PhotoEditMode.EDIT_MODE_MAIN;
-    private origin: PixelMapWrapper;
-    private item: MediaItem;
-    private editors: Map<PhotoEditMode, PhotoEditBase> = new Map<PhotoEditMode, PhotoEditBase>();
-    private historyManager: ImageFilterStack;
+    private origin: PixelMapWrapper = undefined;
+    private item: MediaItem = undefined;
+    private editors: Array<PhotoEditBase> = undefined;
+    private historyManager: ImageFilterStack = undefined;
     private logger = new Logger('PhotoEditorManager');
 
     private constructor() {
         this.historyManager = new ImageFilterStack();
+        this.editors = [];
         this.editors[PhotoEditMode.EDIT_MODE_CROP] = new PhotoEditCrop();
     }
 
@@ -90,7 +91,7 @@ export class PhotoEditorManager {
             const filter = this.editors[this.currentMode].exit();
             if (filter != undefined) {
                 // save cache
-                if (filter.isCached() == false) {
+                if (!filter.isCached()) {
                     const prePixelMap = this.getLastestPixelMap();
                     filter.setCache(filter.render(prePixelMap));
                 }
@@ -117,7 +118,7 @@ export class PhotoEditorManager {
     }
 
     redo(): boolean {
-        if (this.isRedoValid() == true) {
+        if (this.isRedoValid()) {
             let newPixel = this.historyManager.doRedo();
             this.editors[this.currentMode].entry(newPixel);
             return true;
@@ -127,7 +128,7 @@ export class PhotoEditorManager {
     }
 
     undo(): boolean {
-        if (this.isUndoValid() == true) {
+        if (this.isUndoValid()) {
             let newPixel = this.historyManager.doUndo();
             this.editors[this.currentMode].entry(newPixel);
             return true;

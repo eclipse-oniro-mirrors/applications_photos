@@ -38,7 +38,7 @@ export struct DownloadCancelOperationDialog {
 
     build() {
         Column() {
-            Row(){
+            Row() {
                 Text($r('app.string.download_cancel_message'))
                     .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontFamily($r('app.string.id_text_font_family_regular'))
@@ -59,7 +59,7 @@ export struct DownloadCancelOperationDialog {
                 Button() {
                     Text($r('app.string.download_progress_continue'))
                         .fontColor($r('app.color.color_control_highlight'))
-                        .fontFamily($r('app.string.id_text_font_family_regular'))
+                        .fontWeight(FontWeight.Medium)
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 }
                 .onClick(() => {
@@ -76,6 +76,7 @@ export struct DownloadCancelOperationDialog {
                     Text($r('app.string.download_progress_cancel'))
                         .fontColor($r('app.color.color_control_highlight'))
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                        .fontWeight(FontWeight.Medium)
                 }
                 .onClick(() => {
                     this.logger.info('click cancel')

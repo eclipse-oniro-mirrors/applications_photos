@@ -42,7 +42,7 @@ export class MediaLibraryAccess {
         this.logger.info('onCreate done');
     }
 
-    static onDestroy(){
+    static onDestroy() {
         MediaLibraryAccess.media.release();
         this.logger.info('onDestroy done');
     }
@@ -55,7 +55,7 @@ export class MediaLibraryAccess {
     static PUBLIC_PATH_VIDEO = '';
 
     static async getAllObject(fetchOpt) {
-        this.logger.debug(`getAllObject: ${JSON.stringify(fetchOpt)}`);
+        this.logger.info(`getAllObject: ${JSON.stringify(fetchOpt)}`);
         try {
             let dataList = await MediaLibraryAccess.media.getFileAssets(fetchOpt);
             if (dataList == null) {
@@ -74,7 +74,7 @@ export class MediaLibraryAccess {
     }
 
     static async getCount(fetchOpt) {
-        this.logger.debug(`getCount: ${JSON.stringify(fetchOpt)}`);
+        this.logger.info(`getCount: ${JSON.stringify(fetchOpt)}`);
         try {
             let dataList = await MediaLibraryAccess.media.getFileAssets(fetchOpt);
             if (dataList == null) {
@@ -94,7 +94,7 @@ export class MediaLibraryAccess {
             count: 0,
             obj: null,
         }
-        this.logger.debug(`getFirstObject: ${JSON.stringify(fetchOpt)}`);
+        this.logger.info(`getFirstObject: ${JSON.stringify(fetchOpt)}`);
         try {
             let fileResult = await MediaLibraryAccess.media.getFileAssets(fetchOpt);
             if (fileResult != undefined) {
@@ -148,14 +148,14 @@ export class MediaLibraryAccess {
     }
 
     static async createAsset(mediaType: any, displayName: string, relativePath: string) {
-        this.logger.info('createAsset start');
+        this.logger.debug('createAsset start');
         if (relativePath == null || relativePath == undefined) {
             this.logger.error('createAsset with empty relativePath');
             return null;
         }
-        this.logger.info(`createAsset start ${mediaType} ${displayName} ${relativePath}`);
+        this.logger.info(`createAsset ${mediaType} ${displayName} ${relativePath}`);
         let fileAsset = await MediaLibraryAccess.media.createAsset(mediaType, displayName, relativePath);
-        this.logger.info(`createAsset end. new fileAsset: ${fileAsset}`);
+        this.logger.debug(`createAsset end. new fileAsset: ${fileAsset}`);
         if (fileAsset == null || fileAsset == undefined) {
             this.logger.error('createAsset Fail');
             return null;
@@ -164,7 +164,7 @@ export class MediaLibraryAccess {
     }
 
     static async openAsset(mode: string, fileAsset: any) {
-        this.logger.info('openAsset start');
+        this.logger.debug('openAsset start');
         let fd = await fileAsset.open(mode);
         this.logger.info(`openAsset end. fd: ${fd}`);
         if (fd <= 0) {
@@ -175,54 +175,53 @@ export class MediaLibraryAccess {
     }
 
     static async closeAsset(fd: number, fileAsset: any) {
-        this.logger.info('closeAsset start');
+        this.logger.debug('closeAsset start');
         if (fd <= 0) {
             this.logger.error('closeAsset fd is invalid');
             return;
         }
         try {
             await fileAsset.close(fd);
-            this.logger.info('closeAsset end');
         } catch(error) {
-            this.logger.info(`closeAsset fail mag: ${error}, code: ${JSON.stringify(error)}`);
+            this.logger.error(`closeAsset fail mag: ${error}, code: ${JSON.stringify(error)}`);
         }
     }
 
     static async trashAsset(isTrash: boolean, fileAsset: any) {
-        this.logger.info('trashAsset start');
+        this.logger.debug('trashAsset start');
         try {
             await fileAsset.trash(isTrash);
             this.logger.info('trashAsset end');
         } catch(error) {
-            this.logger.info(`trashAsset fail ${error}`);
+            this.logger.error(`trashAsset fail ${error}`);
         }
     }
 
     static async getFavoriteObject(fetchOpt) {
-        this.logger.debug(`getFavoriteObject: ${JSON.stringify(fetchOpt)}`);
+        this.logger.info(`Get favorite object: ${JSON.stringify(fetchOpt)}`);
         try {
             let albums = await MediaLibraryAccess.media.getPrivateAlbum(MediaLib.PrivateAlbumType.TYPE_FAVORITE);
-            this.logger.debug(`Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
+            this.logger.debug(`[getFavoriteObject] get smart albums length:${albums.length} name:${albums[0].albumName}`);
             let fileResult = await albums[0].getFileAssets(fetchOpt);
-            this.logger.debug(`object count :${fileResult.getCount()}`);
+            this.logger.debug(`[getFavoriteObject] object count :${fileResult.getCount()}`);
             let objects = await fileResult.getAllObject();
-            this.logger.debug(`Get objects done`);
+            this.logger.debug(`[getFavoriteObject] objects done`);
             return objects;
         } catch(err) {
-            this.logger.error(`Get Favorite Object exception! msg:  ${err}`);
+            this.logger.error(`Get favorite object exception! msg:  ${err}`);
             return [];
         }
     }
 
     static async getTrashObject(fetchOpt) {
-        this.logger.debug(`getTrashObject: ${JSON.stringify(fetchOpt)}`);
+        this.logger.info(`Get trash object: ${JSON.stringify(fetchOpt)}`);
         try {
             let albums = await MediaLibraryAccess.media.getPrivateAlbum(MediaLib.PrivateAlbumType.TYPE_TRASH);
-            this.logger.debug(`Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
+            this.logger.debug(`[getTrashObject] get smart albums length:${albums.length} name:${albums[0].albumName}`);
             let fileResult = await albums[0].getFileAssets(fetchOpt);
-            this.logger.debug(`object count :${fileResult.getCount()}`);
+            this.logger.debug(`[getTrashObject] object count :${fileResult.getCount()}`);
             let objects = await fileResult.getAllObject();
-            this.logger.debug(`Get objects done`);
+            this.logger.debug(`[getTrashObject] get objects done`);
             return objects;
         } catch(err) {
             this.logger.error(`Get Trash Object exception! msg: ${err}`);
@@ -231,22 +230,22 @@ export class MediaLibraryAccess {
     }
 
     static async getEntityAlbumObject(fetchOpt, fileFetchOpt) {
-        this.logger.debug(`getEntityAlbumObject opt${JSON.stringify(fetchOpt)} fileOpt${JSON.stringify(fileFetchOpt)}`);
+        this.logger.info(`getEntityAlbumObject opt${JSON.stringify(fetchOpt)} fileOpt${JSON.stringify(fileFetchOpt)}`);
         try {
             let albums = await MediaLibraryAccess.media.getAlbums(fetchOpt);
-            this.logger.debug(`Get Albums done`);
-            this.logger.debug(`Album length:${albums.length}`);
+            this.logger.debug(`[getEntityAlbumObject]Get Albums done`);
+            this.logger.debug(`[getEntityAlbumObject]Album length:${albums.length}`);
             if (albums.length == 0) {
                 return null;
             }
-            this.logger.debug(`Albums name:${albums[0].albumName}`);
+            this.logger.debug(`[getEntityAlbumObject]Albums name:${albums[0].albumName}`);
             let fileResult = await albums[0].getFileAssets(fileFetchOpt);
-            this.logger.debug(`objects count :${fileResult.getCount()}`);
+            this.logger.debug(`[getEntityAlbumObject]objects count :${fileResult.getCount()}`);
             if (fileResult.getCount() == 0) {
                 return null
             }
             let objects = await fileResult.getAllObject();
-            this.logger.debug(`Get objects done`);
+            this.logger.debug(`[getEntityAlbumObject]Get objects done`);
             return objects;
         } catch(err) {
             this.logger.error(`Get Entity Album Object exception! msg:  ${err}`);
@@ -263,9 +262,9 @@ export class MediaLibraryAccess {
         }
         try {
             let albums = await MediaLibraryAccess.media.getPrivateAlbum(MediaLib.PrivateAlbumType.TYPE_FAVORITE);
-            this.logger.debug(`Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
+            this.logger.debug(`[getFavoriteCount]Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
             let fileResult = await albums[0].getFileAssets(fetchOpt);
-            this.logger.debug(`Get objects done`);
+            this.logger.debug(`[getFavoriteCount]Get objects done`);
             let count = fileResult.getCount();
             return count;
         } catch(err) {
@@ -283,9 +282,9 @@ export class MediaLibraryAccess {
         }
         try {
               let albums = await MediaLibraryAccess.media.getPrivateAlbum(MediaLib.PrivateAlbumType.TYPE_TRASH);
-              this.logger.debug(`Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
+              this.logger.debug(`[getTrashCount]Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
               let fileResult = await albums[0].getFileAssets(fetchOpt);
-              this.logger.debug(`Get objects done`);
+              this.logger.debug(`[getTrashCount]Get objects done`);
               let count = fileResult.getCount();
               return count;
         } catch(err) {
@@ -295,10 +294,10 @@ export class MediaLibraryAccess {
     }
 
     static async getEntityAlbumCount(fetchOpt, fileFetchOpt?) {
-        this.logger.debug(`getEntityAlbumCount opt: ${JSON.stringify(fetchOpt)}`);
+        this.logger.info(`getEntityAlbumCount opt: ${JSON.stringify(fetchOpt)}`);
         try {
             let albums = await MediaLibraryAccess.media.getAlbums(fetchOpt);
-            this.logger.debug(`Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
+            this.logger.debug(`[getEntityAlbumCount]Get smart Albums length:${albums.length} name:${albums[0].albumName}`);
             let fileFetchOp;
             if (fileFetchOpt == undefined) {
                 fileFetchOp = {
@@ -308,9 +307,9 @@ export class MediaLibraryAccess {
             } else {
                 fileFetchOp = fileFetchOpt;
             }
-            this.logger.debug(`file opt: ${JSON.stringify(fileFetchOp)}`);
+            this.logger.debug(`[getEntityAlbumCount]file opt: ${JSON.stringify(fileFetchOp)}`);
             let fileResult = await albums[0].getFileAssets(fileFetchOp);
-            this.logger.debug(`Get objects done`);
+            this.logger.debug(`[getEntityAlbumCount]Get objects done`);
             let count = fileResult.getCount();
             return count;
         } catch(err) {
@@ -320,11 +319,11 @@ export class MediaLibraryAccess {
     }
 
     static async getAlbums(fetchOpt) {
-        this.logger.debug(`getAlbums ${JSON.stringify(fetchOpt)}`);
+        this.logger.info(`getAlbums ${JSON.stringify(fetchOpt)}`);
         try {
             let albums = await MediaLibraryAccess.media.getAlbums(fetchOpt);
-            this.logger.debug(`Get Albums done`);
-            this.logger.debug(`length :${albums.length}`);
+            this.logger.debug(`[getAlbums]Get Albums done`);
+            this.logger.debug(`[getAlbums]length :${albums.length}`);
             return albums;
         } catch(err) {
             this.logger.error(`Get Album exception! msg:  ${err}`);
@@ -336,8 +335,8 @@ export class MediaLibraryAccess {
         this.logger.debug(`getFavoriteObject`);
         try {
             let albums = await MediaLibraryAccess.media.getPrivateAlbum(MediaLib.PrivateAlbumType.TYPE_FAVORITE);
-            this.logger.debug(`Get smart Albums done`);
-            this.logger.debug(`Albums length:${albums.length}`);
+            this.logger.debug(`[getFavoriteAlbum]Get smart Albums done`);
+            this.logger.debug(`[getFavoriteAlbum]Albums length:${albums.length}`);
             return albums.length == 0 ? undefined : albums[0];
         } catch(err) {
             this.logger.error(`Get Favorite album exception! msg:  ${err}`);
@@ -349,8 +348,8 @@ export class MediaLibraryAccess {
         this.logger.debug(`getTrashAlbum`);
         try {
             let albums = await MediaLibraryAccess.media.getPrivateAlbum(MediaLib.PrivateAlbumType.TYPE_TRASH);
-            this.logger.debug(`Get smart Albums done`);
-            this.logger.debug(`Albums length:${albums.length}`);
+            this.logger.debug(`[getTrashAlbum]Get smart Albums done`);
+            this.logger.debug(`[getTrashAlbum]Albums length:${albums.length}`);
             return albums[0];
         } catch(err) {
             this.logger.error(`Get Trash album exception! msg:  ${err}`);
@@ -362,7 +361,7 @@ export class MediaLibraryAccess {
         this.logger.debug(`getConnectedRemoteDevice`);
         try {
             let result = await MediaLibraryAccess.media.getActivePeers();
-            this.logger.debug(`device count: ${result.length}`);
+            this.logger.debug(`[getConnectedRemoteDevice]device count: ${result.length}`);
             return result;
         } catch(err) {
             this.logger.error(`Get Connected Remote Device exception! msg:  ${err}`);

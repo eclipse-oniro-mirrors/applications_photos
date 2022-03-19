@@ -34,9 +34,9 @@ export class AlbumDataImpl extends BrowserDataImpl {
     private deviceId:string = '';
     private deviceName:string = '';
 
-    constructor(param){
+    constructor(param) {
         super();
-        if(param) {
+        if (param) {
             this.logger.debug(`Remote networkId: ${param.deviceId}`);
             this.deviceId = param.deviceId;
             this.deviceName = param.deviceName;
@@ -48,7 +48,7 @@ export class AlbumDataImpl extends BrowserDataImpl {
     }
 
     async getData(callback, param) : Promise<void> {
-        if (param == null){
+        if (param == null) {
             await this.buildAlbums(callback);
         } else {
             await this.genAlbumsInfo(callback,param);
@@ -56,7 +56,7 @@ export class AlbumDataImpl extends BrowserDataImpl {
         return new Promise((resolve) => { resolve(); });
     }
 
-    private async genAlbumsInfo(cb, uris){
+    private async genAlbumsInfo(cb, uris) {
         this.logger.debug(`genAlbumsInfo uris: ${JSON.stringify(uris)}`);
 
         let res = {
@@ -70,7 +70,7 @@ export class AlbumDataImpl extends BrowserDataImpl {
             this.logger.debug(`get album objects: Name:${name} length: ${objects.length}`);
 
             res.count += objects.length;
-            for(let item of objects){
+            for (let item of objects) {
                 res.uris.push(item.uri);
             }
             let tmpAlbum = new AlbumInfo('', name, '', 0, '');
@@ -113,7 +113,7 @@ export class AlbumDataImpl extends BrowserDataImpl {
 
         for (let name of this.virtualAlbumList) {
             let file = await this.getFirstObject(AlbumDefine.getFetchOpt(name, this.deviceId));
-            if (file.count > 0){
+            if (file.count > 0) {
                 let data = new AlbumInfo(await this.getThumbnailSafe(file.obj),
                     name, this.getAlbumDisplayName(name), file.count, this.deviceId);
                 data.deviceName = this.deviceName;
@@ -126,13 +126,13 @@ export class AlbumDataImpl extends BrowserDataImpl {
         this.logger.debug('get virtual album done');
     }
 
-    private async getFavorAlbum(albumList){
+    private async getFavorAlbum(albumList) {
         if (this.isRemoteDevice()){
             return;
         }
 
         let favAlbum = await MediaLibraryAccess.getFavoriteAlbum();
-        if(favAlbum) {
+        if (favAlbum) {
             this.logger.debug('get favorite album is not null');
             let fileResult = await favAlbum.getFileAssets(AlbumDefine.getFetchOpt(AlbumDefine.ALBUM_NAME_FAVOR));
             let fileCount = fileResult.getCount();
@@ -148,16 +148,16 @@ export class AlbumDataImpl extends BrowserDataImpl {
         }
     }
 
-    private async getTrashAlbum(albumList){
+    private async getTrashAlbum(albumList) {
         if (this.isRemoteDevice()) {
             return;
         }
 
         let trashAlbum = await MediaLibraryAccess.getTrashAlbum();
-        if (trashAlbum){
+        if (trashAlbum) {
             let trashResult = await trashAlbum.getFileAssets(AlbumDefine.getFetchOpt(AlbumDefine.ALBUM_NAME_RECYCLE));
             this.logger.debug(`trash photo count ${trashResult.getCount()}`);
-            if (trashResult.getCount() > 0){
+            if (trashResult.getCount() > 0) {
                 let trashFile = await trashResult.getFirstObject();
                 let trash = new AlbumInfo(await this.getThumbnailSafe(trashFile), AlbumDefine.ALBUM_NAME_RECYCLE,
                     this.getAlbumDisplayName(AlbumDefine.ALBUM_NAME_RECYCLE), trashResult.getCount(), this.deviceId);
@@ -183,7 +183,7 @@ export class AlbumDataImpl extends BrowserDataImpl {
             for (let item of albums) {
                 let fileResult = await item.getFileAssets(fileFetchOpt);
                 let count = fileResult.getCount();
-                if (count <= 0){
+                if (count <= 0) {
                     this.logger.warn(`Not valid album Name: ${item.albumName} URI: ${item.albumUri}`);
                     continue;
                 }
@@ -280,7 +280,7 @@ export class AlbumDataImpl extends BrowserDataImpl {
                 break;
             default:
                 albumInfo.videoCount
-                    = await MediaLibraryAccess.getEntityAlbumCount(AlbumDefine.getFetchOpt(albumInfo.name), fetchOpt);
+                    = await MediaLibraryAccess.getEntityAlbumCount(AlbumDefine.getAlbumFetchOpt(albumInfo.name), fetchOpt);
                 break;
         }
     }

@@ -44,7 +44,7 @@ export struct ActionBarButton {
                     .onClick(() => {
                         this.onMenuClicked && this.onMenuClicked(menu);
                     })
-                if(this.moreMenuList.indexOf(menu) != this.moreMenuList.length - 1) {
+                if (this.moreMenuList.indexOf(menu) != this.moreMenuList.length - 1) {
                     Divider()
                         .width(ScreenManager.getInstance().getColumnsWidth(ColumnSize.COLUMN_TWO))
                         .strokeWidth(Constants.MENU_DIVIDER_STROKE_WIDTH)
@@ -89,8 +89,8 @@ export struct ActionBarButton {
     }
 
     build() {
-        if(this.action == Action.MORE) {
-            Row(){
+        if (this.action == Action.MORE) {
+            Row() {
                 this.ActionBarButtonBuilder()
             }
             .onClick(() => {
@@ -109,7 +109,7 @@ export struct ActionBarButton {
                     }
                 })
         } else {
-            Row(){
+            Row() {
                 this.ActionBarButtonBuilder()
             }
             .onClick(() => {

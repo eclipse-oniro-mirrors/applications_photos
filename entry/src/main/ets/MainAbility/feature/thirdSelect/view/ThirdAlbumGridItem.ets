@@ -56,7 +56,7 @@ export struct ThirdAlbumGridItem {
         this.updateCardSize();
     }
 
-    updateCardSize(){
+    updateCardSize() {
         let contentWidth = ScreenManager.getInstance().getWinWidth();
         let maxCardWidth = Constants.ALBUM_SET_COVER_SIZE * Constants.GRID_MAX_SIZE_RATIO;
         let count: number = Math.ceil((contentWidth - Constants.ALBUM_SET_MARGIN * 2 + Constants.ALBUM_SET_GUTTER) /
@@ -87,7 +87,7 @@ export struct ThirdAlbumGridItem {
                     .fillColor($r('app.color.empty_or_recycle_album_icon'))
             }
 
-            Column(){
+            Column() {
                 Text(this.item.displayName)
                     .margin({right: $r('app.float.album_set_name_margin_right')})
                     .textOverflow({overflow: TextOverflow.Ellipsis})

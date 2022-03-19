@@ -62,7 +62,6 @@
           "feature/thirdSelect/view/ThirdSelectPhotoBrowser",
           "feature/thirdSelect/view/ThirdSelectAlbumSetPage",
           "feature/thirdSelect/view/ThirdSelectPhotoGridPage",
-          "feature/browser/view/photo/SlideShow",
           "feature/browser/view/album/DistributedAlbumSetPage",
           "common/view/mediaOperation/MediaOperationPage",
           "feature/browser/view/album/NewAlbumPage",

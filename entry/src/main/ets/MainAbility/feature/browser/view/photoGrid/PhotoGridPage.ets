@@ -44,6 +44,8 @@ import { MoveMenuOperation } from '../../../../common/model/browser/operation/Mo
 import { GridScrollBar } from '../../../../common/view/GridScrollBar.ets';
 import { BatchRecoverMenuOperation } from '../../../../common/model/browser/operation/BatchRecoverMenuOperation.ets';
 import { ClearRecycleMenuOperation } from '../../../../common/model/browser/operation/ClearRecycleMenuOperation.ets';
+import { MediaObserver } from '../../../../common/model/browser/dataObserver/MediaObserver.ets';
+import { CommonObserverCallback } from '../../../../common/model/browser/CommonObserverCallback.ets';
 
 AppStorage.SetOrCreate('PhotoGridPageIndex', Constants.INVALID);
 // Album Page
@@ -78,6 +80,7 @@ export struct PhotoGridPage {
     isDistributedAlbum = false;
     deviceId: string = '';
     deleteMode: boolean = false;
+    private dataObserver: CommonObserverCallback  = new CommonObserverCallback(this);
     private appBroadCast: BroadCast = BroadCastManager.getInstance().getBroadCast();
 
     onIndexChange() {
@@ -185,7 +188,7 @@ export struct PhotoGridPage {
     }
 
     async openDetailsDialog(): Promise<void> {
-        if(this.totalSelectedCount == 0) {
+        if (this.totalSelectedCount == 0) {
             this.logger.error('no select error');
             return;
         } else if (this.totalSelectedCount == 1) {
@@ -236,26 +239,36 @@ export struct PhotoGridPage {
 
     onCopyStart(): void {
         this.isDataFreeze = true;
+        MediaObserver.getInstance().unregisterObserver(this.dataObserver);
         this.dataSource.freeze();
     }
 
-    onCopyEnd(): void {
+    onCopyEnd(err, count, total): void {
+        this.logger.debug(`onCopyEnd count: ${count}, total: ${total}`);
         this.isDataFreeze = false;
         this.onModeChange();
+        MediaObserver.getInstance().registerObserver(this.dataObserver);
+        this.dataSource.onChange('image');
         this.dataSource.unfreeze();
+        if (err) {
+            UiUtil.showToast($r('app.string.copy_failed_single'));
+        }
     }
 
     onDownloadStart(): void {
         this.isDataFreeze = true;
+        MediaObserver.getInstance().unregisterObserver(this.dataObserver);
         this.dataSource.freeze();
     }
 
     async onDownloadEnd(err, count, total) {
         this.isDataFreeze = false;
         this.onModeChange();
+        MediaObserver.getInstance().registerObserver(this.dataObserver);
+        this.dataSource.onChange('image');
         this.dataSource.unfreeze();
-        if(err) {
-            if(total > 1) {
+        if (err) {
+            if (total > 1) {
                 this.logger.error(`get selectItems is error ${count}`);
                 let str = await UiUtil.getResourceString($r('app.string.download_failed_multi'));
                 let message = str.replace('%d', count.toString());
@@ -273,24 +286,34 @@ export struct PhotoGridPage {
 
     onMoveStart(): void {
         this.isDataFreeze = true;
+        MediaObserver.getInstance().unregisterObserver(this.dataObserver);
         this.dataSource.freeze();
     }
 
-    onMoveEnd(): void {
+    onMoveEnd(err, count, total): void {
+        this.logger.debug(`onMoveEnd count: ${count}, total: ${total}`);
         this.isDataFreeze = false;
         this.onModeChange();
+        MediaObserver.getInstance().registerObserver(this.dataObserver);
+        this.dataSource.onChange('image');
         this.dataSource.unfreeze();
+        if (err) {
+            UiUtil.showToast($r('app.string.move_failed_single'));
+        }
     }
 
     onDeleteStart(): void {
         this.deleteMode = true;
         this.isDataFreeze = true;
+        MediaObserver.getInstance().unregisterObserver(this.dataObserver);
         this.dataSource.freeze();
     }
 
-    onDeleteEnd(uris: string[]): void {
+    onDeleteEnd(): void {
         this.isDataFreeze = false;
         this.onModeChange();
+        MediaObserver.getInstance().registerObserver(this.dataObserver);
+        this.dataSource.onChange('image');
         this.dataSource.unfreeze();
     }
 
@@ -315,7 +338,7 @@ export struct PhotoGridPage {
     private onPageShow() {
         this.isShow = true
         let params = router.getParams();
-        if(params != null && params.pageType != null) {
+        if (params != null && params.pageType != null) {
             this.logger.info('MediaOperation back');
             switch(params.pageType) {
                 case MediaOperationType.Move:
@@ -345,9 +368,6 @@ export struct PhotoGridPage {
                 this.totalSelectedCount = this.mSelectManager.getSelectedCount();
                 this.dataSource.forceUpdate();
             }
-            if (this.albumName == AlbumDefine.ALBUM_NAME_FAVOR) {
-                this.dataSource.initData();
-            }
         }
     }
 
@@ -365,11 +385,6 @@ export struct PhotoGridPage {
         if (index != -1) {
             this.dataSource.onDataChanged(index);
         }
-    }
-
-     private onUpdateDateSource(): void {
-        this.logger.debug('onUpdateDateSource');
-        this.dataSource.onChange('image');
     }
 
     private onBackPress() {
@@ -418,13 +433,13 @@ export struct PhotoGridPage {
             this.albumName = item.name;
             this.dataSource.setAlbumName(item.name);
 
-            if(param.isDistributedAlbum){
+            if (param.isDistributedAlbum) {
                 this.isDistributedAlbum = param.isDistributedAlbum;
                 this.deviceId = item.deviceId;
                 this.title = param.distributedAlbumName;
             }
 
-            if(item.deviceId){
+            if (item.deviceId) {
                 this.dataSource.setDeviceId(item.deviceId);
                 this.mSelectManager.setDeviceId(item.deviceId);
                 this.deviceName = item.deviceName;
@@ -436,6 +451,7 @@ export struct PhotoGridPage {
         this.dataSource.setBroadCast(this.broadCast)
         this.mSelectManager.setPhotoDataImpl();
         this.mSelectManager.setAlbumName(this.albumName);
+        MediaObserver.getInstance().registerObserver(this.dataObserver);
         this.broadCast.on(BroadCastConstants.SELECT,
             (position: number, key: string, value: boolean, callback: Function) => {
             if (self.mSelectManager.toggle(key, value)) {
@@ -448,9 +464,13 @@ export struct PhotoGridPage {
         });
         this.broadCast.on(BroadCastConstants.JUMP_PHOTO_BROWSER, (name: string, item: MediaItem) => {
             let targetIndex = self.dataSource.getDataIndex(item);
+            if(targetIndex == Constants.NOT_FOUND) {
+                self.logger.error('targetIndex is not found');
+                return;
+            }
             self.logger.info(`jump to photo browser at index: ${targetIndex}`);
             let pageEntryFrom = Constants.ENTRY_FROM.NORMAL;
-            if(self.dataSource.albumName == AlbumDefine.ALBUM_NAME_RECYCLE) {
+            if (self.dataSource.albumName == AlbumDefine.ALBUM_NAME_RECYCLE) {
                 pageEntryFrom = Constants.ENTRY_FROM.RECYCLE;
             } else if (self.isDistributedAlbum) {
                 pageEntryFrom = Constants.ENTRY_FROM.DISTRIBUTED;
@@ -471,12 +491,15 @@ export struct PhotoGridPage {
             });
         });
         this.broadCast.on(BroadCastConstants.JUMP_THIRD_PHOTO_BROWSER, (name: string, item: MediaItem) => {
-            let targetIndex = self.dataSource.getDataIndex(item);
             self.logger.info('JUMP_THIRD_PHOTO_BROWSER');
-            self.logger.info(`jump to photo browser at index: ${targetIndex}`);
-            self.logger.info(`jump to photo browser at transition: ${name}`);
+            let targetIndex = self.dataSource.getDataIndex(item);
+            if(targetIndex == Constants.NOT_FOUND) {
+                self.logger.error('targetIndex is not found');
+                return;
+            }
+            self.logger.info(`jump to photo browser at index: ${targetIndex} ${name}`);
             let pageEntryFrom = Constants.ENTRY_FROM.NORMAL;
-            if(self.dataSource.albumName == AlbumDefine.ALBUM_NAME_RECYCLE) {
+            if (self.dataSource.albumName == AlbumDefine.ALBUM_NAME_RECYCLE) {
                 pageEntryFrom = Constants.ENTRY_FROM.RECYCLE;
             } else if (self.isDistributedAlbum) {
                 pageEntryFrom = Constants.ENTRY_FROM.DISTRIBUTED;
@@ -496,7 +519,7 @@ export struct PhotoGridPage {
             this.logger.info(`ON_LOADING_FINISHED size: ${size}`);
         });
         this.appBroadCast.on(BroadCastConstants.UPDATE_DATA_SOURCE, this.onUpdateFavorState.bind(this));
-        this.appBroadCast.on(BroadCastConstants.ON_OPERATION_FINISHED, this.onUpdateDateSource.bind(this));
+
         if(this.deviceId){
             this.logger.info(`deviceId size: ${this.deviceId}`);
             this.appBroadCast.on(BroadCastConstants.ON_REMOTE_CHANGED, this.onUpdateRemoteDevice.bind(this));
@@ -517,7 +540,7 @@ export struct PhotoGridPage {
             self.logger.info(`updateTotalCount ${newState}`);
             self.isHideScrollBar = (newState <= 50);
             self.mSelectManager.setTotalCount(newState);
-            if(newState == 0){
+            if (newState == 0) {
                 router.back({
                     uri: this.isHorizontal === true ? 'product/pad/view/index' : 'product/phone/view/index',
                 });
@@ -556,14 +579,11 @@ export struct PhotoGridPage {
 
     private onUpdateRemoteDevice(res, deviceId): void {
         this.logger.info(`onUpdateRemoteDevice`);
-        if(deviceId != this.deviceId || this.isActive == false) {
+        if (deviceId != this.deviceId || this.isActive == false) {
             this.logger.debug(`other device`);
             return;
         }
-        if(res == 'changed') {
-            this.logger.debug(`device data changed`);
-            this.dataSource.initData();
-        } else if(res == 'offline') {
+        if(res == 'offline') {
             this.logger.debug(`device offline route to album main`);
             router.back({
                 uri: this.isHorizontal === true ? 'product/pad/view/index' : 'product/phone/view/index',
@@ -577,12 +597,17 @@ export struct PhotoGridPage {
         }
     }
 
+    onMediaLibDataChange(changeType){
+        this.logger.info(`onMediaLibDataChange type: ${changeType}`);
+        this.dataSource.onChange(changeType);
+    }
+
     private aboutToDisappear(): void {
         this.logger.info(`aboutToDisappear`);
         this.broadCast.off(null, null);
         this.appBroadCast.off(BroadCastConstants.UPDATE_DATA_SOURCE, this.onUpdateFavorState.bind(this));
-        this.appBroadCast.off(BroadCastConstants.ON_OPERATION_FINISHED, this.onUpdateDateSource.bind(this));
         this.appBroadCast.off(BroadCastConstants.ON_REMOTE_CHANGED, this.onUpdateRemoteDevice.bind(this));
+        MediaObserver.getInstance().unregisterObserver(this.dataObserver);
     }
 
     build() {
@@ -613,9 +638,11 @@ export struct PhotoGridPage {
                     .columnsGap(Constants.GRID_GUTTER)
                     .rowsGap(Constants.GRID_GUTTER)
                     .cachedCount(Constants.GRID_CACHE_ROW_COUNT)
-
                 GridScrollBar({scroller: this.scroller});
             }.layoutWeight(1)
+            .padding({
+                bottom: ((this.isSelectedMode || (this.dataSource.albumName == AlbumDefine.ALBUM_NAME_RECYCLE)) && !this.isHorizontal) ? Constants.ActionBarHeight : 0
+            })
 
             CustomDialogView();
 
@@ -629,7 +656,7 @@ export struct PhotoGridPage {
 
         }
         .backgroundColor($r('app.color.default_background_color'))
-            .margin({
+            .padding({
                 top: this.leftBlank[1],
                 bottom: this.leftBlank[3]
             })

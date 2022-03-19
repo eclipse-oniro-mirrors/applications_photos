@@ -51,6 +51,7 @@ export struct SaveDialog {
                     Text($r('app.string.save_dialog_save_text'))
                         .fontColor($r('app.color.color_control_highlight'))
                         .fontSize($r('sys.float.ohos_id_text_size_button1'))
+                        .fontWeight(FontWeight.Medium)
                 }
                 .height($r('app.float.default_button_size'))
                 .width($r('app.float.selection_actionbar_bg_height'))
@@ -64,6 +65,7 @@ export struct SaveDialog {
                     Text($r('app.string.save_dialog_overwrite_text'))
                         .fontColor($r('app.color.color_control_highlight'))
                         .fontSize($r('sys.float.ohos_id_text_size_button1'))
+                        .fontWeight(FontWeight.Medium)
                 }
                 .height($r('app.float.default_button_size'))
                 .width($r('app.float.selection_actionbar_bg_height'))
@@ -77,6 +79,7 @@ export struct SaveDialog {
                     Text($r('app.string.save_dialog_cancel_text'))
                         .fontColor($r('app.color.color_control_highlight'))
                         .fontSize($r('sys.float.ohos_id_text_size_button1'))
+                        .fontWeight(FontWeight.Medium)
                 }
                 .height($r('app.float.default_button_size'))
                 .width($r('app.float.selection_actionbar_bg_height'))

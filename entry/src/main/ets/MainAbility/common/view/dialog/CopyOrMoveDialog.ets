@@ -102,6 +102,7 @@ export struct CopyOrMoveDialog {
                         .fontColor($r('app.color.color_control_highlight'))
                         .width('100%')
                         .textAlign(TextAlign.Center)
+                        .fontWeight(FontWeight.Medium)
                 }
                 .backgroundColor($r('app.color.transparent'))
                     .height($r('app.float.details_dialog_button_height'))

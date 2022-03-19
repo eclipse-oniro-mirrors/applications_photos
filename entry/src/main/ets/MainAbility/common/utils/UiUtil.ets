@@ -233,10 +233,10 @@ export class UiUtil {
     static async getResourceString(resource: Resource) {
         try {
             this.logger.info(`getResourceString: ${JSON.stringify(resource)}`);
-            let mgr = await resourceManager.getResourceManager(globalThis.photosAbilityContext)
-            if(mgr){
+            let mgr = await resourceManager.getResourceManager(globalThis.photosAbilityContext);
+            if (mgr) {
                 return await mgr.getString(resource.id);
-            }else{
+            } else {
                 this.logger.error(`getResourceManager instance is none`);
                 return null;
             }

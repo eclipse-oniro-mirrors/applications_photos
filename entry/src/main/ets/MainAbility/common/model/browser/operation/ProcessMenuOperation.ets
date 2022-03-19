@@ -18,8 +18,10 @@ import {Logger} from '../../../utils/Logger.ets'
 import {MenuOperationCallback} from './MenuOperationCallback'
 import {MenuOperation} from './MenuOperation'
 import {MenuContext} from './MenuContext'
-import { BroadCastConstants } from '../../common/BroadCastConstants.ets';
-import { BroadCastManager } from '../../common/BroadCastManager.ets'
+import {BroadCastConstants} from '../../common/BroadCastConstants.ets';
+import {BroadCastManager} from '../../common/BroadCastManager.ets'
+import {UiUtil} from '../../../utils/UiUtil.ets';
+import {AlbumDefine} from '../AlbumDefine.ets';
 
 export enum FindSameOperation {
     NONE,
@@ -78,7 +80,7 @@ export class ProcessMenuOperation implements MenuOperation, AsyncCallback<String
     onCompleted(): void {
         this.logger.info(`onCompleted ${this.isPause}`);
         this.successBatch++;
-        if(!this.isPause) {
+        if (!this.isPause) {
             this.cyclicOperation();
         }
     }
@@ -116,9 +118,10 @@ export class ProcessMenuOperation implements MenuOperation, AsyncCallback<String
     // Batch circular deletion
     cyclicOperation() {
         this.logger.info('cyclicOperation');
-        this.menuContext.broadCast.emit(BroadCastConstants.UPDATE_PROGRESS, [this.getExpectProgress()]);
+        this.menuContext.broadCast.emit(BroadCastConstants.UPDATE_PROGRESS,
+            [this.getExpectProgress(), this.currentBatch]);
 
-        if (this.isCancelled){
+        if (this.isCancelled) {
             this.isCancelled = false;
         }
 
@@ -139,8 +142,6 @@ export class ProcessMenuOperation implements MenuOperation, AsyncCallback<String
             average ${(costTime / deleteCount)} ms/item.`);
         }
         this.onOperationEnd && this.onOperationEnd(this.isError, this.successBatch, this.count);
-
-        BroadCastManager.getInstance().getBroadCast().emit(BroadCastConstants.ON_OPERATION_FINISHED,['delete']);
     }
 
     // Delete cancel callback
@@ -167,5 +168,33 @@ export class ProcessMenuOperation implements MenuOperation, AsyncCallback<String
     setFindSameOperation(newOperation: number): void {
         this.logger.info(`setFindSameOperation ${newOperation}`);
         this.findSameOperation = newOperation
+    }
+
+    async getAlbumDisplayName(name) {
+        let res: Resource = undefined
+        switch (name) {
+            case AlbumDefine.ALBUM_NAME_ALL:
+                res = $r('app.string.album_all');
+                break;
+            case AlbumDefine.ALBUM_NAME_VIDEO:
+                res = $r('app.string.album_video');
+                break;
+            case AlbumDefine.ALBUM_NAME_RECYCLE:
+                res = $r('app.string.album_recycle');
+                break;
+            case AlbumDefine.ALBUM_NAME_CAMERA:
+                res = $r('app.string.album_camera');
+                break;
+            case AlbumDefine.ALBUM_NAME_FAVOR:
+                res = $r('app.string.album_favor');
+                break;
+            case AlbumDefine.ALBUM_NAME_REMOTE:
+                res = $r('app.string.album_remote_device');
+                break;
+            default:
+                return name;
+        }
+        let displayName = await UiUtil.getResourceString(res);
+        return displayName;
     }
 }

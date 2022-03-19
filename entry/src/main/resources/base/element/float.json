@@ -721,6 +721,14 @@
       "value": "0.5"
     },
     {
+      "name": "process_bar_margin_left",
+      "value": "4"
+    },
+    {
+      "name": "process_bar_margin_right",
+      "value": "40"
+    },
+    {
       "name": "menu_padding_horizontal",
       "value": "16vp"
     },

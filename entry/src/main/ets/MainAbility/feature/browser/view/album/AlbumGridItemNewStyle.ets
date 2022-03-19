@@ -171,7 +171,7 @@ export struct AlbumGridItemNewStyle {
                     .width('100%')
                     .border({radius: $r('sys.float.ohos_id_corner_radius_default_l')})
                     .visibility(this.isSelected && this.isAlbumSetSelectedMode && this.selectable ? Visibility.None : Visibility.Visible)
-            Column(){
+            Column() {
                 Text(this.item.displayName)
                     .margin({right: $r('app.float.album_set_name_margin_right')})
                     .textOverflow({overflow: TextOverflow.Ellipsis})
@@ -227,7 +227,7 @@ export struct AlbumGridItemNewStyle {
                     })
             )
             .onClick(() => {
-                if(this.isAlbumSetSelectedMode) {
+                if (this.isAlbumSetSelectedMode) {
                     this.selectStateChange();
                 } else {
                     this.logger.info(`After onClick, MediaSet is: ${JSON.stringify(this.item)}`);

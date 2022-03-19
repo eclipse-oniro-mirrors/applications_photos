@@ -31,6 +31,14 @@ enum ScreenWidth {
     WIDTH_LARGE = 840
 }
 
+enum WindowMode {
+    UNDEFINED = 1,
+    FULLSCREEN,
+    PRIMARY,
+    SECONDARY,
+    FLOATING
+}
+
 export class ScreenManager {
     static readonly ON_WIN_SIZE_CHANGED = 'on_win_size_changed';
     static readonly ON_SPLIT_MODE_CHANGED = 'on_split_mode_changed';
@@ -51,6 +59,7 @@ export class ScreenManager {
 
     // Default sidebar
     private sidebar = false;
+    private windowMode = WindowMode.UNDEFINED;
 
     private constructor() {
         this.logger.info('constructor');
@@ -176,9 +185,31 @@ export class ScreenManager {
         return this.naviBarHeight;
     }
 
+    initWindowMode() {
+        this.logger.debug(`start to initialize photos application window mode: ${this.windowMode}`);
+        this.checkWindowMode();
+    }
+
     isSplitMode(): boolean {
-        return this.winWidth != 0 && this.winHeight != 0
-            && this.winWidth / this.winHeight < ScreenManager.SPLIT_THRESHOLD;
+        return (WindowMode.PRIMARY == this.windowMode || WindowMode.SECONDARY == this.windowMode)
+            ? true
+            : false;
+    }
+
+    async checkWindowMode() {
+        let before = this.windowMode;
+        let mode = await globalThis.photosWindowStage.getWindowMode();
+        this.logger.info(`photos application before/current window mode: ${before}/${mode}`);
+
+        if (before == mode) {
+            return;
+        }
+        this.windowMode = mode;
+        if (WindowMode.FULLSCREEN == this.windowMode) {
+            this.setFullScreen();
+        } else {
+            this.setSplitScreen();
+        }
     }
 
     setMainWindow(win) {
@@ -210,6 +241,17 @@ export class ScreenManager {
         }
     }
 
+    setSplitScreen() {
+        try {
+            this.statusBarHeight = 0;
+            this.naviBarHeight = 0;
+            this.leftBlank = [0, 0, 0, 0];
+            this.emit(ScreenManager.ON_LEFT_BLANK_CHANGED, [this.leftBlank]);
+        } catch (err) {
+            this.logger.error(`setSplitScreen err: ${err}`);
+        }
+    }
+
     hideStatusBar() {
         this.logger.debug('hideStatusBar start');
         let topWindow: any = AppStorage.Get('mainWindow');
@@ -238,6 +280,7 @@ export class ScreenManager {
             this.logger.error(`hideStatusBar err: ${err}`);
         }
     }
+
     setSystemUi(isShowBar: boolean): void {
         this.logger.debug('setSystemUi start');
         let topWindow: any = AppStorage.Get('mainWindow');
@@ -285,6 +328,7 @@ export class ScreenManager {
             return;
         }
         let isSplitModeBefore = this.isSplitMode();
+        this.checkWindowMode();
         let sizeBefore = {
             width: this.winWidth,
             height: this.winHeight

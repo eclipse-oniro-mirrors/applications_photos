@@ -49,6 +49,9 @@ export class MediaDataSource extends AbsDataSource {
     // Is the quantity changed
     isCountChanged = false
 
+    // Is the quantity changed
+    isCountReduced = false
+
     // Save the amount of data of a window size
     items: MediaItem[] = [];
 
@@ -199,6 +202,7 @@ export class MediaDataSource extends AbsDataSource {
     updateSize(requestTime: number, count: number): void {
         this.logger.info(`updateSize, old size: ${this.size}, new size: ${count}`)
         this.isCountChanged = count != this.size;
+        this.isCountReduced = count < this.size;
         this.mediaCount = count;
         this.size = this.mediaCount;
         this.dataIndexes = [];
@@ -324,7 +328,7 @@ export class MediaDataSource extends AbsDataSource {
 //            !this.isCountChanged && this.onDataChanged(this.layoutIndexes[i]);
         }
         if (this.isCountChanged) {
-            if (this.photosBroadCast) {
+            if (this.photosBroadCast && this.isCountReduced) {
                 this.photosBroadCast.emit(BroadCastConstants.ON_DATA_RELOADED, [])
             } else if (this.broadCast) {
                 this.broadCast.emit(BroadCastConstants.ON_DATA_RELOADED, [])
@@ -333,6 +337,7 @@ export class MediaDataSource extends AbsDataSource {
             }
 
             this.isCountChanged = false;
+            this.isCountReduced = false;
         } else {
             for (let i = fromIndex; i < endIndex; i++) {
                 this.onDataChanged(this.layoutIndexes[i]);
@@ -489,8 +494,8 @@ export class MediaDataSource extends AbsDataSource {
     }
 
     getIndexByMediaItem(item: MediaItem): number {
-        for(let index = 0; index < this.items.length; index++){
-            if(item.uri == this.items[index].uri){
+        for(let index = 0; index < this.items.length; index++) {
+            if (item.uri == this.items[index].uri) {
                 this.items[index] = item
                 return index;
             }
@@ -508,11 +513,28 @@ export class MediaDataSource extends AbsDataSource {
     }
 
     getIndexByUri(uri: string): number {
-        for(let index = 0; index < this.items.length; index++){
-            if(uri == this.items[index].uri){
+        for (let index = 0; index < this.items.length; index++) {
+            if (uri == this.items[index].uri) {
                 return index;
             }
         }
         return -1;
+    }
+
+    getPositionByIndex(index: number): number {
+        return index;
+    }
+
+    onChange(mediaType: string) {
+        if(this.deviceId == '' || this.deviceId == undefined) {
+            if (mediaType == 'image' || mediaType == 'video' || mediaType == 'album') {
+                this.logger.debug(`local onChange ${mediaType}`);
+                super.onChange(mediaType);
+            }
+        } else {
+            if (mediaType == 'remote') {
+                this.initData();
+            }
+        }
     }
 }

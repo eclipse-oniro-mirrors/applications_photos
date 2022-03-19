@@ -146,13 +146,13 @@ struct MediaOperationPage {
     }
 
     build() {
-        Column(){
+        Column() {
             MediaOperationActionBar({onMenuClicked: this.onMenuClicked})
 
             List({scroller: this.scroller}) {
                 LazyForEach(this.albums, (item:AlbumInfo) => {
                     ListItem() {
-                        if(!AlbumDefine.ALBUM_DISABLE_COPY_LIST.has(item.name) && item.name != this.sourceAlbumName) {
+                        if (!AlbumDefine.ALBUM_DISABLE_COPY_LIST.has(item.name) && item.name != this.sourceAlbumName) {
                             AlbumListCard({item: item})
                         }
                     }
@@ -163,6 +163,7 @@ struct MediaOperationPage {
                 top: $r('app.float.album_let_page_padding_top'),
                 left : $r('app.float.max_padding_start'),
                 right : $r('app.float.max_padding_end'),
+                bottom: this.leftBlank[3]
             })
             .padding({
                 left : $r('app.float.list_card_margin'),
@@ -173,9 +174,9 @@ struct MediaOperationPage {
 
             CustomDialogView()
         }
-        .height('100%')
         .backgroundColor($r('app.color.default_background_color'))  // ux: colorSubBackground
-        .margin({
+        .height('100%')
+        .padding({
             top: this.leftBlank[1],
             bottom: this.leftBlank[3]
         })

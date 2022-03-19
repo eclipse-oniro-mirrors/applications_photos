@@ -44,6 +44,7 @@ export struct EditExitDialog {
                 Button() {
                     Text($r('app.string.save_dialog_cancel_text'))
                         .fontColor($r('app.color.color_control_highlight'))
+                        .fontWeight(FontWeight.Medium)
                         .fontSize($r('sys.float.ohos_id_text_size_button1'))
                 }
                 .height($r('app.float.default_button_size'))
@@ -59,6 +60,7 @@ export struct EditExitDialog {
                 Button() {
                     Text($r('app.string.edit_exit_dialog_discard_text'))
                         .fontColor($r('app.color.color_control_highlight'))
+                        .fontWeight(FontWeight.Medium)
                         .fontSize($r('sys.float.ohos_id_text_size_button1'))
                 }
                 .height($r('app.float.default_button_size'))

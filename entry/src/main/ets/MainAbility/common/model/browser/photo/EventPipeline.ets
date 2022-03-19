@@ -174,13 +174,13 @@ export class EventPipeline {
         if ((this.orientation == Constants.ROTATE_ONCE || this.orientation == Constants.ROTATE_THRICE) && isEnlarged) {
             if (!this.hasReachTop && !this.hasReachBottom) {
                 direction = PanDirection.All;
-            } else if(this.hasReachTop && !this.hasReachBottom) {
+            } else if (this.hasReachTop && !this.hasReachBottom) {
                 if (this.orientation == Constants.ROTATE_THRICE) {
                     direction = PanDirection.Vertical | PanDirection.Left;
                 } else {
                     direction = PanDirection.Vertical | PanDirection.Right;
                 }
-            } else if(!this.hasReachTop && this.hasReachBottom) {
+            } else if (!this.hasReachTop && this.hasReachBottom) {
                 if (this.orientation == Constants.ROTATE_THRICE) {
                     direction = PanDirection.Vertical | PanDirection.Right;
                 } else {

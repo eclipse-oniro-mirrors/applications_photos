@@ -149,6 +149,10 @@
       "value": "#0A59F7"
     },
     {
+      "name": "color_system_highlight",
+      "value": "#007DFF"
+    },
+    {
       "name": "text_color_secondary",
       "value": "#99182431"
     },
@@ -159,6 +163,10 @@
     {
       "name": "color_secondary",
       "value": "#99000000"
+    },
+    {
+      "name": "color_notify",
+      "value": "#66000000"
     },
     {
       "name": "album_set_empty_album_bright",

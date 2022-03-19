@@ -17,15 +17,18 @@ import {ScreenManager} from '../../../common/model/common/ScreenManager.ets';
 import {DateUtil} from '../../../common/utils/DateUtil.ets';
 import {TimelineData} from '../../../common/model/browser/photo/TimelineData.ets';
 import {Logger} from '../utils/Logger'
+import {BroadCast} from '../../../common/utils/BroadCast.ets';
+import {BroadCastConstants} from '../../../common/model/common/BroadCastConstants.ets';
 
 @Component
 export struct TimelineScrollBar {
     scroller: Scroller;
 
     @Consume @Watch('updateTotalNum') yearData: TimelineData[];
-    @Provide isClickScrollBar: boolean = false;
+    @State isClickScrollBar: boolean = false;
     @Consume isHideScrollBar: boolean;
     @Consume dateText: string;
+    @Consume broadCast: BroadCast;
 
     @State totalNum: number = 0;
     gridHeight: number = ScreenManager.getInstance().getWinHeight() - Constants.ActionBarHeight;
@@ -38,7 +41,7 @@ export struct TimelineScrollBar {
     nodeGap(count: number): number {
         this.logger.debug(`nodeGap start ${count} --- ${this.gridHeight} ---- ${this.totalNum}`)
         let gapS = Math.ceil(this.gridHeight * count / this.totalNum - 24);
-        if (gapS >= Constants.SCROLL_BAR_SIDE_MIN_GAP){
+        if (gapS >= Constants.SCROLL_BAR_SIDE_MIN_GAP) {
             return gapS;
         }
 
@@ -55,10 +58,10 @@ export struct TimelineScrollBar {
 
     build() {
         Stack({alignContent: Alignment.End}) {
-            if(this.isClickScrollBar) {
-                Column(){
+            if (this.isClickScrollBar) {
+                Column() {
                     ForEach(this.yearData, (year: TimelineData) => {
-                        if(this.nodeGap(year.count) > 0 || this.yearData.indexOf(year) == 0
+                        if (this.nodeGap(year.count) > 0 || this.yearData.indexOf(year) == 0
                         || this.yearData.indexOf(year) == this.yearData.length - 1) {
                             Row() {
                                 Text(DateUtil.getLocalizedYear(year.startDate))
@@ -99,21 +102,21 @@ export struct TimelineScrollBar {
 
             ScrollBar({ scroller: this.scroller, direction: ScrollBarDirection.Vertical,
                 state: this.isHideScrollBar? BarState.Off: BarState.Auto }) {
-                Row(){
-                    if (this.isClickScrollBar){
+                Row() {
+                    if (this.isClickScrollBar) {
                         Flex({
                             direction: FlexDirection.RowReverse,
                             alignItems: ItemAlign.Center,
                             justifyContent: FlexAlign.Start
                         }) {
-                            Row(){
+                            Row() {
                                 Image($r('app.media.scroll_press_light_hdpi'))
                             }
                             .width($r('app.float.scroll_bar_big_width'))
                             .height($r('app.float.scroll_bar_big_height'))
                             .margin({left: $r('app.float.scroll_bar_side_gap')})
 
-                            Row(){
+                            Row() {
                                 Text(this.dateText)
                                     .fontSize($r('sys.float.ohos_id_text_size_sub_title1'))
                                     .fontFamily($r('app.string.id_text_font_family_medium'))
@@ -154,9 +157,13 @@ export struct TimelineScrollBar {
                 y: 0
             })
             .onTouch((event: TouchEvent) => {
-                if(event.type == TouchType.Down){
+                if (this.dateText == '') {
+                    this.logger.debug(`dateText is null`)
+                    this.broadCast.emit(BroadCastConstants.INIT_DATE_TEXT, [])
+                }
+                if (event.type == TouchType.Down) {
                     this.isClickScrollBar = true;
-                } else if(event.type == TouchType.Up){
+                } else if (event.type == TouchType.Up) {
                     this.isClickScrollBar = false;
                 }
             })

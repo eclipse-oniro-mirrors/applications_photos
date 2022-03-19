@@ -58,7 +58,7 @@ export class MediaItem {
         this.path = data.relativePath;
     }
 
-    setThumbnail(thumbnail: PixelMap){
+    setThumbnail(thumbnail: PixelMap) {
         this.thumbnail = thumbnail;
     }
 

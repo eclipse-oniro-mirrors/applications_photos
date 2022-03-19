@@ -22,10 +22,11 @@ import {Constants as PhotoConstants} from '../../common/model/browser/photo/Cons
 import {Thumbnail} from '../../common/model/browser/photo/Thumbnail'
 import {MediaLibraryAccess} from '../../common/access/MediaLibraryAccess'
 import {ScreenManager} from '../model/common/ScreenManager'
+import {Constants} from '../model/common/Constants.ets';
 
 @Component
 export struct PhotoItem {
-    @State @Watch('onViewDataChanged') item?: MediaItem = new MediaItem(null);
+    @State @Watch('onViewDataChanged') item: MediaItem = new MediaItem(null);
     @State matrix: any = Matrix4.identity().copy();
     @State direction: PanDirection = PanDirection.Vertical;
     @Consume broadCast: BroadCast;
@@ -35,6 +36,7 @@ export struct PhotoItem {
     @State @Watch('onViewDataChanged') thumbnail: Thumbnail = new Thumbnail(undefined, 0, 0);
     @State ratio: number = 1.0;
     @Consume isPullingDown: boolean;
+    @Consume pageFrom: number;
     @Consume('transitionIndex') @Watch('onTransitionChange') updateTransition: number;
     position: number;
     transitionTag: string;
@@ -44,6 +46,7 @@ export struct PhotoItem {
     private animationEndMatrix: any = null;
     @State usePixmap: boolean = true;
     private releasePixmap: Function;
+    private showError = false;
 
     onTransitionChange() {
         this.logger.info(`onTransitionChange , ${this.updateTransition} ${this.position}`);
@@ -95,6 +98,8 @@ export struct PhotoItem {
     }
 
     onViewDataChanged(): void {
+        this.logger.info(`onViewDataChanged start`);
+        this.showError = false;
         if (this.item.orientation == PhotoConstants.ROTATE_ONCE || this.item.orientation == PhotoConstants.ROTATE_THRICE) {
             let componentWidth = vp2px(ScreenManager.getInstance().getWinWidth());
             let componentHeight = vp2px(ScreenManager.getInstance().getWinHeight());
@@ -112,13 +117,13 @@ export struct PhotoItem {
             }).copy();
             this.logger.debug(`onViewDataChanged scale:${scale}, componentSize:${componentWidth}x${componentHeight}\
                 width: ${this.item.width}, height: ${this.item.height}`);
-            this.eventPipeline.setDefaultScale(scale);
+            this.eventPipeline && this.eventPipeline.setDefaultScale(scale);
         } else {
             this.matrix = Matrix4.identity().copy();
             this.objectFit = ImageFit.Contain;
-            this.eventPipeline.setDefaultScale(1);
+            this.eventPipeline && this.eventPipeline.setDefaultScale(1);
         }
-        this.eventPipeline.onDataChanged(this.item)
+        this.eventPipeline && this.eventPipeline.onDataChanged(this.item)
         this.logger.debug(`onViewDataChanged usePixmap:${this.usePixmap}, thumbnail:${JSON.stringify(this.thumbnail)}`);
     }
 
@@ -147,6 +152,10 @@ export struct PhotoItem {
                     .sharedTransition(this.transitionId, {duration: PhotoConstants.SHARE_TRANSITION_DURATION})
                     .onComplete(() => {
                         this.logger.debug(`onComplete finish index: ${this.position}, uri: ${this.item.uri}`);
+                    })
+                    .onError(() => {
+                        this.logger.debug(`image show error`);
+                        this.showError = true;
                     })
             }
             .width('100%')
@@ -272,7 +281,15 @@ export struct PhotoItem {
                 .onTouch((event) => {
                     this.eventPipeline.onTouch(event);
                 })
-
+            // TODO Remind users when pictures of other devices cannot be show
+            if ((this.showError || this.thumbnail.pixelMap == undefined) && this.pageFrom == Constants.ENTRY_FROM.DISTRIBUTED) {
+                Row() {
+                    Text($r('app.string.no_distributed_photo_show_image'))
+                        .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+                        .fontFamily($r('app.string.id_text_font_family_regular'))
+                        .fontColor($r('app.color.color_notify'))
+                }.margin({top: ScreenManager.getInstance().getWinHeight() / 4})
+            }
             Row() {
                 Image($r('app.media.ic_video_play_btn')).width($r('app.float.icon_video_size'))
                     .height($r('app.float.icon_video_size')).onClick(() => {

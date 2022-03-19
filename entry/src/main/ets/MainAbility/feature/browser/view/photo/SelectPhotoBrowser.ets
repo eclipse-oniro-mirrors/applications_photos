@@ -43,6 +43,7 @@ struct SelectPhotoBrowser {
     @Provide isShowBar: boolean = true;
     @Provide isPullingDown: boolean = false;
     @Provide moreMenuList: Array<Action> = new Array<Action>();
+    @Provide pageFrom: number = Constants.ENTRY_FROM.NORMAL;
     selectManager: SelectManager;
     isMultiPick = true;
     transition: string;
@@ -54,6 +55,7 @@ struct SelectPhotoBrowser {
 
     // position
     position: number;
+    timelineIndex: number = -1;
 
     // logger
     private logger: Logger = new Logger('PhotoBrowser');
@@ -86,13 +88,12 @@ struct SelectPhotoBrowser {
         });
         this.selectManager = AppStorage.Get(Constants.THIRD_SELECT_MANAGER);
         let param = router.getParams();
-        let pageFrom;
         if (param.pageFrom) {
-            pageFrom = param.pageFrom;
+            this.pageFrom = param.pageFrom;
         }
-        if (pageFrom == Constants.ENTRY_FROM.RECYCLE) {
+        if (this.pageFrom == Constants.ENTRY_FROM.RECYCLE) {
             this.dataSource = new PhotoDataSource('Recycle');
-        } else if (pageFrom == Constants.ENTRY_FROM.DISTRIBUTED) {
+        } else if (this.pageFrom == Constants.ENTRY_FROM.DISTRIBUTED) {
             this.dataSource.setDeviceId(param.deviceId);
         }
 
@@ -144,11 +145,12 @@ struct SelectPhotoBrowser {
 
     onPhotoChanged(index: number): void{
         this.currentIndex = index;
+        this.timelineIndex = this.dataSource.getPositionByIndex(index);
         let currentPhoto = this.getCurrentPhoto();
         if (currentPhoto == undefined) {
             this.logger.error('onPhotoChanged, item is undefined');
         } else {
-            this.isSelected = this.selectManager.isItemSelected(currentPhoto.uri, index);
+            this.isSelected = this.selectManager.isItemSelected(currentPhoto.uri, this.timelineIndex);
             this.logger.info(`onPhotoChanged, index: ${index}, currentPhoto: ${currentPhoto.uri},\
                 isSelected: ${this.isSelected}`);
         }
@@ -161,7 +163,7 @@ struct SelectPhotoBrowser {
             return;
         }
         this.isSelected = !this.isSelected;
-        if (this.selectManager.toggle(currentPhoto.uri, this.isSelected, this.currentIndex)) {
+        if (this.selectManager.toggle(currentPhoto.uri, this.isSelected, this.timelineIndex)) {
             this.totalSelectedCount = this.selectManager.getSelectedCount();
         }
         this.logger.info(`totalSelectedCount: ${this.totalSelectedCount} after state change`)

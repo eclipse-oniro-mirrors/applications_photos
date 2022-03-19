@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +24,7 @@ import {MediaOperationType} from '../../common/MediaOperationType'
 export class CopyMenuOperation extends ProcessMenuOperation {
     logger: Logger = new Logger('CopyMenuOperation');
     albumName: string;
+    displayName: string;
 
     constructor(menuContext: MenuContext) {
         super(menuContext);
@@ -70,15 +70,18 @@ export class CopyMenuOperation extends ProcessMenuOperation {
 
         this.logger.info(`this.albumName.displayName, ${this.albumName}`);
 
-        if(this.menuContext.deviceId){
-            this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
-                [$r('app.string.download_progress_message', this.albumName),
-                MediaOperationType.Copy, this.cancelFunc.bind(this)]);
-        } else {
-            this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
-                [$r('app.string.copy_progress_message', this.albumName),
-                MediaOperationType.Copy, this.cancelFunc.bind(this)]);
-        }
+        this.getAlbumDisplayName(this.albumName).then((displayName) =>{
+            this.displayName = displayName
+            if (this.menuContext.deviceId) {
+                this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
+                    [$r('app.string.download_progress_message', this.displayName),
+                    MediaOperationType.Copy, this.cancelFunc.bind(this)]);
+            } else {
+                this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
+                    [$r('app.string.copy_progress_message', this.displayName),
+                    MediaOperationType.Copy, this.cancelFunc.bind(this)]);
+            }
+        });
     }
 
     callback(uris: string[]): void {
@@ -97,14 +100,17 @@ export class CopyMenuOperation extends ProcessMenuOperation {
         let endIndex = this.currentBatch * this.BATCH_SIZE;
         let batchUris: string[] = this.uris.slice(startIndex, Math.min(endIndex, this.uris.length));
         let operationImpl = BrowserOperationFactory.getFeature(BrowserOperationFactory.TYPE_PHOTO);
-
+        if (batchUris[0] == undefined) {
+          this.onOperateContinue();
+          return;
+        }
         operationImpl.getExistTargetInTargetAlbum(batchUris[0], this.albumName, this.menuContext.deviceId).then((assets) => {
-            if(assets) {
+            if (assets) {
                 if (this.menuContext.deviceId) {
                     operationImpl.copy(batchUris[0], this.albumName, this, false, this.menuContext.deviceId, true);
                     return;
                 }
-                if(assets.targetAsset.uri == assets.fileAsset.uri) {
+                if (assets.targetAsset.uri == assets.fileAsset.uri) {
                     this.logger.info('copy same fileAsset');
                     this.onOperateContinue();
                     return ;
@@ -139,7 +145,7 @@ export class CopyMenuOperation extends ProcessMenuOperation {
         this.onOperatePause();
         let cancelMessage = $r('app.string.copy_cancel_message', this.getExpectProgress().toString());
 
-        if(this.menuContext.deviceId){
+        if (this.menuContext.deviceId) {
             this.menuContext.broadCast && this.menuContext.broadCast.emit(BroadCastConstants.DOWNLOAD_CANCEL_OPERATE,
                 [cancelMessage, this.onOperateContinue.bind(this), this.onOperateCancelled.bind(this)]);
         } else {
@@ -152,13 +158,13 @@ export class CopyMenuOperation extends ProcessMenuOperation {
     onOperateContinue(): void {
         this.logger.info('Operate Continue');
         this.isPause = false;
-        if(this.menuContext.deviceId){
+        if (this.menuContext.deviceId) {
             this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
-                [$r('app.string.download_progress_message', this.albumName),
+                [$r('app.string.download_progress_message', this.displayName),
                     MediaOperationType.Copy, this.cancelFunc.bind(this)]);
         } else {
             this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG,
-                [$r('app.string.copy_progress_message', this.albumName),
+                [$r('app.string.copy_progress_message', this.displayName),
                     MediaOperationType.Copy, this.cancelFunc.bind(this)]);
         }
         this.cyclicOperation();

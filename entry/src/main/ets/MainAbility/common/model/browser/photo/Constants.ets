@@ -15,7 +15,7 @@
 
 export class Constants {
     // Immersive animation duration
-    static readonly IMMERSE_ANIM_DURATION = 500;
+    static readonly IMMERSE_ANIM_DURATION = 300;
 
     // click event
     static readonly TOGGLE_BAR = 'single_photo_toggle_bar';

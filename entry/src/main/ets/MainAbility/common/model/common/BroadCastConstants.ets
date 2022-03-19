@@ -30,6 +30,7 @@ export class BroadCastConstants {
     static readonly SHOW_MULTI_SELECT_DIALOG = 'showMultiSelectDialog';
     static readonly UPDATE_DATA_SOURCE = 'updateDataSource';
     static readonly SHOW_PROGRESS_DIALOG = 'showProgressDialog';
+    static readonly DELETE_PROGRESS_DIALOG = 'deleteProgressDialog';
     static readonly CANCEL_OPERATE = 'cancelOperate';
     static readonly MEDIA_OPERATION = 'mediaOperation';
     static readonly OPERATE_CONTINUE = 'operateContinue';
@@ -41,11 +42,11 @@ export class BroadCastConstants {
     static readonly SHOW_NEW_ALBUM_PHOTO_DIALOG = 'showNewAlbumPhotoDialog';
     static readonly SHOW_COPY_OR_MOVE_DIALOG = 'showCopyOrMoveDialog';
     static readonly FIND_SAME_FILE_DIALOG = 'findSameFileDialog';
-    static readonly ON_OPERATION_FINISHED = 'on_operation_finished';
     static readonly ON_REMOTE_CHANGED = 'on_remote_changed';
     static readonly EXIT_SAVE_PROGRESS_CLOSE = 'save_progress_close';
     static readonly SHOW_EDIT_SAVE_PROGRESS_DIALOG = 'show_exit_save_progress_dialog';
     static readonly DOWNLOAD_CANCEL_OPERATE = 'download_cancel_operate';
     static readonly ON_DATA_RELOADED = 'on_data_reloaded';
     static readonly SAVE_FORM_EDITOR_DATA = 'save_form_editor_data';
+    static readonly INIT_DATE_TEXT = 'init_date_text';
 }

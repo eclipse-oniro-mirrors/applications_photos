@@ -29,7 +29,7 @@ export class DistributedDataImpl extends BrowserDataImpl {
 
         let devices = await MediaLibraryAccess.getConnectedRemoteDevice();
         for (let dev of devices) {
-            this.logger.debug(`Remote Device Name:${dev.deviceName} networkID: ${dev.networkId}`);
+            this.logger.info(`Online remote Device Name:${dev.deviceName} networkID: ${dev.networkId}`);
             let peerInfo = new PeerInfo(null, dev.deviceName, 0, dev.networkId);
             let file = await this.getFirstObject(AlbumDefine.getFetchOpt(AlbumDefine.ALBUM_NAME_ALL, dev.networkId));
 

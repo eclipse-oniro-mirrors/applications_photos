@@ -42,14 +42,14 @@ export abstract class BrowserDataImpl implements BrowserDataInterface {
 
     async getItems(albumName: string, startIndex?: number, count?:number, deviceId?) {
         let external_order = '';
-        if( startIndex != undefined && count != undefined && startIndex >= 0  && count >= 0) {
+        if ( startIndex != undefined && count != undefined && startIndex >= 0  && count >= 0) {
             external_order = ` LIMIT ${startIndex},${count}`;
         }
 
         let fetchOpt = AlbumDefine.getFetchOpt(albumName, deviceId);
         fetchOpt.order += external_order;
 
-        switch (albumName){
+        switch (albumName) {
             case AlbumDefine.ALBUM_NAME_ALL:
             case AlbumDefine.ALBUM_NAME_VIDEO:
                 return await this.getAllObject(fetchOpt);
@@ -63,7 +63,7 @@ export abstract class BrowserDataImpl implements BrowserDataInterface {
                     selectionArgs: [],
                     order: AlbumDefine.QUERY_ORDER_BASE + external_order
                 }
-                if (deviceId != undefined && deviceId != ''){
+                if (deviceId != undefined && deviceId != '') {
                     fetchOpt['networkId'] = deviceId
                 }
                 return await MediaLibraryAccess.getEntityAlbumObject(
@@ -107,12 +107,12 @@ export abstract class BrowserDataImpl implements BrowserDataInterface {
     async getThumbnailSafe(file, opt?) {
         this.logger.debug('getThumbnailSafe');
         try{
-            if(opt){
+            if (opt) {
                 return await file.getThumbnail(opt);
-            }else{
+            } else {
                 return await file.getThumbnail();
             }
-        }catch(err){
+        } catch (err) {
             this.logger.warn(`get Thumbnail Failed! msg:${err}`);
             return null;
         }

@@ -33,7 +33,7 @@ export struct AlbumListCard {
     }
 
     showMediaRes(): Resource {
-        if(this.item.videoCount == 0){
+        if (this.item.videoCount == 0) {
             return $r('app.string.show_photo_num', this.item.count);
         } else if (this.item.videoCount == this.item.count) {
             return $r('app.string.show_video_num', this.item.count);
@@ -47,14 +47,15 @@ export struct AlbumListCard {
             Image(this.item.coverUri)
                 .height($r('app.float.list_card_image_size'))
                 .width($r('app.float.list_card_image_size'))
-            Column(){
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_s'))
+            Column() {
                 Text(this.item.displayName)
                     .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontColor($r('sys.color.ohos_id_color_primary'))
                     .padding({
                         bottom: $r('sys.float.ohos_id_text_margin_vertical')
                     })
-                if(this.item.count != 0){
+                if (this.item.count != 0) {
                     Text(this.showMediaRes())
                         .fontSize($r('sys.float.ohos_id_text_size_body2'))
                         .fontColor($r('sys.color.ohos_id_color_text_secondary'))

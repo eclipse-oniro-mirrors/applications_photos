@@ -182,6 +182,7 @@ export struct FindSameNameDialog {
                             .fontColor($r('app.color.color_control_highlight'))
                             .width(this.findSameNameParam.singlePhoto ? '50%' : `${100/3}%`)
                             .textAlign(TextAlign.Center)
+                            .fontWeight(FontWeight.Medium)
                     }
                     .margin({
                         left: $r('app.float.details_dialog_button_margin_left'),
@@ -191,7 +192,7 @@ export struct FindSameNameDialog {
                     .height($r('app.float.details_dialog_button_height'))
                     .onClick(() => {
                         this.logger.debug(`replaceCallback`);
-                        if(this.isDoSameAction) {
+                        if (this.isDoSameAction) {
                             this.findSameNameParam.doSameFunc
                             && this.findSameNameParam.doSameFunc(FindSameOperation.REPLACE);
                         }
@@ -216,6 +217,7 @@ export struct FindSameNameDialog {
                                 .fontColor($r('app.color.color_control_highlight'))
                                 .width(`${100/3}%`)
                                 .textAlign(TextAlign.Center)
+                                .fontWeight(FontWeight.Medium)
                         }
                         .margin({
                             left: $r('app.float.details_dialog_button_margin_left'),
@@ -225,7 +227,7 @@ export struct FindSameNameDialog {
                         .height($r('app.float.details_dialog_button_height'))
                         .onClick(() => {
                             this.logger.debug(`skipCallback`);
-                            if(this.isDoSameAction) {
+                            if (this.isDoSameAction) {
                                 this.findSameNameParam.doSameFunc
                                 && this.findSameNameParam.doSameFunc(FindSameOperation.SKIP);
                             }
@@ -250,6 +252,7 @@ export struct FindSameNameDialog {
                             .fontColor($r('app.color.color_control_highlight'))
                             .width(this.findSameNameParam.singlePhoto ? '50%' : `${100/3}%`)
                             .textAlign(TextAlign.Center)
+                            .fontWeight(FontWeight.Medium)
                     }
                     .margin({
                         left: $r('app.float.details_dialog_button_margin_left'),

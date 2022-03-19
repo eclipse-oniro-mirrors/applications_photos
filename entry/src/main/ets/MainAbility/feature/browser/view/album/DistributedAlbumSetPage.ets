@@ -21,11 +21,13 @@ import {Constants} from '../../../../common/model/common/Constants.ets'
 import {DistributedAlbumSetPageActionBar} from './DistributedAlbumSetPageActionBar.ets'
 import {ScreenManager} from '../../../../common/model/common/ScreenManager'
 import {BroadCast} from '../../../../common/utils/BroadCast.ets'
-import {NoPhotoComponent} from '../../../../common/view/NoPhotoComponent'
+import {NoPhotoIndexComponent} from '../../../../common/view/NoPhotoIndexComponent'
 import {Logger} from '../../utils/Logger.ets'
 import {JumpSourceToMain} from '../../../../common/model/browser/photo/JumpSourceToMain'
 import {BroadCastManager} from '../../../../common/model/common/BroadCastManager'
 import {BroadCastConstants} from '../../../../common/model/common/BroadCastConstants'
+import { CommonObserverCallback } from '../../../../common/model/browser/CommonObserverCallback.ets'
+import { MediaObserver } from '../../../../common/model/browser/dataObserver/MediaObserver.ets'
 
 @Entry
 @Component
@@ -37,6 +39,8 @@ export struct DistributedAlbumSetPage {
     @Provide broadCast: BroadCast = new BroadCast();
     @Provide isAlbumSetSelectedMode: boolean = false;
     @StorageLink('isHorizontal') isHorizontal: boolean = ScreenManager.getInstance().isHorizontal();
+
+    private dataObserver: CommonObserverCallback  = new CommonObserverCallback(this);
 
     title: string;
     albums : AlbumSetDataSource
@@ -70,13 +74,15 @@ export struct DistributedAlbumSetPage {
         }
 
         this.onMenuClicked = this.onMenuClicked.bind(this);
-        this.broadCast.on(Constants.ON_LOADING_FINISHED, (triggerType, size: number) => {
-            this.logger.info(`ON_LOADING_FINISHED size: ${size} ${triggerType}`);
+        this.broadCast.on(Constants.ON_LOADING_FINISHED, (size: number) => {
+            this.logger.info(`ON_LOADING_FINISHED size: ${size}`);
             this.isEmpty = size == 0;
         });
 
         BroadCastManager.getInstance().getBroadCast().on(BroadCastConstants.ON_REMOTE_CHANGED,
             this.onUpdateRemoteDevice.bind(this));
+
+        MediaObserver.getInstance().registerObserver(this.dataObserver);
 
         this.onActive();
 
@@ -90,6 +96,7 @@ export struct DistributedAlbumSetPage {
     private aboutToDisappear(): void {
         BroadCastManager.getInstance().getBroadCast().off(BroadCastConstants.ON_REMOTE_CHANGED,
             this.onUpdateRemoteDevice.bind(this));
+        MediaObserver.getInstance().unregisterObserver(this.dataObserver);
     }
 
     private onPageShow() {
@@ -121,18 +128,16 @@ export struct DistributedAlbumSetPage {
     private onUpdateRemoteDevice(res, deviceId): void {
         this.logger.debug(`onUpdateRemoteDevice`);
 
-        if(!this.isActive){
+        if (!this.isActive) {
             return;
         }
 
-        if(deviceId != this.deviceId) {
+        if (deviceId != this.deviceId) {
             this.logger.debug(`other device`);
             return;
         }
 
-        if(res == 'changed') {
-            this.albums.onChange('image')
-        } else if(res == 'offline') {
+        if(res == 'offline') {
             this.logger.debug(`device offline route to album main`);
             router.back({
                 uri: this.isHorizontal === true ? 'product/pad/view/index' : 'product/phone/view/index',
@@ -141,9 +146,14 @@ export struct DistributedAlbumSetPage {
                 }
             })
         } else {
-            this.logger.error(`res code is err`);
+            this.logger.info(`ignore typy: ${res}`);
             return;
         }
+    }
+
+    onMediaLibDataChange(changeType){
+        this.logger.info(`onMediaLibDataChange type: ${changeType}`);
+        this.albums.onChange(changeType);
     }
 
     build() {
@@ -159,37 +169,38 @@ export struct DistributedAlbumSetPage {
 
             Stack() {
                 if (this.isEmpty) {
-                    NoPhotoComponent({title: $r('app.string.title_no_albums')})
-                }
-                Grid(this.scroller) {
-                    LazyForEach(this.albums, (item) => {
-                        if (this.albums.mediaSetList.indexOf(item) == 0) {
-                            GridItem() {
-                                AlbumGridItemTraditionalStyle({
-                                    item: item,
-                                    isBigCard: true
-                                })
-                            }.columnStart(0).columnEnd(1)
-                        } else {
-                            GridItem() {
-                                AlbumGridItemTraditionalStyle({
-                                    item: item,
-                                    isBigCard: false
-                                })
+                    NoPhotoIndexComponent({index: Constants.DISTRIBUTED_ALBUM_PAGE_INDEX})
+                } else {
+                    Grid(this.scroller) {
+                        LazyForEach(this.albums, (item) => {
+                            if (this.albums.mediaSetList.indexOf(item) == 0) {
+                                GridItem() {
+                                    AlbumGridItemTraditionalStyle({
+                                        item: item,
+                                        isBigCard: true
+                                    })
+                                }.columnStart(0).columnEnd(1)
+                            } else {
+                                GridItem() {
+                                    AlbumGridItemTraditionalStyle({
+                                        item: item,
+                                        isBigCard: false
+                                    })
+                                }
                             }
-                        }
-                    }, item => 'uri:' + item.name)
+                        }, item => 'uri:' + item.name)
+                    }
+                    .backgroundColor($r('app.color.default_background_color'))
+                    .columnsTemplate('1fr '.repeat(this.gridColumnsCount))
+                    .padding({
+                        left: $r('app.float.max_padding_start'),
+                        right: $r('app.float.max_padding_end'),
+                        top: $r('app.float.album_set_page_padding_top'),
+                        bottom: $r('app.float.album_set_page_padding_end')
+                    })
+                    .columnsGap($r('app.float.album_set_grid_column_gap'))
+                    .rowsGap($r('app.float.album_set_traditional_style_grid_row_gap'))
                 }
-                .backgroundColor($r('app.color.default_background_color'))
-                .columnsTemplate('1fr '.repeat(this.gridColumnsCount))
-                .padding({
-                    left: $r('app.float.max_padding_start'),
-                    right: $r('app.float.max_padding_end'),
-                    top: $r('app.float.album_set_page_padding_top'),
-                    bottom: $r('app.float.album_set_page_padding_end')
-                })
-                .columnsGap($r('app.float.album_set_grid_column_gap'))
-                .rowsGap($r('app.float.album_set_traditional_style_grid_row_gap'))
             }
         }.margin({
             top: this.leftBlank[1],

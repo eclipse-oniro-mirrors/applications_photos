@@ -175,6 +175,9 @@ export class SelectManager {
 
     public toggle(targetId: string, isSelected: boolean, targetIndex?: number): boolean {
         this.logger.info(`toggle ${targetId} ${isSelected} ${targetIndex}`);
+        if (targetId == undefined) {
+            return true;
+        }
         if (isSelected == (!this.inverseSelection)) {
             this.clickedSet.add(targetId);
             this.logger.info(`add targetID ${targetId}`);
@@ -304,7 +307,7 @@ export class SelectManager {
         }
 
 
-        if(this.albumName) {
+        if (this.albumName) {
             await photoDataImpl.getData(cb,
                 {name: this.albumName, start: start, count: count, deviceId: this.deviceId});
         } else {

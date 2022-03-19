@@ -130,10 +130,12 @@ export struct ImageGridItemComponent {
     selectStateChange() {
         this.logger.info('change selected.');
         let newState = !this.isSelected;
-        this.broadCast.emit(BroadCastConstants.SELECT, [this.position, this.item.uri, newState, function() {
-            this.logger.info('enter callback');
-            this.isSelected = newState;
-        }.bind(this)]);
+        if(this.item.uri) {
+            this.broadCast.emit(BroadCastConstants.SELECT, [this.position, this.item.uri, newState, function() {
+                this.logger.info('enter callback');
+                this.isSelected = newState;
+            }.bind(this)]);
+        }
     }
 
     private generateSampleSize(imageWidth: number, imageHeight: number): number {
@@ -149,20 +151,19 @@ export struct ImageGridItemComponent {
     build() {
         Column() {
             Stack({ alignContent: Alignment.Start }) {
-                Image(this.imageThumbnail)
-                    .alt(this.useAlt ? ((this.item.mediaType == MediaLibraryAccess.MEDIA_TYPE_VIDEO)
-                        ? $r('app.media.alt_video_placeholder') : $r('app.media.alt_placeholder')) : '')
+                Image(this.imageThumbnail ? this.imageThumbnail :
+                    (this.useAlt ? ((this.item.mediaType == MediaLibraryAccess.MEDIA_TYPE_VIDEO) ?
+                    $r('app.media.alt_video_placeholder') : $r('app.media.alt_placeholder')) : ''))
                     .aspectRatio(1)
                     .rotate({ x: 0, y: 0, z: 1, angle: this.useAlt ? 0 : this.item.orientation })
                     .objectFit(ImageFit.Cover)
                     .autoResize(false)
                     .sharedTransition(this.transitionId, {duration:200})
                     .onError(() => {
-                        this.logger.error('alt Image error');
-                        this.useAlt = true;
-                        if (!this.imageThumbnail) {
+                        if(this.item.uri && !this.imageThumbnail) {
                             this.useAlt = true;
                         }
+                        this.logger.error('alt Image error');
                     })
                     .onComplete(() => {
                         this.logger.debug(`Draw the image! ${this.imageThumbnail}`);

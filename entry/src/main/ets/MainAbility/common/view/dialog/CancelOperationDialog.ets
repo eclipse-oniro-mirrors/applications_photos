@@ -55,7 +55,7 @@ export struct CancelOperationDialog {
                 Button() {
                     Text($r('app.string.continue'))
                         .fontColor($r('app.color.color_control_highlight'))
-                        .fontFamily($r('app.string.id_text_font_family_regular'))
+                        .fontWeight(FontWeight.Medium)
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 }
                 .onClick(() => {
@@ -72,6 +72,7 @@ export struct CancelOperationDialog {
                     Text($r('app.string.stop'))
                         .fontColor(Color.Red)
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                        .fontWeight(FontWeight.Medium)
                 }
                 .onClick(() => {
                     this.logger.info('click cancel')

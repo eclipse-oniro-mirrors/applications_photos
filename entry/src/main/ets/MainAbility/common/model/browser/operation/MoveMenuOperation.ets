@@ -24,6 +24,7 @@ import {BroadCastConstants} from '../../common/BroadCastConstants.ets';
 export class MoveMenuOperation extends ProcessMenuOperation {
     logger: Logger = new Logger('MoveMenuOperation');
     albumName: string;
+    displayName: string;
 
     constructor(menuContext: MenuContext) {
         super(menuContext);
@@ -68,9 +69,12 @@ export class MoveMenuOperation extends ProcessMenuOperation {
 
         this.logger.info(`this.albumName.displayName, ${this.albumName}`);
 
-        this.menuContext.broadCast.emit(
-            BroadCastConstants.SHOW_PROGRESS_DIALOG, [$r('app.string.move_progress_message', this.albumName),
+        this.getAlbumDisplayName(this.albumName).then((displayName) =>{
+            this.displayName = displayName
+            this.menuContext.broadCast.emit(
+                BroadCastConstants.SHOW_PROGRESS_DIALOG, [$r('app.string.move_progress_message', this.displayName),
             MediaOperationType.Move, this.cancelFunc.bind(this)]);
+        });
     }
 
     callback(uris: string[]): void {
@@ -90,9 +94,13 @@ export class MoveMenuOperation extends ProcessMenuOperation {
         let batchUris: string[] = this.uris.slice(startIndex, Math.min(endIndex, this.uris.length));
         let operationImpl = BrowserOperationFactory.getFeature(BrowserOperationFactory.TYPE_PHOTO);
 
+        if (batchUris[0] == undefined) {
+            this.onOperateContinue();
+            return;
+        }
         operationImpl.getExistTargetInTargetAlbum(batchUris[0], this.albumName).then((assets) => {
-            if(assets) {
-                if(assets.targetAsset.uri == assets.fileAsset.uri){
+            if (assets) {
+                if (assets.targetAsset.uri == assets.fileAsset.uri) {
                     this.logger.info('move same fileAsset');
                     this.onOperateContinue();
                     return;
@@ -135,7 +143,7 @@ export class MoveMenuOperation extends ProcessMenuOperation {
         this.logger.info('Operate Continue');
         this.isPause = false;
         this.menuContext.broadCast.emit(BroadCastConstants.SHOW_PROGRESS_DIALOG, [$r('app.string.move_progress_message',
-            this.albumName), MediaOperationType.Move, this.cancelFunc.bind(this)]);
+            this.displayName), MediaOperationType.Move, this.cancelFunc.bind(this)]);
         this.cyclicOperation();
     }
 }

@@ -241,6 +241,10 @@ export struct NewAlbumPage {
         this.broadCast.on(BroadCastConstants.JUMP_PHOTO_BROWSER,
             (name: string, item: MediaItem) => {
                 let targetIndex = self.dataSource.getDataIndex(item);
+                if(targetIndex == Constants.NOT_FOUND) {
+                    self.logger.error('targetIndex is not found');
+                    return;
+                }
                 self.logger.info(`jump to photo browser at index: ${targetIndex}`);
                 AppStorage.SetOrCreate(Constants.APP_KEY_PHOTO_BROWSER, self.dataSource);
                 router.push({
@@ -346,8 +350,8 @@ export struct NewAlbumPage {
 
                 ScrollBar({ scroller: this.scroller, direction: ScrollBarDirection.Vertical,
                     state: this.isHideScrollBar? BarState.Off: BarState.Auto }) {
-                    Row(){
-                        if (this.isClickScrollBar){
+                    Row() {
+                        if (this.isClickScrollBar) {
                             Image($r('app.media.scroll_press_light_hdpi'))
                                 .width(40)
                                 .height(69)
@@ -367,9 +371,9 @@ export struct NewAlbumPage {
                 .position({ x:'100%', y:0 })
                 .markAnchor({ x: 40, y: 0 })
                 .onTouch((event: TouchEvent) => {
-                    if(event.type == TouchType.Down){
+                    if (event.type == TouchType.Down) {
                         this.isClickScrollBar = true;
-                    } else if(event.type == TouchType.Down){
+                    } else if (event.type == TouchType.Down) {
                         this.isClickScrollBar = false;
                     }
                 })

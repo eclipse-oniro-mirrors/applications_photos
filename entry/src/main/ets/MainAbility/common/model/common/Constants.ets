@@ -87,6 +87,7 @@ export class Constants {
     static readonly ALBUM_PAGE_INDEX: number = 1;
     static readonly IMAGE_GIF = 'gif';
     static readonly GRID_CACHE_ROW_COUNT: number = 4;
+    static readonly DISTRIBUTED_ALBUM_PAGE_INDEX: number = 3;
 
     // Press animation duration
     static readonly PRESS_ANIM_DURATION = 100;

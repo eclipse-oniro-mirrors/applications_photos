@@ -89,7 +89,7 @@ export struct AlbumSelectGridItemNewStyle {
                 .height('50%')
                 .width('100%')
                 .border({radius: $r('sys.float.ohos_id_corner_radius_default_l')})
-            Column(){
+            Column() {
                 Text(this.item.displayName)
                     .margin({right: $r('app.float.album_set_name_margin_right')})
                     .textOverflow({overflow: TextOverflow.Ellipsis})

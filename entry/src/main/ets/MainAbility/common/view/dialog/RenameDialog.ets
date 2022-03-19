@@ -98,6 +98,7 @@ export struct RenameDialog {
                         Text($r('app.string.no'))
                             .fontSize($r('sys.float.ohos_id_text_size_button1'))
                             .fontColor($r('app.color.color_control_highlight'))
+                            .fontWeight(FontWeight.Medium)
                             .width('50%')
                             .textAlign(TextAlign.Center)
                     }
@@ -117,6 +118,7 @@ export struct RenameDialog {
                         Text($r('app.string.yes'))
                             .fontSize($r('sys.float.ohos_id_text_size_button1'))
                             .fontColor($r('app.color.color_control_highlight'))
+                            .fontWeight(FontWeight.Medium)
                             .width('50%')
                             .textAlign(TextAlign.Center)
                     }
@@ -127,17 +129,17 @@ export struct RenameDialog {
                     .height($r('app.float.details_dialog_button_height'))
                     .onClick(() => {
                         let check = /[\\.\\\\/:*?<>\"|\[\]{}\s]/;
-                        let passCheck = check.test(this.inputName)
-                        if (passCheck){
+                        let passCheck = check.test(this.inputName);
+                        if (passCheck) {
                             UiUtil.showToast($r('app.string.specific_characters_not_supported'));
-                            return
+                            return;
                         }
                         if (this.inputName == this.renameFileName) {
-                            this.controller.close()
-                            return
+                            this.controller.close();
+                            return;
                         }
                         this.dialogCallback && this.dialogCallback.confirmCallback(this.inputName);
-                        this.controller.close()
+                        this.controller.close();
                     })
                 }
             }

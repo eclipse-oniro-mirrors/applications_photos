@@ -230,27 +230,27 @@
     },
     {
       "name": "recycle_single_album_with_photos_tips",
-      "value": "是否删除此相册？（包含 %d 张图片）"
+      "value": "是否删除此相册 （包含 %d 张图片）？"
     },
     {
       "name": "recycle_single_album_with_videos_tips",
-      "value": "是否删除此相册？（包含 %d 个视频）"
+      "value": "是否删除此相册 （包含 %d 个视频）？"
     },
     {
       "name": "recycle_single_album_tips",
-      "value": "是否删除此相册？（包含 %d 张图片， %d 个视频）"
+      "value": "是否删除此相册 （包含 %d 张图片， %d 个视频）？"
     },
     {
       "name": "recycle_albums_with_photos_tips",
-      "value": "是否删除 %d 本相册？（包含 %d 张图片）"
+      "value": "是否删除 %d 本相册 （包含 %d 张图片）？"
     },
     {
       "name": "recycle_albums_with_videos_tips",
-      "value": "是否删除 %d 本相册？（包含 %d 个视频）"
+      "value": "是否删除 %d 本相册 （包含 %d 个视频）？"
     },
     {
       "name": "recycle_albums_tips",
-      "value": "是否删除 %d 本相册？（包含 %d 张图片， %d 个视频）"
+      "value": "是否删除 %d 本相册 （包含 %d 张图片， %d 个视频）？"
     },
     {
       "name": "photo_deleting",
@@ -545,6 +545,14 @@
       "value": "文件保存失败"
     },
     {
+      "name": "copy_failed_single",
+      "value": "复制失败"
+    },
+    {
+      "name": "move_failed_single",
+      "value": "移动失败"
+    },
+    {
       "name": "download_failed_multi",
       "value": "已保存 %d 个，部分文件保存失败"
     },
@@ -751,6 +759,14 @@
     {
       "name": "no_photo_sub_title_album",
       "value": "整理美好记忆，查找更方便"
+    },
+    {
+      "name": "no_distributed_photo_head_title_album",
+      "value": "没有照片和视频"
+    },
+    {
+      "name": "no_distributed_photo_show_image",
+      "value": "请先在对端图库打开大图，再在本端浏览"
     },
     {
       "name": "distribute_album_title_holder",

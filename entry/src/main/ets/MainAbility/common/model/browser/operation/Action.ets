@@ -149,7 +149,7 @@ export class Action {
         id: ActionID.FAVORITE,
         iconRes: $r('app.media.ic_gallery_public_Favorite_filled'),
         textRes: $r('app.string.action_favorite'),
-        fillColor: $r('app.color.icon_highlight_color'),
+        fillColor: $r('app.color.color_system_highlight'),
         actionType: $r('app.string.action_favorite')
     });
 

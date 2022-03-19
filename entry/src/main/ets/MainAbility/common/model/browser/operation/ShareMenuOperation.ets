@@ -52,7 +52,7 @@ export class ShareMenuOperation implements MenuOperation, AsyncCallback<string[]
         this.shareFileAsset();
     }
 
-    shareFileAsset(){
+    shareFileAsset() {
         this.logger.info('shareFileAsset');
         globalThis.photosAbilityContext.startAbility({
             'action': 'com.huawei.intent.action.hwCHOOSER',

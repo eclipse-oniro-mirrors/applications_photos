@@ -150,7 +150,7 @@ export struct Edit {
                         .visibility(this.selectedMode == PhotoEditMode.EDIT_MODE_CROP
                             ? Visibility.Visible : Visibility.None)
                     }
-                    .height(this.isVerticalScreen ? this.imageScale : this.imageScale)
+                    .height(this.imageScale)
                     .width(this.isVerticalScreen ? "100%" : this.imageScaleWidth)
 
                     Column() {

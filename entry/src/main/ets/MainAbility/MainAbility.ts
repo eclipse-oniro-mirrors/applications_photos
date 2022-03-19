@@ -82,6 +82,7 @@ export default class MainAbility extends Ability {
         windowStage.getMainWindow().then((win) => {
             AppStorage.SetOrCreate('mainWindow', win);
         });
+        globalThis.photosWindowStage = windowStage;
     }
 
     onWindowStageDestroy() {

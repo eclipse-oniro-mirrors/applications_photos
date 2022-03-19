@@ -52,26 +52,38 @@ export struct NoPhotoIndexComponent {
                     .margin({
                         bottom: $r('app.float.image_margin_horizontal'),
                     })
-                Text((this.index == Constants.TIMELINE_PAGE_INDEX) ? $r('app.string.no_photo_head_title_timeline')
-                                                                   : $r('app.string.no_photo_head_title_album'))
-                    .fontSize($r('sys.float.ohos_id_text_size_headline8'))
-                    .fontFamily($r('app.string.id_text_font_family_regular'))
-                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                    .margin({
-                        left: $r('app.float.max_padding_start'),
-                        right: $r('app.float.max_padding_start'),
-                        bottom: $r('sys.float.ohos_id_text_paragraph_margin_s'),
-                    })
-                Text((this.index == Constants.TIMELINE_PAGE_INDEX) ? $r('app.string.no_photo_sub_title_timeline')
-                                                                   : $r('app.string.no_photo_sub_title_album'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .fontFamily($r('app.string.id_text_font_family_regular'))
-                    .fontColor($r('sys.color.ohos_id_color_text_secondary'))
-                    .margin({
-                        left: $r('app.float.max_padding_start'),
-                        right: $r('app.float.max_padding_start'),
-                        bottom: $r('sys.float.ohos_id_text_paragraph_margin_s'),
-                    })
+                if (Constants.DISTRIBUTED_ALBUM_PAGE_INDEX == this.index) {
+                    Text($r('app.string.no_distributed_photo_head_title_album'))
+                        .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+                        .fontFamily($r('app.string.id_text_font_family_regular'))
+                        .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                        .margin({
+                            left: $r('app.float.max_padding_start'),
+                            right: $r('app.float.max_padding_start'),
+                            bottom: $r('sys.float.ohos_id_text_paragraph_margin_s'),
+                        })
+                } else {
+                    Text((this.index == Constants.TIMELINE_PAGE_INDEX) ? $r('app.string.no_photo_head_title_timeline')
+                                                                       : $r('app.string.no_photo_head_title_album'))
+                        .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+                        .fontFamily($r('app.string.id_text_font_family_regular'))
+                        .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                        .margin({
+                            left: $r('app.float.max_padding_start'),
+                            right: $r('app.float.max_padding_start'),
+                            bottom: $r('sys.float.ohos_id_text_paragraph_margin_s'),
+                        })
+                    Text((this.index == Constants.TIMELINE_PAGE_INDEX) ? $r('app.string.no_photo_sub_title_timeline')
+                                                                       : $r('app.string.no_photo_sub_title_album'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                        .fontFamily($r('app.string.id_text_font_family_regular'))
+                        .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+                        .margin({
+                            left: $r('app.float.max_padding_start'),
+                            right: $r('app.float.max_padding_start'),
+                            bottom: $r('sys.float.ohos_id_text_paragraph_margin_s'),
+                        })
+                }
             }
             .width('100%')
         }

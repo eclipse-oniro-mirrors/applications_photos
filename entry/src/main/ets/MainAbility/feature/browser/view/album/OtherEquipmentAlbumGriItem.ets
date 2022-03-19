@@ -45,7 +45,7 @@ export struct OtherEquipmentAlbumGriItem {
         this.updateCardSize();
     }
 
-    updateCardSize(){
+    updateCardSize() {
         let sideBarWidth = this.isSidebar ? Constants.TAB_BAR_WIDTH : 0;
         let contentWidth = ScreenManager.getInstance().getWinWidth() - sideBarWidth;
         let maxCardWidth = Constants.ALBUM_SET_COVER_SIZE * Constants.GRID_MAX_SIZE_RATIO;
@@ -93,7 +93,7 @@ export struct OtherEquipmentAlbumGriItem {
             }
 
 
-            Column(){
+            Column() {
                 Text(this.item.deviceName)
                     .margin({right: $r('app.float.album_set_name_margin_right')})
                     .textOverflow({overflow: TextOverflow.Ellipsis})

@@ -206,4 +206,12 @@ export class PhotoDataSource implements IDataSource, LoadingListener {
         // cannot cancel it in unregisterDataChangeListener
         this.albumDataSource && this.albumDataSource.unregisterObserver();
     }
+
+    getPositionByIndex(index: number): number {
+        return this.albumDataSource.getPositionByIndex(index);
+    }
+
+    onChange(changeType) {
+        this.albumDataSource.onChange(changeType);
+    }
 }
