@@ -13,17 +13,6 @@
  * limitations under the License.
  */
 
-import type { MediaObserverCallback } from '../interface/MediaObserverCallback';
-import type { MediaLibDataChangeCallback } from '../interface/MediaLibDataChangeCallback';
-
-export class CommonObserverCallback implements MediaObserverCallback {
-    private source: MediaLibDataChangeCallback;
-
-    constructor(source: MediaLibDataChangeCallback) {
-        this.source = source;
-    }
-
-    onChange(mediaType: string): void {
-        this.source.onMediaLibDataChange(mediaType);
-    }
+export interface MediaLibDataChangeCallback {
+    onMediaLibDataChange(mediaType: string): void;
 }
