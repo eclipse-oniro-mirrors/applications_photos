@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
-export { Constants } from './src/main/ets/model/Constants';
+export { TimelinePage } from './src/main/ets/view/TimelinePage';
 
-export { GetTimelineDataCallback } from './src/main/ets/model/GetTimelineDataCallback';
+export { TimelinePageActionBar } from './src/main/ets/view/TimelinePageActionBar';
 
-export { TimelineDataSource } from './src/main/ets/model/TimelineDataSource';
+export { TimelinePageToolBar } from './src/main/ets/view/TimelinePageToolBar';
 
-export { TimelineDataSourceManager } from './src/main/ets/model/TimelineDataSourceManager';
+export { TimelineScrollBar } from './src/main/ets/view/TimelineScrollBar';
+
+export { TimelineTitleComponent } from './src/main/ets/view/TimelineTitleComponent';
