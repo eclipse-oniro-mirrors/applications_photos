@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
-import AbilityStage from '@ohos.app.ability.AbilityStage';
+export { TimelinePage } from './src/main/ets/view/TimelinePage';
 
-export default class PhotosAbilityStage extends AbilityStage {
-  onCreate() {
-    AppStorage.setOrCreate('photosGlobalContext', this.context);
-  }
-}
+export { TimelinePageActionBar } from './src/main/ets/view/TimelinePageActionBar';
+
+export { TimelinePageToolBar } from './src/main/ets/view/TimelinePageToolBar';
+
+export { TimelineScrollBar } from './src/main/ets/view/TimelineScrollBar';
+
+export { TimelineTitleComponent } from './src/main/ets/view/TimelineTitleComponent';
