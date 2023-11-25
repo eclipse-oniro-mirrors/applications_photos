@@ -527,8 +527,6 @@ export struct TimelinePage {
                                         })
                                     }
                                     .aspectRatio(1)
-                                    .columnStart((item as LazyItem<MediaDataItem>).get().index % this.gridRowCount)
-                                    .columnEnd((item as LazyItem<MediaDataItem>).get().index % this.gridRowCount)
                                 }
                             }, (item) => {
                                 if (item == null || item.get() == null) {
