@@ -325,6 +325,14 @@ struct PhotoBrowser {
             this.isToEdit = false;
         }
         this.currentIndex = this.isToEdit ? 0 : index;
+        if (this.currentIndex === 0) {
+            this.browserDataSource.reloadGroupItemData(false).then(() => {
+                this.browserDataSource.notifyDataReload();
+            })
+        }
+        if (this.currentIndex === -1) {
+            this.onBackPress();
+        }
         this.updateActionBar();
     }
 
