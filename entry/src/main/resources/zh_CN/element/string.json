@@ -550,7 +550,7 @@
     },
     {
       "name": "specific_characters_not_supported",
-      "value": "不支持\".\\\/:*?<>|[]{}"
+      "value":"不支持 ' ` \" . \\ / : * ? < > | [ ] { }"
     },
     {
       "name": "Maximum_length_reached",
