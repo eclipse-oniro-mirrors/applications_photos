@@ -555,7 +555,7 @@
     },
     {
       "name": "specific_characters_not_supported",
-      "value": "\".\\\/:*?<>|[]{} are not supported"
+      "value":"' ` \" . \\ / : * ? < > | [ ] { } are not supported."
     },
     {
       "name": "Maximum_length_reached",
