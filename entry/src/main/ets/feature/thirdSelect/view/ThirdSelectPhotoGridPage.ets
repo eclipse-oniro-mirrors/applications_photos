@@ -200,6 +200,9 @@ struct ThirdSelectPhotoGridPage {
         if (!this.isActive) {
             Log.info(TAG, 'onActive');
             this.isActive = true;
+            this.groupDataSource.reloadGroupItemData(true).then((isEmpty: boolean) => {
+                this.groupDataSource.notifyDataReload();
+            })
         }
     }
 
