@@ -187,6 +187,7 @@ export struct TimelinePage {
         this.appBroadcast.off(BroadcastConstants.RESET_STATE_EVENT, null);
         this.appBroadcast.off(BroadcastConstants.UPDATE_DATA_SOURCE, null);
         this.appBroadcast.off(BroadcastConstants.RESET_ZERO, null);
+        this.appBroadcast.off(BroadcastConstants.TIMELINE_TITLE_SELECT, null);
         screenManager.off(screenManager.ON_WIN_SIZE_CHANGED, this.onWindowSizeChangeCallBack);
         this.onWindowSizeChangeCallBack = null;
         mediaObserver.unregisterObserver(this.dataObserver);
@@ -478,11 +479,16 @@ export struct TimelinePage {
         }
     }
 
+    isTimelineTitleSelected () {
+        this.isMediaLibDataChanged = true;
+    }
+
     // The callback when current page is in the foreground
     onActive() {
         if (!this.isActive) {
             Log.info(TAG, 'onActive');
             this.isActive = true;
+            this.appBroadcast.on(BroadcastConstants.TIMELINE_TITLE_SELECT, this.isTimelineTitleSelected.bind(this));
         }
         this.loadItem();
     }
