@@ -76,6 +76,10 @@ export class MoveMenuOperation extends ProcessMenuOperation {
 
     private async moveOne(item: MediaDataItem) {
         let fileAsset = await item.loadFileAsset();
+        if (!fileAsset) {
+            this.onOperateContinue();
+            return;
+        }
         let assets = await this.getFileCopyOrMoveInfo(fileAsset, this.albumInfo);
         if (assets.targetAsset) {
             if (assets.targetAsset.uri == assets.sourceAsset.uri) {
