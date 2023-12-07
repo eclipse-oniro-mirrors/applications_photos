@@ -156,6 +156,7 @@ struct SelectPhotoBrowser {
         this.isSelected = currentPhoto.isSelect;
         this.totalSelectedCount = this.browserDataSource.getSelectedCount();
         this.appBroadcast.emit(BroadcastConstants.UPDATE_DATA_SOURCE, [currentPhoto]);
+        this.appBroadcast.emit(BroadcastConstants.TIMELINE_TITLE_SELECT, []);
         Log.info(TAG, `totalSelectedCount: ${this.totalSelectedCount} after state change`);
     }
 

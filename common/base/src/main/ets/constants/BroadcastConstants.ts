@@ -30,6 +30,7 @@ export class BroadcastConstants {
     static readonly SHOW_DETAIL_DIALOG = 'showDetailDialog';
     static readonly SHOW_MULTI_SELECT_DIALOG = 'showMultiSelectDialog';
     static readonly UPDATE_DATA_SOURCE = 'updateDataSource';
+    static readonly TIMELINE_TITLE_SELECT = 'timelineTitleSelect';
     static readonly SHOW_PROGRESS_DIALOG = 'showProgressDialog';
     static readonly DELETE_PROGRESS_DIALOG = 'deleteProgressDialog';
     static readonly CANCEL_OPERATE = 'cancelOperate';
