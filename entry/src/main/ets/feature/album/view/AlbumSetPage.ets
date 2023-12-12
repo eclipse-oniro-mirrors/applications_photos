@@ -226,7 +226,7 @@ export struct AlbumSetPage {
 
     aboutToDisappear(): void {
         Log.info(TAG, `aboutToDisappear`);
-        // screenManager.setNavigationBarColor('#00FFFFFF', '#FF000000');
+        screenManager.setNavigationBarColor('#00FFFFFF', '#FF000000');
         this.broadCast.off(null, null);
         this.appBroadcast.off(BroadcastConstants.BACK_PRESS_EVENT, null);
         this.appBroadcast.off(BroadcastConstants.ON_TAB_CHANGED, null);
@@ -252,7 +252,6 @@ export struct AlbumSetPage {
     }
 
     createAlbum() {
-        screenManager.setNavigationBarColor('#FFF1F3F5', '#FF000000');
         let newAlbum = AppStorage.Get<boolean>(Constants.APP_KEY_NEW_ALBUM);
         if (newAlbum) {
             AppStorage.Delete(Constants.APP_KEY_NEW_ALBUM);
