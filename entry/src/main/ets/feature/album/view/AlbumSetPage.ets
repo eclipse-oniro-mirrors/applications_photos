@@ -226,6 +226,7 @@ export struct AlbumSetPage {
 
     aboutToDisappear(): void {
         Log.info(TAG, `aboutToDisappear`);
+        // screenManager.setNavigationBarColor('#00FFFFFF', '#FF000000');
         this.broadCast.off(null, null);
         this.appBroadcast.off(BroadcastConstants.BACK_PRESS_EVENT, null);
         this.appBroadcast.off(BroadcastConstants.ON_TAB_CHANGED, null);
@@ -239,6 +240,7 @@ export struct AlbumSetPage {
     // Callback when the page is show.
     onIndexPageShow() {
         Log.info(TAG, `onIndexPageShow`);
+        screenManager.setNavigationBarColor('#FFF1F3F5', '#FF000000');
         if (this.isShow && this.isInCurrentTab) {
             this.onActive();
             this.createAlbum();
@@ -250,6 +252,7 @@ export struct AlbumSetPage {
     }
 
     createAlbum() {
+        screenManager.setNavigationBarColor('#FFF1F3F5', '#FF000000');
         let newAlbum = AppStorage.Get<boolean>(Constants.APP_KEY_NEW_ALBUM);
         if (newAlbum) {
             AppStorage.Delete(Constants.APP_KEY_NEW_ALBUM);
@@ -318,6 +321,7 @@ export struct AlbumSetPage {
     }
 
     onTabChanged(index: number): void {
+        screenManager.setNavigationBarColor('#FFF1F3F5', '#FF000000');
         if (index == Constants.ALBUM_PAGE_INDEX) {
             this.isInCurrentTab = true;
             this.onActive();
