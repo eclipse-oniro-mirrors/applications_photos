@@ -41,6 +41,7 @@ struct VideoBrowser {
 
     onBackPress() {
         Log.info(this.TAG, 'onBackPress');
+        screenManager.setNavigationBarColor('#FFF1F3F5', '#FF000000');
         router.back();
         return true;
     }
