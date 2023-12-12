@@ -305,6 +305,7 @@ struct PhotoBrowser {
             this.isShowBar = false;
             this.browserBackgroundColor = $r('app.color.black');
             screenManager.setSystemUi(false);
+            screenManager.setNavigationBarColor('#00FFFFFF', '#FF000000');
         }
     }
 
@@ -514,6 +515,7 @@ struct PhotoBrowser {
 
     aboutToDisappear(): void {
         Log.info(TAG, 'aboutToDisappear');
+        screenManager.setNavigationBarColor('#00FFFFFF', '#FF000000');
         if (!this.isShowBar) {
             screenManager.setSystemUi(true);
         }
@@ -533,6 +535,7 @@ struct PhotoBrowser {
         Log.info(TAG, 'photoBrowser aboutToAppear');
         AppStorage.SetOrCreate("isDelete", 0);
         AppStorage.SetOrCreate("isLeftSwiper", 0);
+        screenManager.setNavigationBarColor('#FFF1F3F5', '#FF000000');
         this.hasAppeared = true;
         mMultimodalInputManager.registerListener((control: number) => {
             Log.info(TAG, `key control: ${control} index ${this.currentIndex}`);
