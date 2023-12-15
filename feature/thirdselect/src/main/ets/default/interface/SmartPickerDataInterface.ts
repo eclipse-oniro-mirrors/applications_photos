@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,13 @@
  * limitations under the License.
  */
 
-export interface AsyncCallback<T> {
-  callback(t: T, param?: string): void;
+import { RecommendationOptions } from '../common/SmartPickerManager';
+import SmartPickerRecommendInfo from '../common/SmartPickerRecommendInfo';
+
+export interface SmartPickerDataInterface {
+  getTabInfoList(recommendationOptions: RecommendationOptions, param?: any): Promise<Array<SmartPickerRecommendInfo>>;
+
+  getData(callback: any, param: any): void;
+
+  getDataCount(callback: any, param: any): Promise<number>;
 }
