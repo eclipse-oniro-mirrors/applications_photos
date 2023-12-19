@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
-export interface AsyncCallback<T> {
-  callback(t: T, param?: string): void;
+import type SmartPickerDataAdapter from './SmartPickerDataAdapter';
+import type SmartPickerRecommendInfo from './SmartPickerRecommendInfo';
+
+export default interface SmartPickerRecommendInfoListener {
+  onPickerRecommendInfoListReady(smartPickerRecommendInfoList: Array<SmartPickerRecommendInfo>, dataAdapter: SmartPickerDataAdapter): void;
+
+  onDataChanged(smartPickerRecommendInfo: SmartPickerRecommendInfo): void;
 }
