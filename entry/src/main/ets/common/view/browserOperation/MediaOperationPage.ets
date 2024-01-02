@@ -52,18 +52,18 @@ struct MediaOperationPage {
     private scroller: Scroller = new Scroller();
 
     aboutToAppear(): void {
-        let blackList = Array.from(MediaConstants.ALBUM_DISABLE_COPY_LIST)
+        let excludeBlackList = Array.from(MediaConstants.ALBUM_DISABLE_COPY_LIST)
         let param = router.getParams();
         if (param) {
             this.pageType = param.pageType.toString();
             if (param.albumInfo) {
                 this.albumInfo = JSON.parse(param.albumInfo.toString()) as SimpleAlbumDataItem;
                 this.sourceAlbumId = this.albumInfo.id;
-                blackList.push(this.sourceAlbumId)
+                excludeBlackList.push(this.sourceAlbumId)
                 Log.info(TAG, `router getParams pageType:${this.pageType},Album:${this.sourceAlbumId}`);
             }
         }
-        this.albumsDataSource.setBlackList(blackList)
+        this.albumsDataSource.setBlackList(excludeBlackList)
         this.onActive();
         this.loadAlbums()
         this.onMenuClicked = this.onMenuClicked.bind(this);

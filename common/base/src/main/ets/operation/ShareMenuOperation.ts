@@ -45,10 +45,10 @@ export class ShareMenuOperation implements MenuOperation {
     shareFileAsset() {
         Log.info(TAG, 'shareFileAsset');
         let want: Want = {
-            'action': 'com.huawei.intent.action.hwCHOOSER',
+            'action': 'com.action.hwCHOOSER',
             'parameters': {
-                'ability.want.params.INTENT': {
-                    'action': 'ability.intent.SEND_DATA',
+                'ability.want.params': {
+                    'action': 'ability.SEND_DATA',
                     'type': '*/*',
                     'parameters': {
                         'ability.params.stream': this.uris

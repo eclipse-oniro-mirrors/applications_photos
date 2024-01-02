@@ -23,12 +23,12 @@ import { QueryConstants } from '../constants/QueryConstants';
 const TAG = "AlbumDataImpl"
 
 export class AlbumDataImpl {
-    private blackList: string[] = [];
+    private excludeBlackList: string[] = [];
     private selectType: number = MediaConstants.SELECT_TYPE_ALL;
     private deviceId: string = '';
 
-    setBlackList(blackList: string[]) {
-        this.blackList = blackList;
+    setBlackList(excludeBlackList: string[]) {
+        this.excludeBlackList = excludeBlackList;
     }
 
     setSelectType(selectType: number) {
@@ -59,7 +59,7 @@ export class AlbumDataImpl {
         let albums: MediaLib.Album[] = await mediaModel.getAlbums(fetchOption);
         for (let i = 0;i < albums.length; i++) {
             let album: MediaLib.Album = albums[i];
-            if (this.blackList.indexOf(album.albumId.toString()) >= 0) {
+            if (this.excludeBlackList.indexOf(album.albumId.toString()) >= 0) {
                 continue;
             }
             let fetchFileResult: MediaLib.FetchFileResult = await album.getFileAssets();
@@ -80,7 +80,7 @@ export class AlbumDataImpl {
     }
 
     private async getAlbumItem(id: string, albumDataItems: AlbumDataItem[]): Promise<void> {
-        if (this.blackList.indexOf(id) >= 0) {
+        if (this.excludeBlackList.indexOf(id) >= 0) {
             Log.debug(TAG, `no need as in black list`);
             return;
         }
@@ -136,7 +136,7 @@ export class AlbumDataImpl {
     private async addAlbumDataItem(albumDataItems: AlbumDataItem[], albums: MediaLib.Album[]) {
         for (let i = 0;i < albums.length; i++) {
             let album: MediaLib.Album = albums[i];
-            if (this.blackList.indexOf(album.albumId.toString()) >= 0) {
+            if (this.excludeBlackList.indexOf(album.albumId.toString()) >= 0) {
                 continue;
             }
             let fetchFileResult: MediaLib.FetchFileResult = await album.getFileAssets();

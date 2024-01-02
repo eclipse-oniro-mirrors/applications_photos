@@ -24,8 +24,8 @@ export class AlbumsDataSource extends ItemDataSource {
     private albumDataItems: AlbumDataItem[] = [];
     private albumDataImpl: AlbumDataImpl = new AlbumDataImpl();
 
-    setBlackList(blackList: string[]) {
-        this.albumDataImpl.setBlackList(blackList);
+    setBlackList(excludeBlackList: string[]) {
+        this.albumDataImpl.setBlackList(excludeBlackList);
     }
 
     setSelectType(selectType: number) {

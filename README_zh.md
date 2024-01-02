@@ -202,9 +202,6 @@
 
 ![](./figures/signature_3.png)
 
-使用的SDK 3.2.2.5版本编译master仓代码，在/entry/package.json里手动触发npm install
-![](D:\workspace\readme\applications_photos\figures\npm.png)
-
 ### 打包
 DevEco Studio 支持 debug 与 release 两种打包类型。可以在 OhosBuild Variants 窗口中进行切换。
 
@@ -248,7 +245,7 @@ DevEco Studio 支持 debug 与 release 两种打包类型。可以在 OhosBuild 
 
 ![](./figures/cmd3.png)
 
-首次安装需要卸载系统自带的图库
+刷完版本后安装需要卸载系统自带的图库
 
 ```html
 hdc shell mount -o remount,rw /
@@ -323,7 +320,7 @@ hilog | grep Album
    ![](./figures/commit_source_forked_repo.png)
 
 ### 提交代码
-1. 访问我们自己在码云账号上 fork 的代码仓库，点击“克隆/下载”按钮，选择 SSH，点击“复制”按钮。
+1. fork代码到自己的代码仓库，点击“克隆/下载”按钮，点击“复制”按钮。
    ![](./figures/commit_source_clone_page.png)
 
 2. 在本地新建 Photos 目录，在 Photos 目录中执行如下命令
@@ -335,12 +332,12 @@ hilog | grep Album
 
    > 将代码引入工程，以及编译工程等相关内容请参见 **3. 代码使用** 部分的相关内容。
 4. 提交代码到 fork 仓库。  
-   > 修改后的代码，首先执行 `git add` 命令，然后执行 `git commit` 命令与 `git push` 命令，将代码 push 到我们自己的 fork 仓中。
+   > 修改后的代码，首先执行 `git add` 命令，然后执行 `git commit` 命令与 `git push` 命令，将代码 push 到 fork 仓中。
    > 关于代码提交的这部分内容涉及 git 的使用，可以参照 [git官网](https://git-scm.com/) 的内容，在此不再赘述。
    > 注意事项：需要使用commit -s,暴露提交者信息，否则门禁不通过
 
 ### 发起 Pull Request (PR)
-在将代码提交到 fork 仓之后，我们可以通过发起 Pull Request（PR）的方式来为 OpenHarmony 的相关项目贡献代码。
+在将代码提交到 fork 仓之后，可以通过发起 Pull Request（PR）的方式来为 OpenHarmony 的相关项目贡献代码。
 
 1. 打开 fork 仓库。选择 `Pull Requests` → `新建 Pull Request`
 
