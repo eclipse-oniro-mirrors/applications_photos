@@ -29,6 +29,8 @@ const TAG: string = 'common_BatchDeleteMenuOperation';
 
 export class BatchDeleteMenuOperation extends ProcessMenuOperation {
   private isTrash = true;
+  // Number of data operated in a batch
+  readonly BATCH_SIZE: number = 100;
 
   constructor(menuContext: MenuContext) {
     super(menuContext);
@@ -105,7 +107,7 @@ export class BatchDeleteMenuOperation extends ProcessMenuOperation {
     }
     this.currentBatch++;
     let startIndex: number = (this.currentBatch - 1) * this.BATCH_SIZE;
-    let endIndex: number = this.currentBatch * this.BATCH_SIZE;
+    let endIndex: number = Math.min(this.currentBatch * this.BATCH_SIZE, this.count);
     let batchUris: Array<string> = new Array();
     for (let index = startIndex; index < endIndex; index++) {
       batchUris.push(this.uris[index]);
