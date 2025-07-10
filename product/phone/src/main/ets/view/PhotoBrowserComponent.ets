@@ -401,7 +401,7 @@ export struct PhotoBrowserComponent {
     } else {
       let timelineIndex = this.dataSource.getPositionByIndex(index);
       AppStorage.setOrCreate<number>('placeholderIndex', timelineIndex);
-      this.geometryTransitionId = this.browserController.pageFrom + currentPhoto.getHashCode() + 'false';
+      this.geometryTransitionId = this.browserController.pageFrom + currentPhoto.getHashCode?.() + 'false';
       AppStorage.setOrCreate<string>('geometryTransitionBrowserId', this.geometryTransitionId);
       Log.debug(TAG, `onPhotoChanged, index: ${index}, currentPhoto: ${currentPhoto.uri}, \
         placeholderIndex ${AppStorage.get<number>('placeholderIndex') as number},\
