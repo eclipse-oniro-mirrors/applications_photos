@@ -14,8 +14,11 @@
  */
 
 #include "CustomCropFilter.h"
-#include "../../../../libs/SecureC/include/securec.h"
-#include <sstream>
+
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+
 #include "log/HmcLog.h"
 #include "ohos/util/PixelmapUtil.h"
 #include <multimedia/image_effect/image_effect_filter.h>
@@ -65,7 +68,7 @@ void ApplyCustomAlgo(EffectBufferInfo& src, EffectBufferInfo& dst, FilterInfo& f
     dst.rowSize = dst.width * bytesPerPixel;
     dst.format = src.format;
     dst.addr = malloc(dst.rowSize * dst.height);
-    memset_s(dst.addr, dst.rowSize * dst.height, 0, dst.rowSize * dst.height);
+    memset(dst.addr, 0, dst.rowSize * dst.height);
 
     LOGI("CustomCropFilter ApplyCustomAlgo %d %d %d", dst.width, dst.height, dst.rowSize);
     float centerX = viewportX / 2.0f;
@@ -174,8 +177,26 @@ bool Render(OH_EffectFilter *filter, OH_EffectBufferInfo *info, OH_EffectFilterD
     filterInfo.ratioX = value.dataValue.floatValue;
     OH_EffectFilter_GetValue(filter, "ratioY", &value);
     filterInfo.ratioY = value.dataValue.floatValue;
-    
-    LOGI("CustomCropFilter Render ApplyCustomAlgo");
+    OH_EffectFilter_GetValue(filter, "rotationZ", &value);
+    if (value.dataType == ImageEffect_DataType::EFFECT_DATA_TYPE_DOUBLE) {
+        filterInfo.rotationZ = static_cast<float>(value.dataValue.doubleValue);
+    } else {
+        filterInfo.rotationZ = value.dataValue.floatValue;
+    }
+    OH_EffectFilter_GetValue(filter, "cropRotate", &value);
+    if (value.dataType == ImageEffect_DataType::EFFECT_DATA_TYPE_DOUBLE) {
+        filterInfo.cropRotate = static_cast<float>(value.dataValue.doubleValue);
+    } else {
+        filterInfo.cropRotate = value.dataValue.floatValue;
+    }
+    ImageEffect_Any dragValue;
+    memset(&dragValue, 0, sizeof(ImageEffect_Any));
+    OH_EffectFilter_GetValue(filter, "isDragImage", &dragValue);
+    if (dragValue.dataType == ImageEffect_DataType::EFFECT_DATA_TYPE_INT32) {
+        filterInfo.isDragImage = dragValue.dataValue.int32Value != 0;
+    } else if (dragValue.dataType == ImageEffect_DataType::EFFECT_DATA_TYPE_BOOL) {
+        filterInfo.isDragImage = dragValue.dataValue.boolValue;
+    }
     
     EffectBufferInfo outputBufferInfo;
     // 调用自定义滤镜算法。

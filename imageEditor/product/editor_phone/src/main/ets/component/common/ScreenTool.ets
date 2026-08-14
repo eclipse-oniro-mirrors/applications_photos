@@ -69,6 +69,11 @@ export struct ScreenTool {
   @State @Watch('screenToolAreaChange') screenClass: ScreenClass = App.getInstance().screenClass;
   @StorageProp(SCREEN_ORIENTATION_PORTRAIT) isScreenPortrait: boolean = ScreenManager.getInstance().isScreenPortrait();
 
+  private isCropOverlayTab(): boolean {
+    return this.editor.tabIndex === TabName.TabAdjust && this.editor.asset.isShowCropRect;
+  }
+
+
   screenToolAreaChange() {
     let isSplitMode: boolean = ScreenManager.getInstance().isSplitMode();
     let isScreenPortrait = ScreenManager.getInstance().isScreenPortrait();
