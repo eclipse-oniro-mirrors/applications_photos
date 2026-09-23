@@ -266,6 +266,7 @@ protected:
     INT32 m_firstFilterIndex{-1};
     INT32 m_restoredFilterCount{0};
     bool m_isSurfaceOutput = false;
+    bool m_needFlush = false;
     
 private:
     RenderType m_renderType;

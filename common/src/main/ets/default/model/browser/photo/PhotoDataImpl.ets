@@ -100,15 +100,8 @@ export class PhotoDataImpl extends BrowserDataImpl {
       let mediaItem: MediaItem = new MediaItem(item);
       // 这里不直接依赖 TimeLineModelManager 类型，避免引入额外耦合。
       const timeLineManager = AppStorage.get('TimeLineModelManager') as TimeLineManagerLike | undefined;
-      let isOpenYearMonth: boolean = timeLineManager?.isOpenYearMonthTimeLine?.() ?? false;
-      const isLongImage = ImageUtil.isLongImage(mediaItem.width, mediaItem.height);
-      if (isOpenYearMonth && isLongImage) {
-        mediaItem.setThumbnail(ImageUtil.getThumbnailJpgUriWithSize(mediaItem.uri, mediaItem.path, mediaItem.getDateModified(),
-          256, 256, mediaItem.getThumbnailReady()));
-      } else {
-        mediaItem.setThumbnail(this.getThumbnailUri(mediaItem.uri, mediaItem.path, mediaItem.getDateModified(),
-          mediaItem.getThumbnailReady()));
-      }
+      mediaItem.setThumbnail(this.getThumbnailUri(mediaItem.uri, mediaItem.path, mediaItem.getDateModified(),
+        mediaItem.getThumbnailReady()));
       mediaItem.setDetailTimeString(String(item.get(photoAccessHelper.PhotoKeys.DETAIL_TIME.toString()))) ;
       mediaItemList.push(mediaItem);
     }

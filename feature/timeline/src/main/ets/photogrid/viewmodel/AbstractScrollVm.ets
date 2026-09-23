@@ -648,7 +648,9 @@ export abstract class AbstractScrollVm extends AbstractFormVm {
           this.firstAddressMediaItem.resetSubLocalityAddress();
         }
         subLocalityAddress = await this.loadSubLocalityAddress(dataIndex);
-        gpsCoordinate = await this.loadGpsCoordinate(dataIndex);
+        if (this.firstAddressMediaItem.mediaType !== UserFileManagerAccess.MEDIA_TYPE_VIDEO) {
+          gpsCoordinate = await this.loadGpsCoordinate(dataIndex);
+        }
       } else {
         // 拖动滚动条时滑窗不更新，会导致获取不到对应Index的MediaItem，此时获取SimpleGridMediaItem
         LogUtils.info(this.tag, `findAddress from SimpleGridMediaItem:${dataIndex}`);
