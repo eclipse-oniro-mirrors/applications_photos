@@ -944,12 +944,17 @@ export class MediaItem {
       Log.info(TAG, 'getGpsCoordinateStatic null:' + this.dateDay);
       return '';
     }
+    if (this.mediaType === UserFileManagerAccess.MEDIA_TYPE_VIDEO) {
+      Log.info(TAG, 'getGpsCoordinateStatic skip video:' + this.dateDay);
+      return '';
+    }
     const fd: number = await this.data.open('R');
     if (fd <= 0) {
       return '';
     }
+    let imageSource: image.ImageSource | undefined;
     try {
-      const imageSource: image.ImageSource = image.createImageSource(fd);
+      imageSource = image.createImageSource(fd);
       const longitude: string = await imageSource.getImageProperty(image.PropertyKey.GPS_LONGITUDE);
       const latitude: string = await imageSource.getImageProperty(image.PropertyKey.GPS_LATITUDE);
       const longitudeRef: string = await imageSource.getImageProperty(image.PropertyKey.GPS_LONGITUDE_REF);
@@ -963,6 +968,9 @@ export class MediaItem {
     } catch (e) {
       Log.error(TAG, `getGpsCoordinateStatic failed: ${e?.message}`, e?.stack);
     } finally {
+      if (imageSource) {
+        await imageSource.release();
+      }
       await this.data.close(fd);
     }
     return '';

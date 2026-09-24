@@ -51,12 +51,11 @@
 ```
 applications_photos/
 ├── AppScope/                      # 应用级 app.json5 等（包名、版本、图标）
-├── product/phone/                 # 手机/平板 entry：主 HAP、Ability、主页面入口
+├── product/phone/                 # 手机 entry：主 HAP、Ability、主页面入口
 ├── common/                        # 全局公共：模型、权限、视图与 VM 等
 ├── feature/                       # 各业务特性 HSP/HAR（浏览、时间线、选图、隐私…）
 ├── browserCommon/                 # 浏览公共逻辑
 ├── browserCommonPhone/            # 手机端浏览差异与控制器等
-├── browserCommonPC/               # PC 端浏览（手机开发一般少改）
 ├── imageEditor/                   # 图片编辑子工程（含 editor_phone）
 ├── tools/                         # 工具模块
 ├── demo/                          # 示例工程（如 PhotoPicker demo）
@@ -95,7 +94,7 @@ product/phone/src/main/
     └── resources/                         # 模块内嵌资源（如 lottie/json）
 ```
 
-### 3. 公共模块 `common`（手机与特性共用）
+### 3. 公共模块 `common`
 
 路径：`common/src/main/ets/`。手机端大量页面与逻辑依赖此处的模型与组件。
 

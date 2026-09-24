@@ -274,12 +274,13 @@ std:
         return;
     }
     m_ready = FALSE;
+    window_ = nullptr;
     if (m_lastExportTaskFuture.valid()) {
         m_lastExportTaskFuture.wait();
     }
     if (m_renderThread) {
         auto weakThis = weak_from_this();
-        auto task = std::make_shared<RenderTask<>>([weakThis]() {
+        auto task = std::make_shared<RenderTask<>>([weakThis]() { 
                 auto strong = weakThis.lock();
                 if (strong == nullptr) {
                     LOGE("HmcRenderEngine::Destroy strong is nullptr.");
@@ -298,6 +299,7 @@ std:
     }
     std::lock_guard<std::mutex> locker(m_waterMarkMtx);
     m_watermarkCache.clear();
+    m_effectGlobalCache.clear();
     LOGI("[Render] Engine %ld destroy end!", m_id);
 }
 
@@ -308,7 +310,7 @@ VOID HmcRenderEngine::InitEnv(std::string const & editData)
     if (m_renderThread == NULL) {
         // 自动回收纹理资源
         auto weakThis = weak_from_this();
-        auto func = [weakThis]() {
+        auto func = [weakThis, editData]() {
             auto strong = weakThis.lock();
             if (strong == nullptr) {
                 LOGE("HmcRenderEngine::InitEnv1 strong is nullptr.");
@@ -318,6 +320,10 @@ VOID HmcRenderEngine::InitEnv(std::string const & editData)
                 int temp = 1;
                 ConfigValue(strong->mImageEffect, &temp, CONFIG_TEXTURE_RESIZE_TEX_CACHE_FUNCTION,
                     ImageEffect_DataType::EFFECT_DATA_TYPE_INT32);
+            }
+            if (strong->m_needFlush) {
+                strong->RestoreImageEffect(editData);
+                strong->m_needFlush = false;
             }
         };
         m_renderThread = new RenderThread<>(RENDER_QUEUE_SIZE, func);
@@ -549,13 +555,8 @@ std:
                 }
             }
 
-            strong->RemoveFilters();
             for (auto &layerInfo : *layers) {
                 images.emplace_back(strong->ConfigRenderInfo(layerInfo, nullptr, TYPE_PREVIEW, previewCanvas, 0));
-            }
-            if (!strong->mIsHMCRenderEnable && !strong->m_isSurfaceOutput) {
-                strong->m_isSurfaceOutput = true;
-                OH_ImageEffect_SetOutputSurface(strong->mImageEffect, static_cast<OHNativeWindow *>(strong->window_));
             }
         
             OH_PixelmapNative *outPixelMap = strong->GenerateOutputPixelmap(layers, previewCanvas, 0, taskId);
@@ -589,7 +590,9 @@ std:
 
             OH_ImageEffect_RemoveFilter(strong->mImageEffect, "CustomCropFilter");
             OH_ImageEffect_SetInputPixelmap(strong->mImageEffect, outPixelMap);
-            OH_ImageEffect_SetOutputSurface(strong->mImageEffect, static_cast<OHNativeWindow *>(strong->window_));
+            if (strong->window_ != nullptr) {
+                OH_ImageEffect_SetOutputSurface(strong->mImageEffect, static_cast<OHNativeWindow *>(strong->window_));
+            }
             
             OH_HiTrace_StartTrace("ImageEditorRenderDraw");
             LOGD("[Render]Draw Frame OH_ImageEffect_Start start");
@@ -602,6 +605,9 @@ std:
             }
             OH_HiTrace_FinishTrace();
             images.clear();
+            OH_PixelmapNative_Release(outPixelMap);
+            strong->RemoveFilters();
+            strong->m_needFlush = true;
             LOGD("[Render]Draw Frame running end, id: %ld, taskId: %d", id, taskId);
         },
         PREVIEW_TASK_TAG, taskId);
@@ -744,6 +750,7 @@ std:
                 OH_PixelmapNative *outPixelMap = strong->GenerateOutputPixelmap(layers, cvs, param.exportType, taskId);
                 OH_PictureNative* outPicture;
                 OH_PictureNative_CreatePicture(outPixelMap, &outPicture);
+                OH_PixelmapNative_Release(outPixelMap);
                 prom->set_value(param.func(outPicture, cvs.canvasWidth_, cvs.canvasHeight_, param.id));
             }
             images.clear();
@@ -836,6 +843,7 @@ OH_PixelmapNative *HmcRenderEngine::CreateOutputPixelmap(SHARED_PTR<VECTOR<HmcRe
     }
 
     OH_PictureNative *outPicture = CopyPicture(inPicture, w, h, false, exportType != 1);
+    inPicture = nullptr;
     if (outPicture == nullptr) {
         LOGE("CreateOutputPicture outPicture is nullptr");
         return nullptr;
@@ -845,6 +853,8 @@ OH_PixelmapNative *HmcRenderEngine::CreateOutputPixelmap(SHARED_PTR<VECTOR<HmcRe
     OH_PixelmapNative* outPixelMap = nullptr;
     OH_PictureNative_GetMainPixelmap(outPicture, &outPixelMap);
     OH_ImageEffect_SetOutputPixelmap(mImageEffect, outPixelMap);
+    
+    OH_PictureNative_Release(outPicture);
     
     m_isSurfaceOutput = false;
     return outPixelMap;
@@ -872,6 +882,7 @@ OH_PictureNative *HmcRenderEngine::CreateOutputPicture(SHARED_PTR<VECTOR<HmcRend
     }
     
     OH_PictureNative *outPicture = CopyPicture(inPicture, w, h, false, exportType != 1);
+    inPicture = nullptr;
     if (outPicture == nullptr) {
         LOGE("CreateOutputPicture outPicture is nullptr");
         return nullptr;
@@ -1243,11 +1254,13 @@ bool HmcRenderEngine::SetInputPixelMap(std::shared_ptr<Image> &image, RenderEngi
 
     OH_PixelmapNative* pixelMap = nullptr;
     OH_PictureNative_GetMainPixelmap(inputPicture, &pixelMap);
+    inputPicture = nullptr;
     
     if (pixelMap == nullptr) {
         LOGE("SetInputPixelmap");
     }
     ImageEffect_ErrorCode code = OH_ImageEffect_SetInputPixelmap(mImageEffect, pixelMap);
+    OH_PixelmapNative_Release(pixelMap);
     if (code != ImageEffect_ErrorCode::EFFECT_SUCCESS) {
         LOGE("ConfigRenderInfo SetInputPicture failed: %d", code);
         return false;
@@ -1570,6 +1583,7 @@ HmcRenderEffectPtr HmcRenderEngine::CopyParamToWatermark(HmcRenderLayerPtr &laye
     watermarkEffect->SetParam(PROJECT_KEY_TRANSFORM_RATIO_X, info->ratioX);
     watermarkEffect->SetParam(PROJECT_KEY_TRANSFORM_VIEWPORT_X, canvas.canvasWidth_);
     watermarkEffect->SetParam(PROJECT_KEY_TRANSFORM_VIEWPORT_Y, canvas.canvasHeight_);
+    delete info;
 
     return watermarkEffect;
 }

@@ -1045,13 +1045,13 @@ export struct PhotoBrowserView {
     this.appBroadCast.off(BroadCastConstants.EFFECT_MODE_SWITCH_CLICKED, this.onEffectModeSwitchClicked);
     this.appBroadCast.off(BroadCastConstants.DOWNLOAD_ORIGIN_PHOTO_RESULT,
       this.downloadOriginPhotoResultFunc);
-    // this.editorController?.release();
+    this.editorController?.release();
     this.appBroadCast.off(BroadCastConstants.SHOW_WALLPAPER, this.setShowWallpaper);
     this.getUIContext().getHostContext()?.eventHub.off(BroadCastConstants.PHOTO_BROWSER_ON_PAGE_SHOW,
       this.onPageShowFunc);
     this.getUIContext().getHostContext()?.eventHub.off(BroadCastConstants.PHOTO_BROWSER_ON_PAGE_HIDE,
       this.onPageHideFunc);
-    // this.browserController.dataSource?.releaseTempData();
+    this.browserController.dataSource?.releaseTempData();
     if (this.browserController.pixmap) {
       this.browserController.releasePixelMap();
       this.imageInfo = undefined;

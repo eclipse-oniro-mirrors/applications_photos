@@ -1799,8 +1799,8 @@ export struct ImageGridItemComponent {
   buildCachedImage() {
     MediaCachedImage(this.getActualImage())
       .sourceSize({
-        width: px2vp(Constants.GRID_IMAGE_SIZE),
-        height: px2vp(Constants.GRID_IMAGE_SIZE),
+        width: Constants.GRID_IMAGE_SIZE,
+        height: Constants.GRID_IMAGE_SIZE,
       })
       .draggable(false)
       .backgroundColor(this.imageBackgroundColor)

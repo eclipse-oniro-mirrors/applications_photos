@@ -56,7 +56,6 @@ applications_photos/
 ├── feature/                       # Business HSP/HAR modules
 ├── browserCommon/                 # Shared browsing logic
 ├── browserCommonPhone/            # Phone-specific browsing differences and controllers
-├── browserCommonPC/               # PC browsing side
 ├── imageEditor/                   # Image editing subproject
 ├── tools/                         # Utility module
 ├── demo/                          # Sample projects, such as PhotoPicker demo
@@ -65,8 +64,6 @@ applications_photos/
 ├── build-profile.json5            # Modules, SDK versions, signing configuration
 └── oh-package.json5               # Root dependencies; submodules also have their own oh-package.json5
 ```
-
-Directories marked with **★** are the locations where phone gallery feature changes are most concentrated.
 
 ### 2. Phone entry module `product/phone`
 
