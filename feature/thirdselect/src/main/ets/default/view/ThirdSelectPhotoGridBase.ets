@@ -2554,8 +2554,8 @@ export struct ThirdSelectPhotoGridBase {
     this.isSelectedMode = true;
     // 强制开启多选能力，以便在缩略图右下角展示多选框
     this.selectParams.isMultiPick = true;
-    // 开启显示选择顺序序号
-    this.selectParams.isShowSerialNum = true;
+    // 序号角标跟随入口 Want：半模态默认对勾；切相册时 param 可能是已污染的 selectParams，优先用原始 this.param
+    this.selectParams.isShowSerialNum = this.param?.isShowSerialNum ?? false;
     if (param != undefined && param.customColor != undefined) {
       this.selectParams.customColor = param?.customColor;
     }
@@ -2633,6 +2633,7 @@ export struct ThirdSelectPhotoGridBase {
     this.selectParams.isNeedSelectBar = param.isNeedSelectBar;
     this.selectParams.isNeedActionBar = param.isNeedActionBar;
     this.selectParams.isFromPickerView = param.isFromPickerView;
+    this.selectParams.isShowSerialNum = param.isShowSerialNum;
     this.selectParams.checkBoxColor = param.checkBoxColor;
     this.selectParams.checkboxTextColor = param.checkboxTextColor;
     this.selectParams.backgroundColor = param.backgroundColor;
