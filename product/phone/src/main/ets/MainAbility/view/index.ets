@@ -1971,6 +1971,11 @@ struct IndexPage {
         this.isShowSideBar = !this.isShowSideBar;
         ActionBarVar.isShowSideBar = this.isShowSideBar;
         this.appBroadCast.emit(BroadCastConstants.ON_SIDEBAR_CHANGED, [this.isShowSideBar]);
+        let sideBarViewModel: SideBarViewModel | undefined =
+          LocalStorage.getShared()?.get<SideBarViewModel>(SideBarViewModel.STORAGE_KEY);
+        if (sideBarViewModel) {
+          sideBarViewModel.status = this.isShowSideBar;
+        }
         if (DeviceInfo.isGRLFoldScreen()) {
           if (this.isShowSideBar) {
             LocalStorage.getShared()?.setOrCreate<number>(Constants.APP_KEY_GRL_IS_SHOW_SIDEBAR, SHOW_SIDEBAR);
